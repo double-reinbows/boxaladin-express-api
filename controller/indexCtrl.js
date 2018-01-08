@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken')
+const AWS = require('aws-sdk')
 
 const db = require('../models')
 const hash = require('../helpers/aladin_hash')
@@ -102,6 +103,7 @@ exports.signup = (req, res) => {
     }, process.env.JWT_SECRET)
     db.user.create(req.body)
     .then(data => {
+      // console.log('INI DATA.email >>>>>>>>>>>>>>>>>>> ', data.email);
       sendEmailVerification(data.email, data.email_token)
       let token = jwt.sign({username: data.username, email: data.email}, process.env.JWT_SECRET)
       res.send(token)
@@ -118,10 +120,44 @@ const sendEmailVerification = (email_address, email_token) => {
   // }, process.env.JWT_SECRET)
 
   // kirim link ${process.env.BA_API_HOST}/emailVerification?encoded=${email_token} via email ke email_address
+  AWS.config.update({region: 'us-west-2',
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+  });
+
+  const ses = new AWS.SES()
+  const params = {
+    Destination: {
+      ToAddresses: [email_address]
+    },
+    Message: {
+      Body: {
+        Html: {
+          Charset: 'UTF-8',
+          Data: `Click this link to verify your email address: ${process.env.BA_API_HOST}/emailVerification?encoded=${email_token}`
+        },
+        Text: {
+          Charset: 'UTF-8',
+          Data: `Click this link to verify your email address: ${process.env.BA_API_HOST}/emailVerification?encoded=${email_token}`
+        }
+      },
+      Subject: {
+        Charset: 'UTF-8',
+        Data: 'boxAladin email verification'
+      }
+    },
+    ReturnPath: "teza.harsony230394@gmail.com",
+    Source: "teza.harsony230394@gmail.com"
+  }
+  ses.sendEmail(params, (err, data) => {
+    if (err) console.log(err, err.stack)
+    else console.log(data)
+  })
 }
 
 exports.verifyEmail = (req, res) => {
   const decoded = jwt.verify(req.query.encoded, process.env.JWT_SECRET)
   // cari user data user yg email == decoded.email && username == decoded.username,
   // kemudian update status "email verified" = true
+  res.send(decoded)
 }
