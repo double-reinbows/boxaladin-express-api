@@ -4,6 +4,7 @@ const router = express.Router();
 const ctrl = require('../controller/indexCtrl')
 
 router.get('/', ctrl.getAll)
+router.get('/emailVerification', ctrl.verifyEmail)
 
 router.post('/signin', ctrl.signin)
 

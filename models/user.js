@@ -50,6 +50,10 @@ module.exports = function(sequelize, DataTypes) {
     },
     coin : {
       type: DataTypes.STRING,
+    },
+    emailVerificationStatus: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false
     }
   });
   return user;

@@ -44,7 +44,7 @@ exports.signin = (req, res) => {
   .then(user => {
     if (user.password.substr(6) === hashedPass.substr(6)) {
       console.log('signed in')
-      let token = jwt.sign({ username: user.username, email: user.email }, SECRET)
+      let token = jwt.sign({ username: user.username, email: user.email }, process.env.JWT_SECRET)
       res.send(token)
     } else {
       console.log('wrong pass')
@@ -92,10 +92,36 @@ exports.signup = (req, res) => {
     console.log('>registering...')
     gmailDotCheck(req.body)
     req.body.password = hash(req.body.password)
+    if (req.body.salt == null) {
+      req.body.salt = '12345'
+    }
+    req.body.emailVerificationStatus = false
+    req.body.email_token = jwt.sign({
+      email: req.body.email,
+      username: req.body.username
+    }, process.env.JWT_SECRET)
     db.user.create(req.body)
     .then(data => {
-      let token = jwt.sign({username: data.username, email: data.email}, SECRET)
+      sendEmailVerification(data.email, data.email_token)
+      let token = jwt.sign({username: data.username, email: data.email}, process.env.JWT_SECRET)
       res.send(token)
     })
   })
+}
+
+const sendEmailVerification = (email_address, email_token) => {
+  // const decoded = jwt.verify(req.body.token, process.env.JWT_SECRET)
+
+  // const email_token = jwt.sign({
+  //   email: decoded.email,
+  //   username: decoded.username
+  // }, process.env.JWT_SECRET)
+
+  // kirim link ${process.env.BA_API_HOST}/emailVerification?encoded=${email_token} via email ke email_address
+}
+
+exports.verifyEmail = (req, res) => {
+  const decoded = jwt.verify(req.query.encoded, process.env.JWT_SECRET)
+  // cari user data user yg email == decoded.email && username == decoded.username,
+  // kemudian update status "email verified" = true
 }
