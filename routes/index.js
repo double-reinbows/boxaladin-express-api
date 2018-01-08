@@ -1,20 +1,15 @@
-module.exports = function(app) {
-    
-  var notes = require('../controllers/note.controller.js');
-  var asd = require('../controllers/category')
+const express = require('express');
+const router = express.Router();
 
-  // Create a new Note
-  // app.post('/notes', notes.create);
+const ctrl = require('../controller/indexCtrl')
 
-  // Retrieve all Notes
-  app.get('/category', asd.list);
+router.get('/', ctrl.getAll)
 
-  // Retrieve a single Note with noteId
-  // app.get('/notes/:noteId', notes.findOne);
+router.post('/signin', ctrl.signin)
 
-  // Update a Note with noteId
-  // app.put('/notes/:noteId', notes.update);
+/**
+ * Endpoint post user data/info ketika signup
+ */
+router.post('/signup', ctrl.signup)
 
-  // Delete a Note with noteId
-  // app.delete('/notes/:noteId', notes.delete);
-}
+module.exports = router;
