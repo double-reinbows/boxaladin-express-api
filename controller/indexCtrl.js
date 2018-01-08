@@ -5,9 +5,33 @@ const hash = require('../helpers/aladin_hash')
 
 const SECRET = 'aradin'
 
+
+// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+/**
+ * Ini method buat cek dan convert format email Gmail
+ * antara alamat email yang dotted dan tidak.
+ * Dipindahin dari view/client, karena kalau ditaruh di sana malah ganggu.
+ * Kalau dianggap menggangu dan penuh-penuhin kalau ditaruh di sini,
+ * (dan memang tidak seharusnya) bisa dibikin jadi modul (helper)
+ * dan di-import disini atau di model (dimasukin hook),
+ * atau dimasukin langsung ke function signup.
+ * Saya pribadi prefer dibikin modul. Kalau dicampur langsung di
+ * function signup, function-nya jadi kepanjangan dan imo ga enak diliat.
+ */
+let gmailDotCheck = obj => {
+  let pattern = /(\w+)\.(\w+)@gmail.com/
+  if (pattern.test(obj.email)) {
+    obj.typed_email = obj.email
+    obj.email = obj.email.replace(pattern, `$1$2@gmail.com`)
+  }
+  return obj
+}
+// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+
 exports.getAll = (req, res) => {
   db.user.findAll({
-    order: [['username', 'ASC']]
+    order: [['username', 'ASC']],
   })
   .then(data => {
     res.send(data)
@@ -16,11 +40,11 @@ exports.getAll = (req, res) => {
 
 exports.signin = (req, res) => {
   let hashedPass = hash(req.body.password)
-  db.user.findOne({ where: { username: req.body.username }})
+  db.user.findOne({ where: { username: req.body.username } })
   .then(user => {
     if (user.password.substr(6) === hashedPass.substr(6)) {
       console.log('signed in')
-      let token = jwt.sign({username: user.username, email: user.email}, SECRET)
+      let token = jwt.sign({ username: user.username, email: user.email }, SECRET)
       res.send(token)
     } else {
       console.log('wrong pass')
@@ -30,10 +54,48 @@ exports.signin = (req, res) => {
 }
 
 exports.signup = (req, res) => {
-  req.body.password = hash(req.body.password)
-  db.user.create(req.body)
-  .then(data => {
-    let token = jwt.sign({username: data.username, email: data.email}, SECRET)
-    res.send(token)
+  /**
+   * Query pertama tujuannya untuk cek
+   * apakah username dan/atau email
+   * sudah ada yang pakai.
+   * Saya belum cek balikan dari
+   * sequelize seandainya user coba input suatu
+   * value yang sama ke kolom yang di-set isUnique.
+   * Kalau balikannya gampang, bisa dipakai buat simplifikasi
+   * kodingan di bawah.
+   */
+  console.log('>checking...')
+  db.user.findOne({
+    attributes: ['username', 'email'],
+    where: {$or: [{
+      username: req.body.username
+    },{
+      email: req.body.email
+    }]}
+  })
+  .then(found => {
+    if (found) {
+      let isUsed = {}
+      if (found.username === req.body.username) isUsed.username = true
+      if (found.email === req.body.email) isUsed.email = true
+      /**
+       * Di sini res.send()-nya pakai return. Jadi klo conditional ini
+       * dieksekusi, ga akan lanjut ke query signup
+       */
+      return res.send({isUsed})
+    }
+
+    /**
+     * username dan/atau email belum terdaftar.
+     * Lanjut ke registrasi (signup)
+     */
+    console.log('>registering...')
+    gmailDotCheck(req.body)
+    req.body.password = hash(req.body.password)
+    db.user.create(req.body)
+    .then(data => {
+      let token = jwt.sign({username: data.username, email: data.email}, SECRET)
+      res.send(token)
+    })
   })
 }
