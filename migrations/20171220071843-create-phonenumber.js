@@ -20,9 +20,13 @@ module.exports = {
         type: Sequelize.BOOLEAN,
         allowNull: false
       },
+      otp: {
+        type: Sequelize.INTEGER,
+        allowNull: false
+      },
       createdAt: {
-        allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        allowNull: false
       },
       updatedAt: {
         allowNull: false,
