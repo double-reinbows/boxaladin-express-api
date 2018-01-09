@@ -24,13 +24,24 @@ const sendSmsVerification = (phonenumber, otp) => {
       secretAccessKey: "wf4wH5dHOxIgpu49ifOZ1XrfSl3jBj+Q9ByC3ALK",
     });
   var sns = new AWS.SNS();
-  var params = {
+
+  var MessageType = {
+    attributes: {
+      'DefaultSMSType': 'Transactional',
+    }
+  };
+  sns.setSMSAttributes(MessageType, function(err, data) {
+    if (err) console.log(err, err.stack); // an error occurred
+    else     console.log(data);           // successful response
+  });
+
+  var Message = {
     Message: `box aladin OTP: ${otp}`,
     MessageStructure: 'string',
     PhoneNumber: `${phonenumber}`,
-    Subject: 'your subject'
-};
-  sns.publish(params, function(err, data) {
+    Subject: 'your subject',
+  }
+  sns.publish(Message, function(err, data) {
     if (err) console.log(err, err.stack); // an error occurred
     else     console.log(data);           // successful response
   });
