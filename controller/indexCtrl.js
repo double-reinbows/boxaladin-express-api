@@ -45,7 +45,7 @@ exports.signin = (req, res) => {
   .then(user => {
     if (user.password.substr(6) === hashedPass.substr(6)) {
       console.log('signed in')
-      let token = jwt.sign({ username: user.username, email: user.email }, process.env.JWT_SECRET)
+      let token = jwt.sign({ username: user.username, email: user.email, id: user.id }, process.env.JWT_SECRET)
       res.send(token)
     } else {
       console.log('wrong pass')
@@ -112,6 +112,14 @@ exports.signup = (req, res) => {
 }
 
 const sendEmailVerification = (email_address, email_token) => {
+  // const decoded = jwt.verify(req.body.token, process.env.JWT_SECRET)
+
+  // const email_token = jwt.sign({
+  //   email: decoded.email,
+  //   username: decoded.username
+  // }, process.env.JWT_SECRET)
+
+  // kirim link ${process.env.BA_API_HOST}/emailVerification?encoded=${email_token} via email ke email_address
   AWS.config.update({region: 'us-west-2',
     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
@@ -149,17 +157,7 @@ const sendEmailVerification = (email_address, email_token) => {
 
 exports.verifyEmail = (req, res) => {
   const decoded = jwt.verify(req.query.encoded, process.env.JWT_SECRET)
-  db.user.update({
-    emailVerificationStatus: true
-  }, {
-    where: {
-      $or: [{
-        username: decoded.username
-      }, {
-        email: decoded.email
-      }]
-    }
-  })
-  .then(result => res.send({message: 'verification success'}))
-  .catch(err => console.log(err))
+  // cari user data user yg email == decoded.email && username == decoded.username,
+  // kemudian update status "email verified" = true
+  res.send(decoded)
 }

@@ -56,5 +56,13 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false
     }
   });
+
+  user.associate = (models) => {
+     user.hasMany(models.phonenumber, {
+       foreignKey: 'userId',
+       as: 'phonenumbers',
+     });
+   };
+
   return user;
 };
