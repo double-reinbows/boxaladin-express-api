@@ -43,13 +43,27 @@ exports.signin = (req, res) => {
   let hashedPass = hash(req.body.password)
   db.user.findOne({ where: { username: req.body.username } })
   .then(user => {
-    if (user.password.substr(6) === hashedPass.substr(6)) {
-      console.log('signed in')
-      let token = jwt.sign({ username: user.username, email: user.email }, process.env.JWT_SECRET)
-      res.send(token)
-    } else {
-      console.log('wrong pass')
-      res.send('wrong password')
+    if (user == null) {
+      res.send({
+        message: 'username not found'
+      })
+    } else if (user.password.substr(6) === hashedPass.substr(6)) {
+      let token = jwt.sign({
+        username: user.username,
+        email: user.email,
+        first_name: user.first_name,
+        family_name: user.family_name,
+        sex: user.sex
+      }, process.env.JWT_SECRET)
+
+      res.send({
+        message: 'login success',
+        token: token
+      })
+    } else if (user.password.substr(6) !== hashedPass.substr(6)) {
+      res.send({
+        message: 'password incorrect'
+      })
     }
   })
 }
@@ -71,7 +85,8 @@ exports.signup = (req, res) => {
     where: {$or: [{
       username: req.body.username
     },{
-      email: req.body.email
+      email: req.body.email,
+      emailVerificationStatus: true
     }]}
   })
   .then(found => {
@@ -91,22 +106,33 @@ exports.signup = (req, res) => {
      * Lanjut ke registrasi (signup)
      */
     console.log('>registering...')
+
     gmailDotCheck(req.body)
+
     req.body.password = hash(req.body.password)
-    if (req.body.salt == null) {
-      req.body.salt = '12345'
-    }
+    var salt = Math.floor(Math.random() * 90000) + 10000
+    req.body.salt = salt
     req.body.emailVerificationStatus = false
+
     req.body.email_token = jwt.sign({
       email: req.body.email,
       username: req.body.username
     }, process.env.JWT_SECRET)
+
     db.user.create(req.body)
     .then(data => {
-      // console.log('INI DATA.email >>>>>>>>>>>>>>>>>>> ', data.email);
       sendEmailVerification(data.email, data.email_token)
-      let token = jwt.sign({username: data.username, email: data.email}, process.env.JWT_SECRET)
-      res.send(token)
+      var token = jwt.sign({
+        username: data.username,
+        email: data.email,
+        first_name: data.first_name,
+        family_name: data.family_name,
+        sex: data.sex
+      }, process.env.JWT_SECRET)
+      res.send({
+        message: 'register success',
+        token: token
+      })
     })
   })
 }
@@ -160,6 +186,6 @@ exports.verifyEmail = (req, res) => {
       }]
     }
   })
-  .then(result => res.send({message: 'verification success'}))
+  .then(result => res.send({ message: 'verification success' }))
   .catch(err => console.log(err))
 }
