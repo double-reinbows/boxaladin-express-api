@@ -11,6 +11,27 @@ exports.postPhoneNumber = (req, res) => {
     otp: randomOtp
   })
   .then(data => {
+    sendSmsVerification(data.number, data.otp)
     res.send(data)
   })
+}
+
+const sendSmsVerification = (phonenumber, otp) => {
+  var AWS = require('aws-sdk');
+    AWS.config.region = 'ap-southeast-1';
+    AWS.config.update({
+      accessKeyId: "AKIAICAYQENJJWW6OMIQ",
+      secretAccessKey: "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",
+    });
+  var sns = new AWS.SNS();
+  var params = {
+    Message: `box aladin OTP: ${otp}`,
+    MessageStructure: 'string',
+    PhoneNumber: `${phonenumber}`,
+    Subject: 'your subject'
+};
+  sns.publish(params, function(err, data) {
+    if (err) console.log(err, err.stack); // an error occurred
+    else     console.log(data);           // successful response
+  });
 }
