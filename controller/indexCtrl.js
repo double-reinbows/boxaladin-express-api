@@ -126,11 +126,11 @@ const sendEmailVerification = (email_address, email_token) => {
       Body: {
         Html: {
           Charset: 'UTF-8',
-          Data: `Click this link to verify your email address: ${process.env.BA_API_HOST}/emailVerification?encoded=${email_token}`
+          Data: `Click this link to verify your email address: ${process.env.BA_WEB_HOST}/emailVerification?encoded=${email_token}`
         },
         Text: {
           Charset: 'UTF-8',
-          Data: `Click this link to verify your email address: ${process.env.BA_API_HOST}/emailVerification?encoded=${email_token}`
+          Data: `Click this link to verify your email address: ${process.env.BA_WEB_HOST}/emailVerification?encoded=${email_token}`
         }
       },
       Subject: {
