@@ -4,19 +4,33 @@ const jwt = require('jsonwebtoken')
 exports.postPhoneNumber = (req, res) => {
   var randomOtp = Math.floor(Math.random()*900000) + 100000;
   var decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
-  db.phonenumber.create({
-    userId: decoded.id,
-    number: req.body.phonenumber,
-    verified: false,
-    otp: randomOtp
+
+  db.phonenumber.findAll({
+    where: {
+      userId: decoded.id
+    }
   })
-  .then(data => {
-    sendSmsVerification(data.number, data.otp)
-    res.send({
-      message: 'data added',
-      data: data
+  .then(result => {
+    var primaryStatus = null
+    result.length == 0 ? primaryStatus = true : primaryStatus = false
+
+    db.phonenumber.create({
+      userId: decoded.id,
+      number: req.body.phonenumber,
+      verified: false,
+      otp: randomOtp,
+      primary: primaryStatus
     })
+    .then(data => {
+      sendSmsVerification(data.number, data.otp)
+      res.send({
+        message: 'data added',
+        data: data
+      })
+    })
+    .catch(err => console.log(err))
   })
+  .catch(errCreate => console.log(errCreate))
 }
 
 const sendSmsVerification = (phonenumber, otp) => {
