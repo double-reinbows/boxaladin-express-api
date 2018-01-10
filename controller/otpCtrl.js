@@ -4,16 +4,35 @@ const jwt = require('jsonwebtoken')
 exports.postPhoneNumber = (req, res) => {
   var randomOtp = Math.floor(Math.random()*900000) + 100000;
   var decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
-  db.phonenumber.create({
-    userId: decoded.id,
-    number: req.body.phonenumber,
-    verified: false,
-    otp: randomOtp
+
+
+  db.phonenumber.findAll({
+    where : { userId : decoded.id }
   })
   .then(data => {
-    sendSmsVerification(data.number, data.otp)
-    res.send(data)
+    var primaryPhone = null
+    console.log(data.length);
+    if (data.length == 0) {
+      primaryPhone = true
+    } else {
+      primaryPhone = false
+    }
+
+    db.phonenumber.create({
+      userId: decoded.id,
+      number: req.body.phonenumber,
+      verified: false,
+      primary: primaryPhone,
+      otp: randomOtp
+    })
+    .then(data => {
+      sendSmsVerification(data.number, data.otp)
+      res.send(data)
+    })
+
   })
+
+
 }
 
 const sendSmsVerification = (phonenumber, otp) => {
@@ -27,7 +46,7 @@ const sendSmsVerification = (phonenumber, otp) => {
 
   var MessageType = {
     attributes: {
-      'DefaultSMSType': 'Transactional',
+      'DefaultSMSType': 'Transactional'
     }
   };
   sns.setSMSAttributes(MessageType, function(err, data) {
@@ -39,7 +58,6 @@ const sendSmsVerification = (phonenumber, otp) => {
     Message: `box aladin OTP: ${otp}`,
     MessageStructure: 'string',
     PhoneNumber: `${phonenumber}`,
-    Subject: 'your subject',
   }
   sns.publish(Message, function(err, data) {
     if (err) console.log(err, err.stack); // an error occurred

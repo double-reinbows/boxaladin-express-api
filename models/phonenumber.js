@@ -4,6 +4,7 @@ module.exports = function(sequelize, DataTypes) {
       userId: DataTypes.INTEGER,
       number: DataTypes.STRING,
       verified: DataTypes.BOOLEAN,
+      primary: DataTypes.BOOLEAN,
       otp: DataTypes.INTEGER
     });
 
