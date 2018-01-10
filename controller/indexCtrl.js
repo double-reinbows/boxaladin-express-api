@@ -49,6 +49,7 @@ exports.signin = (req, res) => {
       })
     } else if (user.password.substr(6) === hashedPass.substr(6)) {
       let token = jwt.sign({
+        id: user.id,
         username: user.username,
         email: user.email,
         first_name: user.first_name,
@@ -123,6 +124,7 @@ exports.signup = (req, res) => {
     .then(data => {
       sendEmailVerification(data.email, data.email_token)
       var token = jwt.sign({
+        id: data.id,
         username: data.username,
         email: data.email,
         first_name: data.first_name,
@@ -138,6 +140,14 @@ exports.signup = (req, res) => {
 }
 
 const sendEmailVerification = (email_address, email_token) => {
+  // const decoded = jwt.verify(req.body.token, process.env.JWT_SECRET)
+
+  // const email_token = jwt.sign({
+  //   email: decoded.email,
+  //   username: decoded.username
+  // }, process.env.JWT_SECRET)
+
+  // kirim link ${process.env.BA_API_HOST}/emailVerification?encoded=${email_token} via email ke email_address
   AWS.config.update({region: 'us-west-2',
     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
