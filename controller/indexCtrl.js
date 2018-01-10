@@ -138,6 +138,14 @@ exports.signup = (req, res) => {
 }
 
 const sendEmailVerification = (email_address, email_token) => {
+  // const decoded = jwt.verify(req.body.token, process.env.JWT_SECRET)
+
+  // const email_token = jwt.sign({
+  //   email: decoded.email,
+  //   username: decoded.username
+  // }, process.env.JWT_SECRET)
+
+  // kirim link ${process.env.BA_API_HOST}/emailVerification?encoded=${email_token} via email ke email_address
   AWS.config.update({region: 'us-west-2',
     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
