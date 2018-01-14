@@ -123,3 +123,24 @@ exports.verifyPhoneNumber = (req, res) => {
   })
   .catch(err => res.send(err))
 }
+exports.verifyVerified = (req, res) => {
+  db.phonenumber.findOne({
+    where: {
+      number: req.body.number
+    }
+  })
+  .then(result =>{
+    if(!result.verified) {
+      res.send({ 
+        verified: false,
+        hp: "no hp yang anda masukkan belum terverifikasi"  
+      });
+      return;
+    }
+    res.send({ 
+      verified: true ,
+      hp: "no hp terverifikasi"});
+  })
+  .catch(err => res.send(err))
+  
+} 
