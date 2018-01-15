@@ -3,22 +3,22 @@
 module.exports = {
   up : function (queryInterface, Sequelize) {
     return queryInterface.bulkInsert('categories', [{
-      category : 'Pulsa',
+      categoryName : 'Pulsa',
       createdAt : new Date(),
       updatedAt : new Date(),
     },
     {
-      category : 'Paket Data',
+      categoryName : 'Paket Data',
       createdAt : new Date(),
       updatedAt : new Date(),
     },
     {
-      category : 'Voucher Game',
+      categoryName : 'Voucher Game',
       createdAt : new Date(),
       updatedAt : new Date(),
     },
     {
-      category : 'Voucher Hiburan',
+      categoryName : 'Voucher Hiburan',
       createdAt : new Date(),
       updatedAt : new Date(),
     },], {});
@@ -26,22 +26,22 @@ module.exports = {
 
   down : function (queryInterface, Sequelize) {
     queryInterface.bulkDelete('categories', [{
-      category : 'Pulsa',
+      categoryName : 'Pulsa',
       createdAt : new Date(),
       updatedAt : new Date(),
     },
     {
-      category : 'Paket Data',
+      categoryName : 'Paket Data',
       createdAt : new Date(),
       updatedAt : new Date(),
     },
     {
-      category : 'Voucher Game',
+      categoryName : 'Voucher Game',
       createdAt : new Date(),
       updatedAt : new Date(),
     },
     {
-      category : 'Voucher Hiburan',
+      categoryName : 'Voucher Hiburan',
       createdAt : new Date(),
       updatedAt : new Date(),
     },], {});

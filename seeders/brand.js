@@ -3,57 +3,57 @@
 module.exports = {
   up : function (queryInterface, Sequelize) {
     return queryInterface.bulkInsert('brands', [{
-      brand : 'Telkomsel',
+      brandName : 'Telkomsel',
       createdAt : new Date(),
       updatedAt : new Date(),
     },
     {
-      brand : 'XL',
+      brandName : 'XL',
       createdAt : new Date(),
       updatedAt : new Date(),
     },
     {
-      brand : 'Indosat',
+      brandName : 'Indosat',
       createdAt : new Date(),
       updatedAt : new Date(),
     },
     {
-      brand : 'Tri',
+      brandName : 'Tri',
       createdAt : new Date(),
       updatedAt : new Date(),
     },
     {
-      brand : 'Axis',
+      brandName : 'Axis',
       createdAt : new Date(),
       updatedAt : new Date(),
     },
     {
-      brand : 'Smartfren',
+      brandName : 'Smartfren',
       createdAt : new Date(),
       updatedAt : new Date(),
     },
     {
-      brand : 'Bolt',
+      brandName : 'Bolt',
       createdAt : new Date(),
       updatedAt : new Date(),
     },
     {
-      brand : 'Garena',
+      brandName : 'Garena',
       createdAt : new Date(),
       updatedAt : new Date(),
     },
     {
-      brand : 'Steam',
+      brandName : 'Steam',
       createdAt : new Date(),
       updatedAt : new Date(),
     },
     {
-      brand : 'McDonald',
+      brandName : 'McDonald',
       createdAt : new Date(),
       updatedAt : new Date(),
     },
     {
-      brand : 'Carrefour',
+      brandName : 'Carrefour',
       createdAt : new Date(),
       updatedAt : new Date(),
     }], {});
@@ -61,57 +61,57 @@ module.exports = {
 
   down : function (queryInterface, Sequelize) {
     queryInterface.bulkDelete('brands', [{
-      brand : 'Telkomsel',
+      brandName : 'Telkomsel',
       createdAt : new Date(),
       updatedAt : new Date(),
     },
     {
-      brand : 'XL',
+      brandName : 'XL',
       createdAt : new Date(),
       updatedAt : new Date(),
     },
     {
-      brand : 'Indosat',
+      brandName : 'Indosat',
       createdAt : new Date(),
       updatedAt : new Date(),
     },
     {
-      brand : 'Tri',
+      brandName : 'Tri',
       createdAt : new Date(),
       updatedAt : new Date(),
     },
     {
-      brand : 'Axis',
+      brandName : 'Axis',
       createdAt : new Date(),
       updatedAt : new Date(),
     },
     {
-      brand : 'Smartfren',
+      brandName : 'Smartfren',
       createdAt : new Date(),
       updatedAt : new Date(),
     },
     {
-      brand : 'Bolt',
+      brandName : 'Bolt',
       createdAt : new Date(),
       updatedAt : new Date(),
     },
     {
-      brand : 'Garena',
+      brandName : 'Garena',
       createdAt : new Date(),
       updatedAt : new Date(),
     },
     {
-      brand : 'Steam',
+      brandName : 'Steam',
       createdAt : new Date(),
       updatedAt : new Date(),
     },
     {
-      brand : 'McDonald',
+      brandName : 'McDonald',
       createdAt : new Date(),
       updatedAt : new Date(),
     },
     {
-      brand : 'Carrefour',
+      brandName : 'Carrefour',
       createdAt : new Date(),
       updatedAt : new Date(),
     }], {});
