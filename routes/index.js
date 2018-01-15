@@ -7,7 +7,6 @@ const phoneHelper = require('../helpers/phone')
 
 const categoryController = require('../controller/category')
 const brandController = require('../controller/brand')
-const priceController = require('../controller/price')
 const productController = require('../controller/product')
 
 router.get('/', ctrl.getAll)
@@ -16,7 +15,7 @@ router.get('/phoneNumbers', phoneCtrl.getPhoneByUser)
 
 // checking verified or not in product page
 router.post('/verifyNumber', phoneCtrl.verifyVerified)
-router.get('/getPhone/:id', phoneCtrl.phoneId)
+router.get('/getPhone/', phoneCtrl.phoneId)
 // -----------------------------------------------
 
 router.post('/phoneVerification', phoneCtrl.verifyPhoneNumber)
@@ -40,12 +39,6 @@ router.get('/api/brand/:id', brandController.retrieve);
 router.post('/api/brand', brandController.create);
 router.put('/api/brand/:id', brandController.update);
 router.delete('/api/brand/:id', brandController.destroy);
-
-router.get('/api/price', priceController.list);
-router.get('/api/price/:id', priceController.retrieve);
-router.post('/api/price', priceController.create);
-router.put('/api/price/:id', priceController.update);
-router.delete('/api/price/:id', priceController.destroy);
 
 router.get('/api/product', productController.list);
 router.get('/api/product/:id', productController.retrieve);

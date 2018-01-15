@@ -8,15 +8,31 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      categoryid: {
+      categoryId: {
         type: Sequelize.INTEGER,
         allowNull: false
       },
-      brandid: {
+      brandId: {
         type: Sequelize.INTEGER,
         allowNull: false
       },
-      priceid: {
+      productName: {
+        type: Sequelize.STRING,
+        allowNull: false
+      },
+      description: {
+        type: Sequelize.STRING,
+        allowNull: true
+      },
+      stock: {
+        type: Sequelize.INTEGER,
+        allowNull: true
+      },
+      price: {
+        type: Sequelize.INTEGER,
+        allowNull: false
+      },
+      aladinPrice: {
         type: Sequelize.INTEGER,
         allowNull: false
       },
