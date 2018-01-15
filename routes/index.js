@@ -9,6 +9,12 @@ const categoryController = require('../controller/category')
 const brandController = require('../controller/brand')
 const productController = require('../controller/product')
 
+const firebaseHelper = require('../helpers/firebase')
+const aladinController = require('../controller/aladin')
+
+router.post('/unlockPrice', aladinController.decreaseAladinPrice)
+router.get('/firebase', firebaseHelper.syncToFirebase)
+
 router.get('/allPhone', phoneCtrl.all)
 router.get('/', ctrl.getAll)
 router.get('/emailVerification', ctrl.verifyEmail)

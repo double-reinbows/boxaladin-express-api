@@ -6,6 +6,18 @@ var cors = require('cors')
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 require('dotenv').config()
+var firebase = require('firebase')
+
+// Initialize Firebase
+var config = {
+  apiKey: "AIzaSyD384SUrkibh_5ht78CLR_Fttc7k945sO8",
+  authDomain: "kanban-irianto.firebaseapp.com",
+  databaseURL: "https://kanban-irianto.firebaseio.com",
+  projectId: "kanban-irianto",
+  storageBucket: "kanban-irianto.appspot.com",
+  messagingSenderId: "231233131978"
+};
+firebase.initializeApp(config);
 
 var index = require('./routes/index');
 var users = require('./routes/users');

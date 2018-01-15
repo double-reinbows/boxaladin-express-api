@@ -43,7 +43,7 @@ exports.signin = (req, res) => {
   let hashedPass = hash(req.body.password)
   db.user.findOne({ where: { username: req.body.username } })
   .then(user => {
-    console.log(user);  
+    console.log(user);
     if (user == null) {
       res.send({
         message: 'username not found'
@@ -115,6 +115,7 @@ exports.signup = (req, res) => {
     var salt = Math.floor(Math.random() * 90000) + 10000
     req.body.salt = salt
     req.body.emailVerificationStatus = false
+    req.body.aladin_keys = 5
 
     req.body.email_token = jwt.sign({
       email: req.body.email,
