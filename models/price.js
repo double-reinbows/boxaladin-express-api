@@ -5,6 +5,10 @@ module.exports = (sequelize, DataTypes) => {
       primaryKey: true,
       autoIncrement: true,
       type:DataTypes.INTEGER,
+    },
+    priceid: {
+      type: Sequelize.INTEGER,
+      allowNull: false
     },    
     price: DataTypes.INTEGER
   }, {

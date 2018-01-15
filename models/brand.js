@@ -6,6 +6,10 @@ module.exports = (sequelize, DataTypes) => {
       autoIncrement: true,
       type:DataTypes.INTEGER,
     },
+      brandid: {
+        type: Sequelize.INTEGER,
+        allowNull: false
+      },
     brand: DataTypes.STRING
   }, {
     classMethods: {

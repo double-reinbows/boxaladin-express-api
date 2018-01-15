@@ -6,6 +6,10 @@ module.exports = (sequelize, DataTypes) => {
       autoIncrement: true,
       type:DataTypes.INTEGER,
     },
+    categoryid: {
+      type: Sequelize.INTEGER,
+      allowNull: false
+    },
     category: DataTypes.STRING
   }, {
     classMethods: {
