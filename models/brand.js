@@ -6,11 +6,11 @@ module.exports = (sequelize, DataTypes) => {
       autoIncrement: true,
       type:DataTypes.INTEGER,
     },
-    brand: DataTypes.STRING
+    brandName: DataTypes.STRING
   }, {
     classMethods: {
       associate: function(models) {
-        brand.belongsTo(models.product, {
+        brand.hasMany(models.product, {
           foreignkey: 'brandid'
         })
       }

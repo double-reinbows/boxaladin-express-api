@@ -6,24 +6,25 @@ module.exports = (sequelize, DataTypes) => {
       autoIncrement: true,
       type:DataTypes.INTEGER,
     },
-    categoryid: DataTypes.INTEGER,
-    brandid: DataTypes.INTEGER,
-    priceid: DataTypes.INTEGER
+    categoryId:DataTypes.INTEGER,
+    brandId:DataTypes.INTEGER,
+    productName:DataTypes.STRING,
+    description:DataTypes.STRING,
+    stock:DataTypes.INTEGER,
+    price:DataTypes.INTEGER,
+    aladinPrice:DataTypes.INTEGER
   }, {
     classMethods: {
       associate: function(models) {
-        product.hasMany(models.category, {
+        product.belongsTo(models.category, {
           foreignKey: 'categoryid',
           as: 'category'
         });
-        product.hasMany(models.brand, {
+        product.belongsTo(models.brand, {
           foreignKey: 'brandid',
           as: 'brand'
         });
-        product.hasMany(models.price, {
-          foreignKey: 'priceid',
-          as: 'price'
-        });      }
+      }
     }
   });
   return product;
