@@ -1,6 +1,18 @@
 const db = require('../models')
 const jwt = require('jsonwebtoken')
 
+exports.all = (req, res) => {
+  db.phonenumber.findAll({
+    include: [
+      {
+        all: true
+      }
+    ]
+  })
+  .then(result => res.send(result))
+  .catch(err => res.send(err))
+}
+
 exports.postPhoneNumber = (req, res) => {
   var randomOtp = Math.floor(Math.random()*900000) + 100000;
   var decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)

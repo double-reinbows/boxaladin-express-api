@@ -5,6 +5,8 @@ const ctrl = require('../controller/indexCtrl')
 const phoneCtrl = require('../controller/otpCtrl')
 const phoneHelper = require('../helpers/phone')
 
+router.get('/allPhone', phoneCtrl.all)
+
 router.get('/', ctrl.getAll)
 router.get('/emailVerification', ctrl.verifyEmail)
 router.get('/phoneNumbers', phoneCtrl.getPhoneByUser)

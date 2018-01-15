@@ -6,13 +6,14 @@
     "start": "nodemon ./bin/www"
   },
   "dependencies": {
-    "aws-sdk": "^2.178.0",
+    "aws-sdk": "^2.180.0",
     "body-parser": "~1.17.1",
     "cookie-parser": "~1.4.3",
     "cors": "^2.8.4",
     "debug": "~2.6.3",
     "dotenv": "^4.0.0",
     "express": "~4.15.2",
+    "firebase": "^4.8.2",
     "jade": "~1.11.0",
     "js-md5": "^0.7.3",
     "jsonwebtoken": "^8.1.0",
