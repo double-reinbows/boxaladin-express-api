@@ -58,11 +58,11 @@ module.exports = function(sequelize, DataTypes) {
   });
 
   user.associate = (models) => {
-     user.hasMany(models.phonenumber, {
-       foreignKey: 'userId',
-       as: 'phonenumbers',
-     });
-   };
+    user.hasMany(models.phonenumber, {
+      foreignKey: 'userId',
+      as: 'phonenumbers',
+    });
+  };
 
   return user;
 };

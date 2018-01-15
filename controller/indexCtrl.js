@@ -43,6 +43,7 @@ exports.signin = (req, res) => {
   let hashedPass = hash(req.body.password)
   db.user.findOne({ where: { username: req.body.username } })
   .then(user => {
+    console.log(user);  
     if (user == null) {
       res.send({
         message: 'username not found'
