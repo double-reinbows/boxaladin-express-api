@@ -2,8 +2,12 @@ const product = require('../models').product;
 
 module.exports = {
   list(req, res) {
-    return product.findAll()
-      .then(data => res.status(201).send(data))
+    return product.findAll({
+      include: [
+        { all: true }
+      ]
+    })
+      .then(data => res.send(data))
       .catch(err => res.status(400).send(err));
   },
   retrieve(req, res) {

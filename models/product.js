@@ -13,19 +13,18 @@ module.exports = (sequelize, DataTypes) => {
     stock:DataTypes.INTEGER,
     price:DataTypes.INTEGER,
     aladinPrice:DataTypes.INTEGER
-  }, {
-    classMethods: {
-      associate: function(models) {
-        product.belongsTo(models.category, {
-          foreignKey: 'categoryid',
-          as: 'category'
-        });
-        product.belongsTo(models.brand, {
-          foreignKey: 'brandid',
-          as: 'brand'
-        });
-      }
-    }
   });
+
+  product.associate = (models) => {
+    product.belongsTo(models.brand, {
+      foreignKey: 'brandId',
+      onDelete: 'CASCADE',
+    }),
+    product.belongsTo(models.category, {
+      foreignKey: 'categoryId',
+      onDelete: 'CASCADE',
+    })
+  };
+
   return product;
 };
