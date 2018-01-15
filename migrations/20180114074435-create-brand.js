@@ -8,10 +8,6 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      brandid: {
-        type: Sequelize.INTEGER,
-        allowNull: false
-      },
       brand: {
         type: Sequelize.STRING
       },
