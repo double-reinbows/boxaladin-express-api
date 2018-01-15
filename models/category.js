@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
     classMethods: {
       associate: function(models) {
         category.belongsTo(models.product, {
-          foreignkey: 'id'
+          foreignkey: 'categoryid'
         })
       }
     }

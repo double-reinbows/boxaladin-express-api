@@ -4,7 +4,6 @@ const router = express.Router();
 const ctrl = require('../controller/indexCtrl')
 const phoneCtrl = require('../controller/otpCtrl')
 const phoneHelper = require('../helpers/phone')
-// .....................................................
 
 const categoryController = require('../controller/category')
 const brandController = require('../controller/brand')
@@ -14,8 +13,11 @@ const productController = require('../controller/product')
 router.get('/', ctrl.getAll)
 router.get('/emailVerification', ctrl.verifyEmail)
 router.get('/phoneNumbers', phoneCtrl.getPhoneByUser)
-// ........................................................
-router.post('/phoneNumbers', phoneCtrl.verifyVerified)
+
+// checking verified or not in product page
+router.post('/verifyNumber', phoneCtrl.verifyVerified)
+router.get('/getPhone/:id', phoneCtrl.phoneId)
+// -----------------------------------------------
 
 router.post('/phoneVerification', phoneCtrl.verifyPhoneNumber)
 router.post('/signin', ctrl.signin)

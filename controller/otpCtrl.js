@@ -123,14 +123,18 @@ exports.verifyPhoneNumber = (req, res) => {
   })
   .catch(err => res.send(err))
 }
+
+// ----------------------------verifying phone id for product-----------------------
 exports.verifyVerified = (req, res) => {
   db.phonenumber.findOne({
     where: {
-      number: req.body.number
+      number: req.body.number,
+      verified: true,
     }
   })
   .then(result =>{
-    if(!result.verified) {
+    console.log(result)
+    if(!result) {
       res.send({ 
         verified: false,
         hp: "no hp yang anda masukkan belum terverifikasi"  
@@ -143,4 +147,16 @@ exports.verifyVerified = (req, res) => {
   })
   .catch(err => res.send(err))
   
-} 
+}
+
+exports.phoneId = (req, res) => {
+  db.phonenumber.findOne({
+    where: {
+      userId: req.params.id,
+      primary: true,
+    }
+  })
+  .then(result => res.send(result))
+  .catch(err => console.log(err))
+}
+// -----------------------------------------------------------------------------------------

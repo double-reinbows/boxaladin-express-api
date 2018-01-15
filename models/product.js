@@ -13,15 +13,15 @@ module.exports = (sequelize, DataTypes) => {
     classMethods: {
       associate: function(models) {
         product.hasMany(models.category, {
-          foreignKey: 'id',
+          foreignKey: 'categoryid',
           as: 'category'
         });
         product.hasMany(models.brand, {
-          foreignKey: 'id',
+          foreignKey: 'brandid',
           as: 'brand'
         });
         product.hasMany(models.price, {
-          foreignKey: 'id',
+          foreignKey: 'priceid',
           as: 'price'
         });      }
     }
