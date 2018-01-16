@@ -7,7 +7,9 @@ module.exports = {
 		const decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
 		db.user.findById(decoded.id)
 		.then(user => {
-			user.aladin_keys <= 0 ? res.send({ message: 'not enough aladin key'}) : null
+			if (user.aladin_keys <= 0) {
+				return res.send({ message: 'not enough aladin key'})
+			}
 
 			user.update({
 				aladin_keys: user.aladin_keys - 1
