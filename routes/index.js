@@ -47,6 +47,7 @@ router.post('/api/brand', brandController.create);
 router.put('/api/brand/:id', brandController.update);
 router.delete('/api/brand/:id', brandController.destroy);
 
+router.get('/api/product/filter', productController.filter);
 router.get('/api/product', productController.list);
 router.get('/api/product/:id', productController.retrieve);
 router.post('/api/product', productController.create);
