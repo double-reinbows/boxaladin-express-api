@@ -13,9 +13,9 @@ router.get('/', ctrl.getAll)
 router.get('/emailVerification', ctrl.verifyEmail)
 router.get('/phoneNumbers', phoneCtrl.getPhoneByUser)
 
-// checking verified or not in product page
+// checking phone number verified or not in product page
 router.post('/verifyNumber', phoneCtrl.verifyVerified)
-router.get('/getPhone/', phoneCtrl.phoneId)
+router.get('/getPhone/:id', phoneCtrl.phoneId)
 // -----------------------------------------------
 
 router.post('/phoneVerification', phoneCtrl.verifyPhoneNumber)
