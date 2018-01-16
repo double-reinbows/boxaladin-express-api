@@ -113,6 +113,7 @@ exports.signup = (req, res) => {
 
     req.body.password = hash(req.body.password)
     var salt = Math.floor(Math.random() * 90000) + 10000
+    var randomOtp = Math.floor(Math.random()*900000) + 100000;
     req.body.salt = salt
     req.body.emailVerificationStatus = false
     req.body.aladin_keys = 5
@@ -133,9 +134,18 @@ exports.signup = (req, res) => {
         family_name: data.family_name,
         sex: data.sex
       }, process.env.JWT_SECRET)
-      res.send({
-        message: 'register success',
-        token: token
+      db.phonenumber.create({
+        userId: data.id,
+        number: req.body.phonenumber,
+        verified: false,
+        otp:randomOtp,
+        primary:true
+      })
+      .then(result => {
+        res.send({
+          message: 'register success',
+          token: token
+        })
       })
     })
   })
