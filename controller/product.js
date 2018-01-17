@@ -1,4 +1,5 @@
 const product = require('../models').product;
+const firebase = require('firebase')
 
 module.exports = {
   filter(req, res) {
@@ -79,7 +80,32 @@ module.exports = {
         price: req.body.price,
         aladinPrice: req.body.price
       })
-      .then(data => res.status(201).send(data))
+      .then(data => {
+        console.log(data);
+        product.findOne({
+          where: {
+            id: data.id
+          },
+          include: [
+            { all: true }
+          ]
+        })
+        .then(result => {
+          const productsRef = firebase.database().ref().child('products')
+  				productsRef.child(result.id).set({
+  					id: result.id,
+  					productName: result.productName,
+  					price: result.price,
+  					aladinPrice: result.aladinPrice,
+  					brand: result.brand.brandName,
+  					category: result.category.categoryName,
+  					brandId: result.brand.id,
+  					categoryId: result.category.id
+  				})
+
+          res.status(201).send(data)
+        })
+      })
       .catch(err => res.status(400).send(err));
   },
   update(req, res) {

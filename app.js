@@ -10,12 +10,12 @@ var firebase = require('firebase')
 
 // Initialize Firebase
 var config = {
-  apiKey: "AIzaSyD384SUrkibh_5ht78CLR_Fttc7k945sO8",
-  authDomain: "kanban-irianto.firebaseapp.com",
-  databaseURL: "https://kanban-irianto.firebaseio.com",
-  projectId: "kanban-irianto",
-  storageBucket: "kanban-irianto.appspot.com",
-  messagingSenderId: "231233131978"
+  apiKey: "AIzaSyDjiWTez3r_lZreCZUvIUhaSj8-rIWfhgw",
+  authDomain: "boxaladin-auction.firebaseapp.com",
+  databaseURL: "https://boxaladin-auction.firebaseio.com",
+  projectId: "boxaladin-auction",
+  storageBucket: "boxaladin-auction.appspot.com",
+  messagingSenderId: "912503242137"
 };
 firebase.initializeApp(config);
 
