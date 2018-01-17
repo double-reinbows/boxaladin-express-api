@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 
+// const balanceController = require('../controller/balance')
+
 const ctrl = require('../controller/indexCtrl')
 const phoneCtrl = require('../controller/otpCtrl')
 const phoneHelper = require('../helpers/phone')
@@ -19,6 +21,8 @@ router.get('/allPhone', phoneCtrl.all)
 router.get('/', ctrl.getAll)
 router.get('/emailVerification', ctrl.verifyEmail)
 router.get('/phoneNumbers', phoneCtrl.getPhoneByUser)
+
+// router.get('/balance', balanceController.list)
 
 // checking verified or not in product page
 router.post('/verifyNumber', phoneCtrl.verifyVerified)
