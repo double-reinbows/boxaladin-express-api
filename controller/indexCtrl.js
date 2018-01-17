@@ -54,7 +54,8 @@ exports.signin = (req, res) => {
           email: user.email,
           first_name: user.first_name,
           family_name: user.family_name,
-          sex: user.sex
+          sex: user.sex,
+          emailVerificationStatus: user.emailVerificationStatus
         },
         process.env.JWT_SECRET
       )
@@ -236,3 +237,40 @@ exports.verifyEmail = (req, res) => {
     .then(result => res.send({message: 'verification success'}))
     .catch(err => console.log(err))
 }
+
+
+// ----------------------------verifying phone id for product-----------------------
+exports.verifyVerified = (req, res) => {
+  db.user.findOne({
+    where: {
+      email: req.body.email,
+      emailVerificationStatus: true,
+    }
+  })
+  .then(result =>{
+    console.log(result)
+    if(!result) {
+      res.send({
+        emailVerificationStatus: false,
+      });
+      return;
+    }
+    res.send({
+      emailVerificationStatus: true ,
+      });
+  })
+  .catch(err => res.send(err))
+
+}
+
+exports.emailId = (req, res) => {
+  db.user.findOne({
+    where: {
+      id: req.params.id,
+      email: req.body.email,
+    }
+  })
+  .then(result => res.send(result))
+  .catch(err => console.log(err))
+}
+// -----------------------------------------------------------------------------------------
