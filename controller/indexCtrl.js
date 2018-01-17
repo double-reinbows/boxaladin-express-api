@@ -6,7 +6,6 @@ const hash = require('../helpers/aladin_hash')
 
 const SECRET = 'aradin'
 
-
 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 /**
  * Ini method buat cek dan convert format email Gmail
@@ -29,34 +28,36 @@ let gmailDotCheck = obj => {
 }
 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-
 exports.getAll = (req, res) => {
-  db.user.findAll({
-    order: [['username', 'ASC']],
-  })
-  .then(data => {
-    res.send(data)
-  })
+  db.user
+    .findAll({
+      order: [['username', 'ASC']]
+    })
+    .then(data => {
+      res.send(data)
+    })
 }
 
 exports.signin = (req, res) => {
   let hashedPass = hash(req.body.password)
-  db.user.findOne({ where: { username: req.body.username } })
-  .then(user => {
-    console.log(user);
+  db.user.findOne({where: {username: req.body.username}}).then(user => {
+    console.log(user)
     if (user == null) {
       res.send({
         message: 'username not found'
       })
     } else if (user.password.substr(6) === hashedPass.substr(6)) {
-      let token = jwt.sign({
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        first_name: user.first_name,
-        family_name: user.family_name,
-        sex: user.sex
-      }, process.env.JWT_SECRET)
+      let token = jwt.sign(
+        {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          first_name: user.first_name,
+          family_name: user.family_name,
+          sex: user.sex
+        },
+        process.env.JWT_SECRET
+      )
 
       res.send({
         message: 'login success',
@@ -82,63 +83,85 @@ exports.signup = (req, res) => {
    * kodingan di bawah.
    */
   console.log('>checking...')
-  db.user.findOne({
-    attributes: ['username', 'email'],
-    where: {$or: [{
-      username: req.body.username
-    },{
-      email: req.body.email,
-      emailVerificationStatus: true
-    }]}
-  })
-  .then(found => {
-    if (found) {
-      let isUsed = {}
-      if (found.username === req.body.username) isUsed.username = true
-      if (found.email === req.body.email) isUsed.email = true
+  db.user
+    .findOne({
+      attributes: ['username', 'email'],
+      where: {
+        $or: [
+          {
+            username: req.body.username
+          },
+          {
+            email: req.body.email,
+            emailVerificationStatus: true
+          }
+        ]
+      }
+    })
+    .then(found => {
+      if (found) {
+        let isUsed = {}
+        if (found.username === req.body.username) isUsed.username = true
+        if (found.email === req.body.email) isUsed.email = true
+        /**
+         * Di sini res.send()-nya pakai return. Jadi klo conditional ini
+         * dieksekusi, ga akan lanjut ke query signup
+         */
+        return res.send({isUsed})
+      }
+
       /**
-       * Di sini res.send()-nya pakai return. Jadi klo conditional ini
-       * dieksekusi, ga akan lanjut ke query signup
+       * username dan/atau email belum terdaftar.
+       * Lanjut ke registrasi (signup)
        */
-      return res.send({isUsed})
-    }
+      console.log('>registering...')
 
-    /**
-     * username dan/atau email belum terdaftar.
-     * Lanjut ke registrasi (signup)
-     */
-    console.log('>registering...')
+      gmailDotCheck(req.body)
 
-    gmailDotCheck(req.body)
+      req.body.password = hash(req.body.password)
+      var salt = Math.floor(Math.random() * 90000) + 10000
+      var randomOtp = Math.floor(Math.random() * 900000) + 100000
+      req.body.salt = salt
+      req.body.emailVerificationStatus = false
+      req.body.aladin_keys = 5
 
-    req.body.password = hash(req.body.password)
-    var salt = Math.floor(Math.random() * 90000) + 10000
-    req.body.salt = salt
-    req.body.emailVerificationStatus = false
-    req.body.aladin_keys = 5
+      req.body.email_token = jwt.sign(
+        {
+          email: req.body.email,
+          username: req.body.username
+        },
+        process.env.JWT_SECRET
+      )
 
-    req.body.email_token = jwt.sign({
-      email: req.body.email,
-      username: req.body.username
-    }, process.env.JWT_SECRET)
-
-    db.user.create(req.body)
-    .then(data => {
-      sendEmailVerification(data.email, data.email_token)
-      var token = jwt.sign({
-        id: data.id,
-        username: data.username,
-        email: data.email,
-        first_name: data.first_name,
-        family_name: data.family_name,
-        sex: data.sex
-      }, process.env.JWT_SECRET)
-      res.send({
-        message: 'register success',
-        token: token
+      db.user.create(req.body).then(data => {
+        sendEmailVerification(data.email, data.email_token)
+        var token = jwt.sign(
+          {
+            id: data.id,
+            username: data.username,
+            email: data.email,
+            first_name: data.first_name,
+            family_name: data.family_name,
+            sex: data.sex
+          },
+          process.env.JWT_SECRET
+        )
+        db.phonenumber
+          .create({
+            userId: data.id,
+            number: req.body.phonenumber,
+            verified: false,
+            otp: randomOtp,
+            primary: true
+          })
+          .then(result => {
+            res.send({
+              message: 'register success',
+              token: token
+            })
+          })
       })
     })
-  })
 }
 
 const sendEmailVerification = (email_address, email_token) => {
@@ -150,10 +173,11 @@ const sendEmailVerification = (email_address, email_token) => {
   // }, process.env.JWT_SECRET)
 
   // kirim link ${process.env.BA_API_HOST}/emailVerification?encoded=${email_token} via email ke email_address
-  AWS.config.update({region: 'us-west-2',
+  AWS.config.update({
+    region: 'us-west-2',
     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
-  });
+  })
 
   const ses = new AWS.SES()
   const params = {
@@ -164,11 +188,15 @@ const sendEmailVerification = (email_address, email_token) => {
       Body: {
         Html: {
           Charset: 'UTF-8',
-          Data: `Click this link to verify your email address: ${process.env.BA_WEB_HOST}/emailVerification?encoded=${email_token}`
+          Data: `Click this link to verify your email address: ${
+            process.env.BA_WEB_HOST
+          }/emailVerification?encoded=${email_token}`
         },
         Text: {
           Charset: 'UTF-8',
-          Data: `Click this link to verify your email address: ${process.env.BA_WEB_HOST}/emailVerification?encoded=${email_token}`
+          Data: `Click this link to verify your email address: ${
+            process.env.BA_WEB_HOST
+          }/emailVerification?encoded=${email_token}`
         }
       },
       Subject: {
@@ -176,8 +204,8 @@ const sendEmailVerification = (email_address, email_token) => {
         Data: 'boxAladin email verification'
       }
     },
-    ReturnPath: "teza.harsony230394@gmail.com",
-    Source: "teza.harsony230394@gmail.com"
+    ReturnPath: 'teza.harsony230394@gmail.com',
+    Source: 'teza.harsony230394@gmail.com'
   }
   ses.sendEmail(params, (err, data) => {
     if (err) console.log(err, err.stack)
@@ -187,17 +215,24 @@ const sendEmailVerification = (email_address, email_token) => {
 
 exports.verifyEmail = (req, res) => {
   const decoded = jwt.verify(req.query.encoded, process.env.JWT_SECRET)
-  db.user.update({
-    emailVerificationStatus: true
-  }, {
-    where: {
-      $or: [{
-        username: decoded.username
-      }, {
-        email: decoded.email
-      }]
-    }
-  })
-  .then(result => res.send({ message: 'verification success' }))
-  .catch(err => console.log(err))
+  db.user
+    .update(
+      {
+        emailVerificationStatus: true
+      },
+      {
+        where: {
+          $or: [
+            {
+              username: decoded.username
+            },
+            {
+              email: decoded.email
+            }
+          ]
+        }
+      }
+    )
+    .then(result => res.send({message: 'verification success'}))
+    .catch(err => console.log(err))
 }
