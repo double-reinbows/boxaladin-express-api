@@ -15,4 +15,8 @@
 //       })
 //       .catch(err => console.log(err))
 //   },
+<<<<<<< HEAD
 // }
+=======
+// }
+>>>>>>> merge

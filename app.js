@@ -6,6 +6,18 @@ var cors = require('cors')
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 require('dotenv').config()
+var firebase = require('firebase')
+
+// Initialize Firebase
+var config = {
+  apiKey: "AIzaSyDjiWTez3r_lZreCZUvIUhaSj8-rIWfhgw",
+  authDomain: "boxaladin-auction.firebaseapp.com",
+  databaseURL: "https://boxaladin-auction.firebaseio.com",
+  projectId: "boxaladin-auction",
+  storageBucket: "boxaladin-auction.appspot.com",
+  messagingSenderId: "912503242137"
+};
+firebase.initializeApp(config);
 
 var index = require('./routes/index');
 var users = require('./routes/users');
