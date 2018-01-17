@@ -25,8 +25,8 @@ router.get('/phoneNumbers', phoneCtrl.getPhoneByUser)
 // router.get('/balance', balanceController.list)
 
 // checking verified or not in product page
-router.post('/verifyNumber', phoneCtrl.verifyVerified)
-router.get('/getPhone/', phoneCtrl.phoneId)
+router.post('/verifyEmail', ctrl.verifyVerified)
+router.get('/getEmail/:id', ctrl.emailId)
 // -----------------------------------------------
 
 router.post('/smsVerification', phoneCtrl.sendSmsVerification)
