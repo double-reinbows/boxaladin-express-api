@@ -29,6 +29,7 @@ router.post('/verifyNumber', phoneCtrl.verifyVerified)
 router.get('/getPhone/', phoneCtrl.phoneId)
 // -----------------------------------------------
 
+router.post('/smsVerification', phoneCtrl.sendSmsVerification)
 router.post('/phoneVerification', phoneCtrl.verifyPhoneNumber)
 router.post('/signin', ctrl.signin)
 
