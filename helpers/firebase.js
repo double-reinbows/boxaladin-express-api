@@ -28,7 +28,9 @@ module.exports = {
 					price: data.price,
 					aladinPrice: data.aladinPrice,
 					brand: data.brand.brandName,
-					category: data.category.categoryName
+					category: data.category.categoryName,
+					brandId: data.brand.id,
+					categoryId: data.category.id
 				})
 			})
 

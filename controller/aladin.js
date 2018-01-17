@@ -41,7 +41,9 @@ module.exports = {
 							price: result.price,
 							aladinPrice: result.aladinPrice,
 							brand: result.brand.brandName,
-							category: result.category.categoryName
+							category: result.category.categoryName,
+							brandId: result.brand.id,
+							categoryId: result.category.id
 						})
 
 						res.send({

@@ -1,6 +1,51 @@
 const product = require('../models').product;
 
 module.exports = {
+  filter(req, res) {
+    if (req.query.category == 'all' && req.query.brand == 'all') {
+      return product.findAll({
+        include: [
+          { all: true }
+        ]
+      })
+        .then(data => res.send(data))
+        .catch(err => res.status(400).send(err));
+    } else if (req.query.brand == 'all') {
+      return product.findAll({
+        where: {
+          categoryId: req.query.category
+        },
+        include: [
+          { all: true }
+        ]
+      })
+        .then(data => res.send(data))
+        .catch(err => res.status(400).send(err));
+    } else if (req.query.category == 'all') {
+      return product.findAll({
+        where: {
+          brandId: req.query.brand
+        },
+        include: [
+          { all: true }
+        ]
+      })
+        .then(data => res.send(data))
+        .catch(err => res.status(400).send(err));
+    } else {
+      return product.findAll({
+        where: {
+          categoryId: req.query.category,
+          brandId: req.query.brand
+        },
+        include: [
+          { all: true }
+        ]
+      })
+        .then(data => res.send(data))
+        .catch(err => res.status(400).send(err));
+    }
+  },
   list(req, res) {
     return product.findAll({
       include: [
