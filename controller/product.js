@@ -110,7 +110,11 @@ module.exports = {
   },
   update(req, res) {
     return product
-      .findById(req.params.id)
+      .findById(req.params.id, {
+        include: [
+          { all: true }
+        ]
+      })
       .then(data => {
         if (!data) {
           return res.status(404).send({
@@ -129,7 +133,17 @@ module.exports = {
           })
           .then(result => {
             // tulis hasil uppdate ke firebase di sini
-            //
+            const productsRef = firebase.database().ref().child('products')
+    				productsRef.child(result.id).update({
+    					id: result.id,
+    					productName: result.productName,
+    					price: result.price,
+    					aladinPrice: result.aladinPrice,
+    					brand: result.brand.brandName,
+    					category: result.category.categoryName,
+    					brandId: result.brand.id,
+    					categoryId: result.category.id
+    				})
 
             res.status(200).send(result)  // Send back the updated data.
           })
