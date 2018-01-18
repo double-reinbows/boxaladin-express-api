@@ -1,6 +1,18 @@
 const db = require('../models')
 const jwt = require('jsonwebtoken')
 
+exports.all = (req, res) => {
+  db.phonenumber.findAll({
+    include: [
+      {
+        all: true
+      }
+    ]
+  })
+  .then(result => res.send(result))
+  .catch(err => res.send(err))
+}
+
 exports.postPhoneNumber = (req, res) => {
   var randomOtp = Math.floor(Math.random()*900000) + 100000;
   var decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
@@ -22,7 +34,7 @@ exports.postPhoneNumber = (req, res) => {
       primary: primaryStatus
     })
     .then(data => {
-      sendSmsVerification(data.number, data.otp)
+      // awsSendSms(data.number, data.otp)
       res.send({
         message: 'data added',
         data: data
@@ -33,7 +45,15 @@ exports.postPhoneNumber = (req, res) => {
   .catch(errCreate => console.log(errCreate))
 }
 
-const sendSmsVerification = (phonenumber, otp) => {
+exports.sendSmsVerification = (req, res) => {
+  db.phonenumber.findById(req.body.phoneId)
+  .then(result => {
+    awsSendSms(result.number, result.otp)
+  })
+  .catch(err => res.send(err))
+}
+
+const awsSendSms = (phonenumber, otp) => {
   var AWS = require('aws-sdk');
     AWS.config.region = 'ap-southeast-1';
     AWS.config.update({
@@ -59,9 +79,13 @@ const sendSmsVerification = (phonenumber, otp) => {
     Subject: 'your subject',
   }
   sns.publish(Message, function(err, data) {
-    if (err) console.log(err, err.stack); // an error occurred
-    else     console.log(data);           // successful response
+    if (err) {
+      console.log(err, err.stack); // an error occurred
+    } else {
+      console.log(data);           // successful response
+    }
   });
+  // console.log('SEND SMS FROM AWS TO:', phonenumber, otp);
 }
 
 exports.getPhoneByUser = (req, res) => {
@@ -123,40 +147,3 @@ exports.verifyPhoneNumber = (req, res) => {
   })
   .catch(err => res.send(err))
 }
-
-// ----------------------------verifying phone id for product-----------------------
-exports.verifyVerified = (req, res) => {
-  db.phonenumber.findOne({
-    where: {
-      number: req.body.number,
-      verified: true,
-    }
-  })
-  .then(result =>{
-    console.log(result)
-    if(!result) {
-      res.send({ 
-        verified: false,
-        hp: "no hp yang anda masukkan belum terverifikasi"  
-      });
-      return;
-    }
-    res.send({ 
-      verified: true ,
-      hp: "no hp terverifikasi"});
-  })
-  .catch(err => res.send(err))
-  
-}
-
-exports.phoneId = (req, res) => {
-  db.phonenumber.findOne({
-    where: {
-      userId: req.params.id,
-      primary: true,
-    }
-  })
-  .then(result => res.send(result))
-  .catch(err => console.log(err))
-}
-// -----------------------------------------------------------------------------------------
