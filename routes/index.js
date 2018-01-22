@@ -1,7 +1,9 @@
 const express = require('express');
 const router = express.Router();
 
-// const balanceController = require('../controller/balance')
+const xenditController = require('../controller/balance')
+const paymentController = require('../controller/payment')
+
 
 const ctrl = require('../controller/indexCtrl')
 const phoneCtrl = require('../controller/otpCtrl')
@@ -22,12 +24,12 @@ router.get('/', ctrl.getAll)
 router.get('/emailVerification', ctrl.verifyEmail)
 router.get('/phoneNumbers', phoneCtrl.getPhoneByUser)
 
-// router.get('/balance', balanceController.list)
+//-------------------xendit routes-------------------------
+router.get('/balance', xenditController.balance)
+router.post('/invoice', xenditController.invoice)
+router.post('/payment', paymentController.create)
 
-// checking verified or not in product page
-router.post('/verifyEmail', ctrl.verifyVerified)
-router.get('/getEmail/:id', ctrl.emailId)
-// -----------------------------------------------
+// ---------------------------------------
 
 router.post('/smsVerification', phoneCtrl.sendSmsVerification)
 router.post('/phoneVerification', phoneCtrl.verifyPhoneNumber)
