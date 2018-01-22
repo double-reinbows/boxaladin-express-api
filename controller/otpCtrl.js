@@ -147,3 +147,40 @@ exports.verifyPhoneNumber = (req, res) => {
   })
   .catch(err => res.send(err))
 }
+
+exports.removePhone = (req, res) => {
+  db.phonenumber.destroy({
+    where: {
+      id: req.params.id
+    }
+  })
+  .then(() => res.send({ message: 'Data removed'}))
+  .catch(err => res.send(err))
+}
+
+exports.changePhone = (req, res) => {
+  db.phonenumber.findOne({
+    where: {
+      id: req.params.id
+    }
+  })
+  .then(result => {
+    db.phonenumber.update({
+      number: req.body.phonenumber || result.number,
+      verified: req.body.verified || result.verified,
+      primary: req.body.primaryStatus || result.primaryStatus
+    }, {
+      where: {
+        id: parseInt(req.params.id)
+      }
+    })
+    .then(data => {
+      res.send({
+        message: 'data changed',
+        data: data
+      })
+    })
+    .catch(err => console.log(err))
+  })
+  .catch(errChange => console.log(errChange))
+}
