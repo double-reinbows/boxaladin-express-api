@@ -19,8 +19,6 @@ module.exports = {
   },
 
   invoice(req, res) {
-
-    var external = "3"
 		axios({
 			method: 'POST',
       url: `https://api.xendit.co/v2/invoices`, 

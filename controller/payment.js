@@ -12,7 +12,7 @@ module.exports = {
         availableBanks: "",
       })
       .then(data => {res.send(data)
-        console.log("balikan db lokal", data.dataValues.amount)
+        console.log("balikan db lokal 1", data.dataValues.amount)
         db.transaction.create({
           paymentId: data.id,
           productId: data.productId,
@@ -20,27 +20,24 @@ module.exports = {
           status: "PENDING"
         })
         .then(data => {
-          console.log("TESTIG AMOUNT ->>", dataAmount)
-          const encode_token = new Buffer("eG5kX2RldmVsb3BtZW50X09ZcUFmTDBsMDdldmxjNXJkK0FhRW1URGI5TDM4Tko4bFhiZytSeGkvR2JlOExHb0NBUitndz09Og==:").toString('base64')
-          console.log("HASIL ENCODE ", encode_token)
+          console.log("balikan db lokal 2", dataAmount)
+          console.log(data)
+          let dataStrPaymentID = data.dataValues.paymentId.toString()
           axios({
             method: 'POST',
-            url: 'https://api.xendit.co//v2/invoices', 
+            url: `https://api.xendit.co/v2/invoices`, 
             headers: {
-              authorization: "Basic " + encode_token    
+              authorization: "Basic eG5kX2RldmVsb3BtZW50X09ZcUFmTDBsMDdldmxjNXJkK0FhRW1URGI5TDM4Tko4bFhiZytSeGkvR2JlOExHb0NBUitndz09Og=="       
             },      
             data: {
-              external_id: data.paymentId,
-              amount: 40000,
+              external_id: dataStrPaymentID,
+              amount: dataAmount,
               payer_email: "a@gmail.com",
               description: "asd"
             },
           })
-          .then((data) => {
-            console.log("BAlikan API XENDIT ", data)
-            // res.send(data)
-          })
-          .catch(err => console.log("ERR APAA ??", err))
+          .then(({data}) => {console.log(data)})
+          .catch(err => console.log(err))
         })
         .catch(err => res.status(400).send(err));
         
