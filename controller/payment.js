@@ -1,28 +1,30 @@
 const payment = require('../models').payment;
 const axios = require ('axios')
 const db = require('../models')
+var invoice = ""
+var banksArr_Obj = ""
+var banksStr = ""
+var statusCmplt = ""
 
 module.exports = {
   create(req, res) {
     var dataAmount = req.body.amount
     return payment
       .create({
+        invoiceId: "",
         status: "PENDING",
         amount: req.body.amount,
         availableBanks: "",
       })
-      .then(data => {res.send(data)
-        console.log("balikan db lokal 1", data.dataValues.amount)
+      .then(dataPayment => {
         db.transaction.create({
-          paymentId: data.id,
-          productId: data.productId,
-          userId: data.userId,
+          paymentId: dataPayment.id,
+          productId: dataPayment.productId,
+          userId: dataPayment.userId,
           status: "PENDING"
         })
-        .then(data => {
-          console.log("balikan db lokal 2", dataAmount)
-          console.log(data)
-          let dataStrPaymentID = data.dataValues.paymentId.toString()
+        .then(dataTransaction => {
+          let dataStrPaymentID = dataTransaction.dataValues.paymentId.toString()
           axios({
             method: 'POST',
             url: `https://api.xendit.co/v2/invoices`, 
@@ -36,11 +38,81 @@ module.exports = {
               description: "asd"
             },
           })
-          .then(({data}) => {console.log(data)})
+          .then(({data}) => {
+            invoice = data.id,
+            banksArr_Obj = data.available_banks
+            banksStr = JSON.stringify(banksArr_Obj)
+
+            db.payment.update({
+              invoiceId: invoice,
+              availableBanks: banksStr
+            },{
+              where:{
+                id: dataPayment.id
+              }
+            })
+            .then((data)=>{
+                  db.payment
+                  .findById(dataPayment.id)
+                  .then(data => {
+                    if (!data) {
+                      return res.status(404).send({
+                        message: 'Data Not Found',
+                      });
+                    }
+                    return res.status(200).send(data);
+                  })
+                  .catch(error => res.status(400).send(error));
+            })
+            .catch(err => console.log(err)) 
+          })
           .catch(err => console.log(err))
         })
         .catch(err => res.status(400).send(err));
-        
       })
   }, 
+
+  retrieve(req, res) {
+    console.log("data", invoice)
+    console.log("bank", banksStr)
+    return payment
+      .findById(req.params.id)
+      .then(data => {
+        if (!data) {
+          return res.status(404).send({
+            message: 'Payment Not Found',
+          });
+        }
+        return res.status(200).send(data);
+      })
+      .catch(error => res.status(400).send(error));
+  },  
+
+
+  updateStatus(req, res) {
+    axios({
+      method: 'GET',
+      url: `https://api.xendit.co/v2/invoices/${req.params.invoice}`,
+      headers: {
+        authorization: "Basic eG5kX2RldmVsb3BtZW50X09ZcUFmTDBsMDdldmxjNXJkK0FhRW1URGI5TDM4Tko4bFhiZytSeGkvR2JlOExHb0NBUitndz09Og=="        
+      }
+    })
+    .then(({data}) => {
+      console.log("ini status", data.status)
+
+      db.payment.update({
+        status: data.status
+      },{
+        where:{
+          id: req.params.id
+        }
+      })
+      .then((data)=>{
+        res.send(data)
+      })
+      .catch(err => console.log(err)) 
+    })
+    .catch(err => console.log(err)) 
+  }, 
+
 };

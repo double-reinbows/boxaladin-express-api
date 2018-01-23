@@ -26,8 +26,12 @@ router.get('/phoneNumbers', phoneCtrl.getPhoneByUser)
 
 //-------------------xendit routes-------------------------
 router.get('/balance', xenditController.balance)
-router.post('/invoice', xenditController.invoice)
 router.post('/payment', paymentController.create)
+router.get('/payment/:id', paymentController.retrieve)
+router.get('/status/:id/:invoice', paymentController.updateStatus)
+
+// router.put('/invoice/:id', paymentController.updateInvoice)
+// router.get('/invoice/:id', paymentController.retrieveInvoice)
 
 // ---------------------------------------
 
