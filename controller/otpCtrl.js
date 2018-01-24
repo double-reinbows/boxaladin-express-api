@@ -19,7 +19,8 @@ exports.postPhoneNumber = (req, res) => {
 
   db.phonenumber.findAll({
     where: {
-      userId: decoded.id
+      userId: decoded.id,
+      primary: true
     }
   })
   .then(result => {
@@ -104,6 +105,7 @@ exports.getPhoneByUser = (req, res) => {
         userId: data.userId,
         number: data.number,
         verified: data.verified,
+        primary: data.primary,
         createdAt: data.createdAt,
         updatedAt: data.updatedAt
       })
@@ -183,4 +185,41 @@ exports.changePhone = (req, res) => {
     .catch(err => console.log(err))
   })
   .catch(errChange => console.log(errChange))
+}
+
+exports.changePrimary = (req, res) => {
+  var decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
+
+  db.phonenumber.findAll({
+    where: {
+      userId: decoded.id
+    }
+  })
+  .then(result => {
+
+    result.map(phone => {
+      var primary = false
+      phone.id == req.body.numberId ? primary=true : null
+      // console.log(phone.number, primary)
+
+      db.phonenumber.update({
+        primary: primary
+      }, {
+        where: {
+          id: phone.id
+        }
+      })
+      .then(updateResult => console.log({
+          message: 'updated',
+          data: updateResult
+        })
+      )
+      .catch(err => console.log(err))
+
+    })
+
+    res.send({ message: 'primary phone changed '})
+
+  })
+  .catch(err => res.send(err))
 }

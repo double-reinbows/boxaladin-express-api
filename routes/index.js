@@ -30,6 +30,7 @@ router.post('/verifyEmail', ctrl.verifyVerified)
 router.get('/getEmail/:id', ctrl.emailId)
 // -----------------------------------------------
 
+router.post('/changePrimary', phoneCtrl.changePrimary)
 router.post('/smsVerification', phoneCtrl.sendSmsVerification)
 router.post('/phoneVerification', phoneCtrl.verifyPhoneNumber)
 router.post('/signin', ctrl.signin)
