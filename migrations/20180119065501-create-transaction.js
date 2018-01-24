@@ -20,6 +20,10 @@ module.exports = {
         allowNull: true,
         type: Sequelize.INTEGER
       },
+      dealPrice: {
+        allowNull: false,
+        type: Sequelize.INTEGER
+      },
       status: {
         allowNull: false,
         type: Sequelize.STRING

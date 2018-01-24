@@ -7,7 +7,7 @@ var banksStr = ""
 var statusCmplt = ""
 
 module.exports = {
-  create(req, res) {
+  createInvoice(req, res) {
     var dataAmount = req.body.amount
     return payment
       .create({
@@ -72,7 +72,7 @@ module.exports = {
       })
   }, 
 
-  retrieve(req, res) {
+  retrieveInvoice(req, res) {
     console.log("data", invoice)
     console.log("bank", banksStr)
     return payment

@@ -1,7 +1,4 @@
 const axios = require ('axios')
-const db = require('../models')
-
-const balance = require('../models').brand;
 
 module.exports = {
   balance(req, res) {

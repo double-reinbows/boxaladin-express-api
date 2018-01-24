@@ -3,7 +3,7 @@ const router = express.Router();
 
 const xenditController = require('../controller/balance')
 const paymentController = require('../controller/payment')
-
+const pulsaController = require('../controller/pulsa')
 
 const ctrl = require('../controller/indexCtrl')
 const phoneCtrl = require('../controller/otpCtrl')
@@ -26,14 +26,14 @@ router.get('/phoneNumbers', phoneCtrl.getPhoneByUser)
 
 //-------------------xendit routes-------------------------
 router.get('/balance', xenditController.balance)
-router.post('/payment', paymentController.create)
-router.get('/payment/:id', paymentController.retrieve)
+router.post('/payment', paymentController.createInvoice)
+router.get('/payment/:id', paymentController.retrieveInvoice)
 router.get('/status/:id/:invoice', paymentController.updateStatus)
-
-// router.put('/invoice/:id', paymentController.updateInvoice)
-// router.get('/invoice/:id', paymentController.retrieveInvoice)
-
 // ---------------------------------------
+
+// ------------------pulsa routes----------------------------
+router.post('/pulsa', pulsaController.pulsa)
+// -----------------------------------------------------------
 
 router.post('/smsVerification', phoneCtrl.sendSmsVerification)
 router.post('/phoneVerification', phoneCtrl.verifyPhoneNumber)
