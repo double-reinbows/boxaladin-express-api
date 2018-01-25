@@ -88,7 +88,6 @@ module.exports = {
       .catch(error => res.status(400).send(error));
   },  
 
-
   updateStatus(req, res) {
     axios({
       method: 'GET',
@@ -98,6 +97,7 @@ module.exports = {
       }
     })
     .then(({data}) => {
+      statusCmplt= data.status
       console.log("ini status", data.status)
 
       db.payment.update({
@@ -108,6 +108,7 @@ module.exports = {
         }
       })
       .then((data)=>{
+        console.log("ler",statusCmplt);
         res.send(data)
       })
       .catch(err => console.log(err)) 
@@ -115,4 +116,46 @@ module.exports = {
     .catch(err => console.log(err)) 
   }, 
 
+  createCallback(req, res) {
+    //TODO: CHECKING HEADER
+    if(req.headers['x-callback-token']!==undefined&&req.headers['x-callback-token']==='eG5kX2RldmVsb3BtZW50X1A0cURmT3NzME9DcGw4UnRLclJPSGphUVlOQ2s5ZE41bFNmaytSMWw5V2JlK3JTaUN3WjNqdz09Og==')
+    {      
+      //TODO: GET BODY RESPONSES
+      const body = req.body;
+      const paymentId = body.external_id;
+      console.log("testing")
+      //TODO: UPDATE ORDER IF STATUS COMPLETED
+      return payment    
+      .findById(paymentId)
+          .then(data => {
+            if (!data) {
+              return res.status(404).send({
+                message: 'Id Not Found',
+              });
+            }else{              
+            if(data.status === 'PENDING'&& req.body.status === 'COMPLETED'){
+              //TODO: UPDATE PAYMENT;
+              //TODO: SENDING EMAIL TO USER.
+              db.payment.update({
+                status: req.body.status
+              },{
+                where:{
+                  id: paymentId
+                }
+              })
+              // getPayment.updated = req.body.updated;
+              // getPayment.save();
+              //TODO: POST TO API PULSA.              
+              console.log("sukses")
+              return res.status(200).send(data.status)
+              }
+            }
+            console.log("'if' ga jalan, jdi kluar body")
+            return res.send(body)
+          })
+          .catch(error => res.status(400).send(error)); 
+    }
+    return res.status(500).send('Invalid Credentials')
+  }, 
 };
+

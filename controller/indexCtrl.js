@@ -1,6 +1,5 @@
 const jwt = require('jsonwebtoken')
 const AWS = require('aws-sdk')
-
 const db = require('../models')
 const hash = require('../helpers/aladin_hash')
 
