@@ -35,7 +35,6 @@ exports.postPhoneNumber = (req, res) => {
       primary: primaryStatus
     })
     .then(data => {
-      // awsSendSms(data.number, data.otp)
       res.send({
         message: 'data added',
         data: data
@@ -47,9 +46,36 @@ exports.postPhoneNumber = (req, res) => {
 }
 
 exports.sendSmsVerification = (req, res) => {
+  var decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)  
+  var randomOtp = Math.floor(Math.random()*900000) + 100000;
+  
   db.phonenumber.findById(req.body.phoneId)
-  .then(result => {
-    awsSendSms(result.number, result.otp)
+  .then(findResult => {
+    
+    db.phonenumber.update({
+      number: findResult.number,
+      primary: findResult.primary,
+      verified: findResult.verified,
+      otp: randomOtp,
+      userId: decoded.id
+    }, {
+      where: {
+        id: findResult.id
+      }
+    })
+    .then(updateResult => {
+      
+      db.phonenumber.findById(findResult.id)
+      .then(data => {
+        // console.log('Data buat kirim OTP:', data)
+        // awsSendSms(data.number, data.otp)
+        awsSendSms(data.number, data.otp)
+        res.send({message: 'OTP sent'})
+      })
+      .catch(err => res.send(err))
+
+    })
+    .catch(err => res.send(err))
   })
   .catch(err => res.send(err))
 }
@@ -86,7 +112,7 @@ const awsSendSms = (phonenumber, otp) => {
       console.log(data);           // successful response
     }
   });
-  // console.log('SEND SMS FROM AWS TO:', phonenumber, otp);
+  console.log('SEND SMS FROM AWS TO:', phonenumber, otp);
 }
 
 exports.getPhoneByUser = (req, res) => {
@@ -190,36 +216,48 @@ exports.changePhone = (req, res) => {
 exports.changePrimary = (req, res) => {
   var decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
 
-  db.phonenumber.findAll({
-    where: {
-      userId: decoded.id
-    }
-  })
-  .then(result => {
-
-    result.map(phone => {
-      var primary = false
-      phone.id == req.body.numberId ? primary=true : null
-      // console.log(phone.number, primary)
-
-      db.phonenumber.update({
-        primary: primary
-      }, {
+  db.phonenumber.findById(req.body.numberId)
+  .then(findResult => {
+    if (findResult.otp != req.body.otp) {
+      console.log('Wrong OTP');
+      res.send({ message: 'Wrong OTP'})
+    } else {
+      
+      db.phonenumber.findAll({
         where: {
-          id: phone.id
+          userId: decoded.id
         }
       })
-      .then(updateResult => console.log({
-          message: 'updated',
-          data: updateResult
+      .then(result => {
+
+        result.map(phone => {
+          var primary = false
+          phone.id == req.body.numberId ? primary=true : null
+          // console.log(phone.number, primary)
+
+          db.phonenumber.update({
+            primary: primary
+          }, {
+            where: {
+              id: phone.id
+            }
+          })
+          .then(updateResult => console.log({
+              message: 'updated',
+              data: updateResult
+            })
+          )
+          .catch(err => console.log(err))
+
         })
-      )
-      .catch(err => console.log(err))
 
-    })
+        console.log('primary phone changed')
+        res.send({ message: 'primary phone changed'})
 
-    res.send({ message: 'primary phone changed '})
+      })
+      .catch(err => res.send(err))
+    }
 
   })
-  .catch(err => res.send(err))
+  
 }
