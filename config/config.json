@@ -1,7 +1,7 @@
 {
   "development": {
     "username": "postgres",
-    "password": 12345,
+    "password": "anak223",
     "database": "boxaladin",
     "host": "127.0.0.1",
     "port": 5432,

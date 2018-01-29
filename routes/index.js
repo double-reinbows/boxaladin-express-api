@@ -24,6 +24,7 @@ router.get('/allPhone', phoneCtrl.all)
 router.get('/', ctrl.getAll)
 router.get('/emailVerification', ctrl.verifyEmail)
 router.get('/phoneNumbers', phoneCtrl.getPhoneByUser)
+router.delete('/phone/:id', phoneCtrl.removePhone)
 
 //-------------------xendit routes-------------------------
 router.get('/balance', xenditController.balance)
@@ -37,6 +38,7 @@ router.post('/callbackurl', paymentController.createCallback)
 router.post('/pulsa', pulsaController.pulsa)
 // -----------------------------------------------------------
 
+router.post('/changePrimary', phoneCtrl.changePrimary)
 router.post('/smsVerification', phoneCtrl.sendSmsVerification)
 router.post('/phoneVerification', phoneCtrl.verifyPhoneNumber)
 router.post('/signin', ctrl.signin)
@@ -46,6 +48,8 @@ router.post('/signin', ctrl.signin)
  */
 router.post('/signup', ctrl.signup)
 router.post('/phonenumber', phoneHelper.checkDuplicate, phoneHelper.checkAlready, phoneCtrl.postPhoneNumber)
+
+router.put('/phone/:id', phoneHelper.checkDuplicate, phoneHelper.checkAlready, phoneCtrl.changePhone)
 
 
 router.get('/api/category', categoryController.list);

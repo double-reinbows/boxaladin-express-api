@@ -110,7 +110,11 @@ module.exports = {
   },
   update(req, res) {
     return product
-      .findById(req.params.id)
+      .findById(req.params.id, {
+        include: [
+          { all: true }
+        ]
+      })
       .then(data => {
         if (!data) {
           return res.status(404).send({
@@ -127,7 +131,22 @@ module.exports = {
             price: req.body.price || data.price,
             aladinPrice: req.body.price || data.aladinPrice,
           })
-          .then(() => res.status(200).send(data))  // Send back the updated data.
+          .then(result => {
+            // tulis hasil uppdate ke firebase di sini
+            const productsRef = firebase.database().ref().child('products')
+    				productsRef.child(result.id).update({
+    					id: result.id,
+    					productName: result.productName,
+    					price: result.price,
+    					aladinPrice: result.aladinPrice,
+    					brand: result.brand.brandName,
+    					category: result.category.categoryName,
+    					brandId: result.brand.id,
+    					categoryId: result.category.id
+    				})
+
+            res.status(200).send(result)  // Send back the updated data.
+          })
           .catch((error) => res.status(400).send(error));
       })
       .catch((error) => res.status(400).send(error));
@@ -143,7 +162,14 @@ module.exports = {
         }
         return data
         .destroy()
-        .then(() => res.status(200).send({ message: 'product deleted successfully.' }))
+        .then(result => {
+          // hapus data di firebase sesuai id dari result
+          const productsRef = firebase.database().ref().child('products')
+  				productsRef.child(req.params.id).remove()
+
+          console.log('ID deleted product:', req.params.id);
+          res.status(200).send({ message: 'product deleted successfully.' })
+        })
         .catch(error => res.status(400).send(error));
       })
       .catch(error => res.status(400).send(error));
