@@ -21,7 +21,7 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       dealPrice: {
-        allowNull: false,
+        allowNull: true,
         type: Sequelize.INTEGER
       },
       status: {

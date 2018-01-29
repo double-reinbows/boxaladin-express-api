@@ -9,8 +9,8 @@ module.exports = {
                   <commands>topup</commands>
                   <username>081380572721</username>
                   <ref_id>order01</ref_id>
-                  <hp>081220563934</hp>
-                  <pulsa_code>xld5000</pulsa_code>
+                  <hp>${req.body.hp}</hp>
+                  <pulsa_code>${req.body.pulsa_code}</pulsa_code>
                   <sign>b1b2cc42a395bec43ebab0f22ca80a75</sign>
                 </mp>`
     axios.post('https://testprepaid.mobilepulsa.net/v1/legacy/index', pulsa, {
