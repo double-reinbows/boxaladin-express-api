@@ -51,10 +51,10 @@ exports.signin = (req, res) => {
           id: user.id,
           username: user.username,
           email: user.email,
-          first_name: user.first_name,
-          family_name: user.family_name,
+          firstName: user.firstName,
+          familyName: user.familyName,
           sex: user.sex,
-          emailVerificationStatus: user.emailVerificationStatus
+          emailVerified: user.emailVerified
         },
         process.env.JWT_SECRET
       )
@@ -93,7 +93,7 @@ exports.signup = (req, res) => {
           },
           {
             email: req.body.email,
-            emailVerificationStatus: true
+            emailVerified: true
           }
         ]
       }
@@ -122,8 +122,8 @@ exports.signup = (req, res) => {
       var salt = Math.floor(Math.random() * 90000) + 10000
       var randomOtp = Math.floor(Math.random() * 900000) + 100000
       req.body.salt = salt
-      req.body.emailVerificationStatus = false
-      req.body.aladin_keys = 0
+      req.body.emailVerified = false
+      req.body.aladinKeys = 0
 
       req.body.email_token = jwt.sign(
         {
@@ -140,8 +140,8 @@ exports.signup = (req, res) => {
             id: data.id,
             username: data.username,
             email: data.email,
-            first_name: data.first_name,
-            family_name: data.family_name,
+            firstName: data.firstName,
+            familyName: data.familyName,
             sex: data.sex
           },
           process.env.JWT_SECRET
@@ -218,7 +218,7 @@ exports.verifyEmail = (req, res) => {
   db.user
     .update(
       {
-        emailVerificationStatus: true
+        emailVerified: true
       },
       {
         where: {

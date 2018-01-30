@@ -23,7 +23,7 @@ module.exports = {
   create(req, res) {
     return category
       .create({
-        category: req.body.category,
+        categoryName: req.body.categoryName,
       })
       .then(data => res.status(201).send(data))
       .catch(err => res.status(400).send(err));
@@ -39,7 +39,7 @@ module.exports = {
         }
         return data
           .update({
-            category: req.body.category || data.category,
+            categoryName: req.body.categoryName || data.categoryName,
           })
           .then(() => res.status(200).send(data))  // Send back the updated data.
           .catch((error) => res.status(400).send(error));
