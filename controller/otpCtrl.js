@@ -84,8 +84,8 @@ const awsSendSms = (phonenumber, otp) => {
   var AWS = require('aws-sdk');
     AWS.config.region = 'ap-southeast-1';
     AWS.config.update({
-      accessKeyId: "AKIAICAYQENJJWW6OMIQ",
-      secretAccessKey: "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",
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
     });
   var sns = new AWS.SNS();
 
