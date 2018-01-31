@@ -88,33 +88,33 @@ module.exports = {
       .catch(error => res.status(400).send(error));
   },  
 
-  // updateStatus(req, res) {
-  //   axios({
-  //     method: 'GET',
-  //     url: `https://api.xendit.co/v2/invoices/${req.params.invoice}`,
-  //     headers: {
-  //       authorization: "Basic eG5kX2RldmVsb3BtZW50X09ZcUFmTDBsMDdldmxjNXJkK0FhRW1URGI5TDM4Tko4bFhiZytSeGkvR2JlOExHb0NBUitndz09Og=="        
-  //     }
-  //   })
-  //   .then(({data}) => {
-  //     statusCmplt= data.status
-  //     console.log("ini status", data.status)
+  updateStatus(req, res) {
+    axios({
+      method: 'GET',
+      url: `https://api.xendit.co/v2/invoices/${req.params.invoice}`,
+      headers: {
+        authorization: "Basic eG5kX2RldmVsb3BtZW50X09ZcUFmTDBsMDdldmxjNXJkK0FhRW1URGI5TDM4Tko4bFhiZytSeGkvR2JlOExHb0NBUitndz09Og=="        
+      }
+    })
+    .then(({data}) => {
+      statusCmplt= data.status
+      console.log("ini status", data.status)
 
-  //     db.payment.update({
-  //       status: data.status
-  //     },{
-  //       where:{
-  //         id: req.params.id
-  //       }
-  //     })
-  //     .then((data)=>{
-  //       console.log("ler",statusCmplt);
-  //       res.send(data)
-  //     })
-  //     .catch(err => console.log(err)) 
-  //   })
-  //   .catch(err => console.log(err)) 
-  // }, 
+      db.payment.update({
+        status: data.status
+      },{
+        where:{
+          id: req.params.id
+        }
+      })
+      .then((data)=>{
+        console.log("ler",statusCmplt);
+        res.send(data)
+      })
+      .catch(err => console.log(err)) 
+    })
+    .catch(err => console.log(err)) 
+  }, 
 
   createCallback(req, res) {
     //TODO: CHECKING HEADER

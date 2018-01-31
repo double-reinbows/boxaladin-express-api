@@ -38,7 +38,7 @@ module.exports = {
         }
         return data
           .update({
-            brand: req.body.brand || data.brand,
+            brandName: req.body.brandName || data.brandName,
           })
           .then(() => res.status(200).send(data))  // Send back the updated data.
           .catch((error) => res.status(400).send(error));
