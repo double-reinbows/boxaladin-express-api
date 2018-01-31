@@ -10,7 +10,7 @@ module.exports = {
         userId: decoded.id,
         paymentId: req.body.paymentId,
         productId: req.body.productId,
-        dealPrice: req.body.dealPrice,
+        aladinPrice: req.body.aladinPrice,
         status: "PENDING",
       })
       .then(data => res.send(data))
