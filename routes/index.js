@@ -4,7 +4,7 @@ const router = express.Router();
 const xenditController = require('../controller/balance')
 const paymentController = require('../controller/payment')
 const pulsaController = require('../controller/pulsa')
-// const callbackController = require('../controller/callback')
+const transactionController = require('../controller/transaction')
 
 const ctrl = require('../controller/indexCtrl')
 const phoneCtrl = require('../controller/otpCtrl')
@@ -36,6 +36,10 @@ router.post('/callbackurl', paymentController.createCallback)
 
 // ------------------pulsa routes----------------------------
 router.post('/pulsa', pulsaController.pulsa)
+// -----------------------------------------------------------
+
+// ------------------transaction routes----------------------------
+router.post('/transaction', transactionController.create)
 // -----------------------------------------------------------
 
 router.post('/changePrimary', phoneCtrl.changePrimary)
