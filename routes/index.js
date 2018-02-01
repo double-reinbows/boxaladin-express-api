@@ -1,7 +1,10 @@
 const express = require('express');
 const router = express.Router();
 
-// const balanceController = require('../controller/balance')
+const xenditController = require('../controller/balance')
+const paymentController = require('../controller/payment')
+const pulsaController = require('../controller/pulsa')
+const transactionController = require('../controller/transaction')
 
 const ctrl = require('../controller/indexCtrl')
 const phoneCtrl = require('../controller/otpCtrl')
@@ -23,12 +26,21 @@ router.get('/emailVerification', ctrl.verifyEmail)
 router.get('/phoneNumbers', phoneCtrl.getPhoneByUser)
 router.delete('/phone/:id', phoneCtrl.removePhone)
 
-// router.get('/balance', balanceController.list)
+//-------------------xendit routes-------------------------
+router.get('/balance', xenditController.balance)
+router.post('/payment', paymentController.createInvoice)
+router.get('/payment/:id', paymentController.retrieveInvoice)
+router.get('/status/:id/:invoice', paymentController.updateStatus)
+router.post('/callbackurl', paymentController.createCallback)
+// ---------------------------------------
 
-// checking verified or not in product page
-router.post('/verifyEmail', ctrl.verifyVerified)
-router.get('/getEmail/:id', ctrl.emailId)
-// -----------------------------------------------
+// ------------------pulsa routes----------------------------
+router.post('/pulsa', pulsaController.pulsa)
+// -----------------------------------------------------------
+
+// ------------------transaction routes----------------------------
+router.post('/transaction', transactionController.create)
+// -----------------------------------------------------------
 
 router.post('/changePrimary', phoneCtrl.changePrimary)
 router.post('/smsVerification', phoneCtrl.sendSmsVerification)

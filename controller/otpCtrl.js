@@ -84,8 +84,8 @@ const awsSendSms = (phonenumber, otp) => {
   var AWS = require('aws-sdk');
     AWS.config.region = 'ap-southeast-1';
     AWS.config.update({
-      accessKeyId: "AKIAICAYQENJJWW6OMIQ",
-      secretAccessKey: "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",
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
     });
   var sns = new AWS.SNS();
 
@@ -94,6 +94,7 @@ const awsSendSms = (phonenumber, otp) => {
       'DefaultSMSType': 'Transactional',
     }
   };
+  
   sns.setSMSAttributes(MessageType, function(err, data) {
     if (err) console.log(err, err.stack); // an error occurred
     else     console.log(data);           // successful response

@@ -22,7 +22,7 @@ module.exports = {
   create(req, res) {
     return brand
       .create({
-        brand: req.body.brand,
+        brandName: req.body.brandName,
       })
       .then(data => res.status(201).send(data))
       .catch(err => res.status(400).send(err));
@@ -38,7 +38,7 @@ module.exports = {
         }
         return data
           .update({
-            brand: req.body.brand || data.brand,
+            brandName: req.body.brandName || data.brandName,
           })
           .then(() => res.status(200).send(data))  // Send back the updated data.
           .catch((error) => res.status(400).send(error));
