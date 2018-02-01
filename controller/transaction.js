@@ -18,4 +18,27 @@ module.exports = {
       .catch(err => res.status(400).send(err));
   },
 
+  allPendingByUser(req, res) {
+    var decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
+    return transaction
+      .findAll({
+        where: {
+          userId: decoded.id,
+          status: 'PENDING'
+        },
+        include: [
+          { all: true }
+        ]
+      })
+      .then(data => {
+        data.map(transaction => {
+          transaction.payment.availableBanks = JSON.parse(transaction.payment.availableBanks)
+        })
+
+        res.send(data)
+      })
+
+      .catch(err => res.status(400).send(err))
+  },
+
 };

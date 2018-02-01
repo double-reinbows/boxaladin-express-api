@@ -20,9 +20,10 @@ module.exports = {
         let decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
         db.transaction.create({
           paymentId: dataPayment.id,
-          productId: dataPayment.productId,
+          productId: req.body.productId,
           userId: decoded.id,
-          status: "PENDING"
+          status: "PENDING",
+          aladinPrice: req.body.amount
         })
         .then(dataTransaction => {
           let dataStrPaymentID = dataTransaction.dataValues.paymentId.toString()
