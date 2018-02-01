@@ -129,7 +129,7 @@ module.exports = {
             description: req.body.description || data.description,
             stock: req.body.stock || data.stock,
             price: req.body.price || data.price,
-            aladinPrice: req.body.price || data.aladinPrice,
+            aladinPrice: req.body.price || data.price,
           })
           .then(result => {
             // tulis hasil uppdate ke firebase di sini
