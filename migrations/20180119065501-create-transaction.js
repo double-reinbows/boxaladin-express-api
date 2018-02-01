@@ -9,7 +9,7 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       paymentId: {
-        allowNull: true,
+        allowNull: false,
         type: Sequelize.INTEGER
       },
       productId: {
@@ -17,10 +17,10 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       userId: {
-        allowNull: true,
+        allowNull: false,
         type: Sequelize.INTEGER
       },
-      dealPrice: {
+      aladinPrice: {
         allowNull: true,
         type: Sequelize.INTEGER
       },

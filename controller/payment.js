@@ -1,26 +1,27 @@
 const payment = require('../models').payment;
+const jwt = require('jsonwebtoken')
 const axios = require ('axios')
 const db = require('../models')
-var invoice = ""
-var banksArr_Obj = ""
-var banksStr = ""
-var statusCmplt = ""
+let invoice = ""
+let banksArr_Obj = ""
+let banksStr = ""
 
 module.exports = {
   createInvoice(req, res) {
-    var dataAmount = req.body.amount
+    let dataAmount = req.body.amount
     return payment
       .create({
-        invoiceId: "",
+        invoiceId: "null",
         status: "PENDING",
         amount: req.body.amount,
-        availableBanks: "",
+        availableBanks: "null",
       })
       .then(dataPayment => {
+        let decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
         db.transaction.create({
           paymentId: dataPayment.id,
           productId: dataPayment.productId,
-          userId: dataPayment.userId,
+          userId: decoded.id,
           status: "PENDING"
         })
         .then(dataTransaction => {
@@ -32,13 +33,16 @@ module.exports = {
               authorization: "Basic eG5kX2RldmVsb3BtZW50X09ZcUFmTDBsMDdldmxjNXJkK0FhRW1URGI5TDM4Tko4bFhiZytSeGkvR2JlOExHb0NBUitndz09Og=="       
             },      
             data: {
-              external_id: dataStrPaymentID,
+              external_id: "paymentId no" +""+ dataStrPaymentID,
               amount: dataAmount,
-              payer_email: "a@gmail.com",
+              payer_email: decoded.email,
+              // --------description = description dari product-------------
               description: "asd"
             },
           })
           .then(({data}) => {
+            console.log('user', decoded.email)
+            console.log('status', data.status)
             invoice = data.id,
             banksArr_Obj = data.available_banks
             banksStr = JSON.stringify(banksArr_Obj)
@@ -97,9 +101,6 @@ module.exports = {
       }
     })
     .then(({data}) => {
-      statusCmplt= data.status
-      console.log("ini status", data.status)
-
       db.payment.update({
         status: data.status
       },{
@@ -108,7 +109,7 @@ module.exports = {
         }
       })
       .then((data)=>{
-        console.log("ler",statusCmplt);
+        console.log(data)
         res.send(data)
       })
       .catch(err => console.log(err)) 

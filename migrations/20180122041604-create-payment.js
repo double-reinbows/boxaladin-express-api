@@ -9,7 +9,7 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       invoiceId: {
-        allowNull: true,
+        allowNull: false,
         type: Sequelize.STRING
       },
       status: {
@@ -21,6 +21,7 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       availableBanks: {
+        allowNull: false,
         type: Sequelize.TEXT
       },
       createdAt: {
