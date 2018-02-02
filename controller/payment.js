@@ -156,13 +156,14 @@ module.exports = {
                       paymentId: paymentId
                     }
                   })
-                  .then(() => {
+                  .then((result) => {
 
                     // getPayment.updated = req.body.updated;
                     // getPayment.save();
                     //TODO: POST TO API PULSA.              
                     console.log("sukses")
-                    return res.status(200).send(data)
+                    // return res.status(200).send(data)
+                    return res.status(200).send(result)
                     
                   })
                   .catch(error => res.status(400).send(error));
@@ -170,9 +171,10 @@ module.exports = {
                 // }
               })
               .catch(error => res.status(400).send(error));
+            } else {
+              console.log("'if' ga jalan, jdi kluar body")
+              return res.send(body)
             }
-            console.log("'if' ga jalan, jdi kluar body")
-            return res.send(body)
           }})
           .catch(error => res.status(400).send(error)); 
     }

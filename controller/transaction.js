@@ -61,6 +61,24 @@ module.exports = {
       })
 
       .catch(err => res.status(400).send(err))
-  }
+  },
+
+  byId(req, res) {
+    return transaction
+      .findOne({
+        where: {
+          id: parseInt(req.params.id)
+        },
+        include: [
+          { all: true }
+        ]
+      })
+      .then(data => {
+        data.payment.availableBanks = JSON.parse(data.payment.availableBanks)
+        res.send(data)
+      })
+
+      .catch(err => res.status(400).send(err))
+  },
 
 };
