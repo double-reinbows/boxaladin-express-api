@@ -41,6 +41,7 @@ router.post('/pulsa', pulsaController.pulsa)
 // ------------------transaction routes----------------------------
 router.post('/transaction', transactionController.create)
 router.get('/transaction/userPending', transactionController.allPendingByUser)
+router.get('/transaction/user', transactionController.allByUser)
 // -----------------------------------------------------------
 
 router.post('/changePrimary', phoneCtrl.changePrimary)
