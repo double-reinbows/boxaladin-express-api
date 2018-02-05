@@ -5,6 +5,7 @@ const xenditController = require('../controller/balance')
 const paymentController = require('../controller/payment')
 const pulsaController = require('../controller/pulsa')
 const transactionController = require('../controller/transaction')
+const creditCardController = require('../controller/creditCard')
 
 const ctrl = require('../controller/indexCtrl')
 const phoneCtrl = require('../controller/otpCtrl')
@@ -32,6 +33,8 @@ router.post('/payment', paymentController.createInvoice)
 router.get('/payment/:id', paymentController.retrieveInvoice)
 router.get('/status/:id/:invoice', paymentController.updateStatus)
 router.post('/callbackurl', paymentController.createCallback)
+
+router.post('/creditcard', creditCardController.createCreditCard)
 // ---------------------------------------
 
 // ------------------pulsa routes----------------------------
