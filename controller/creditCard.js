@@ -6,9 +6,9 @@ const db = require('../models')
 let invoice = ""
 let banksArr_Obj = ""
 let banksStr = ""
-let tokenId ="5a77fac142aff8311d581bd5"
+let tokenId ="5a78292f42aff8311d581c93"
 
-module.exports = { 
+module.exports = {
   createCreditCard(req, res) {
     let dataAmount = req.body.amount
     return payment
@@ -31,10 +31,10 @@ module.exports = {
           let dataStrPaymentID = dataTransaction.dataValues.paymentId.toString()
           axios({
             method: 'POST',
-            url: `https://api.xendit.co/v2/invoices`, 
+            url: `https://api.xendit.co/v2/invoices`,
             headers: {
-              authorization: "Basic eG5kX2RldmVsb3BtZW50X09ZcUFmTDBsMDdldmxjNXJkK0FhRW1URGI5TDM4Tko4bFhiZytSeGkvR2JlOExHb0NBUitndz09Og=="       
-            },      
+              authorization: "Basic eG5kX2RldmVsb3BtZW50X09ZcUFmTDBsMDdldmxjNXJkK0FhRW1URGI5TDM4Tko4bFhiZytSeGkvR2JlOExHb0NBUitndz09Og=="
+            },
             data: {
               external_id: dataStrPaymentID,
               amount: dataAmount,
@@ -66,37 +66,23 @@ module.exports = {
               console.log('data amount', dataAmount)
               console.log('data token', tokenId)
 
-              Xendit.card.createToken(tokenData, function (err, data) {
-                if (err) {
-                    //Define error handling
-                }
-                if (data.status === 'VERIFIED') {
-                axios({
-                method: 'POST',
-                url: `https://api.xendit.co/credit_card_charges`, 
-                headers: {
-                  authorization: "Basic eG5kX2RldmVsb3BtZW50X09ZcUFmTDBsMDdldmxjNXJkK0FhRW1URGI5TDM4Tko4bFhiZytSeGkvR2JlOExHb0NBUitndz09Og=="       
-                },      
-                data: {
-                  token_id: tokenId,
-                  external_id: dataStrPaymentID,
-                  amount: dataAmount,
-                  card_cvn: "123"
-                },
-              })
-              .then((data)=>{
-                console.log("sukses")
-              })
-              .catch(err => console.log("gagal", err)) 
-                } else if (data.status === 'IN_REVIEW') {
-                    // Handle authentication (3DS)
-                } else if (data.status === 'FAILED') {
-                    // Handle failure
-                }
-            });
-
-   
-
+              axios({
+              method: 'POST',
+              url: `https://api.xendit.co/credit_card_charges`,
+              headers: {
+                authorization: "Basic eG5kX2RldmVsb3BtZW50X09ZcUFmTDBsMDdldmxjNXJkK0FhRW1URGI5TDM4Tko4bFhiZytSeGkvR2JlOExHb0NBUitndz09Og=="
+              },
+              data: {
+                token_id: tokenId,
+                external_id: dataStrPaymentID,
+                amount: dataAmount,
+                card_cvn: "123"
+              },
+            })
+            .then((data)=>{
+              console.log("sukses")
+            })
+            .catch(err => console.log("gagal", err))
             })
             .then((data)=>{
                   db.payment
@@ -115,10 +101,10 @@ module.exports = {
             //   console.log("ini data 3", dataPayment)
             //   axios({
             //     method: 'POST',
-            //     url: `https://api.xendit.co/credit_card_charges`, 
+            //     url: `https://api.xendit.co/credit_card_charges`,
             //     headers: {
-            //       authorization: "Basic eG5kX2RldmVsb3BtZW50X09ZcUFmTDBsMDdldmxjNXJkK0FhRW1URGI5TDM4Tko4bFhiZytSeGkvR2JlOExHb0NBUitndz09Og=="       
-            //     },      
+            //       authorization: "Basic eG5kX2RldmVsb3BtZW50X09ZcUFmTDBsMDdldmxjNXJkK0FhRW1URGI5TDM4Tko4bFhiZytSeGkvR2JlOExHb0NBUitndz09Og=="
+            //     },
             //     data: {
             //       token_id: "5a77dceb42aff8311d581b41",
             //       external_id: dataStrPaymentID,
@@ -129,13 +115,13 @@ module.exports = {
             //   .then((data)=>{
             //     console.log("sukses")
             //   })
-            //   .catch(err => console.log("gagal", err)) 
+            //   .catch(err => console.log("gagal", err))
             // })
-            .catch(err => console.log(err)) 
+            .catch(err => console.log(err))
           })
           .catch(err => console.log(err))
         })
         .catch(err => res.status(400).send(err));
       })
-  }, 
+  },
 }
