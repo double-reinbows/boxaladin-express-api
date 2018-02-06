@@ -23,10 +23,20 @@ module.exports = {
               status: "COMPLETED",
             },{
               where:{
-                id: dataPayment.id
+                id: req.body.externalId
               }
             })
+            .then((data)=>{
+              db.transaction.update({
+                status: "COMPLETED",
+              },{
+                where:{
+                  paymentId: req.body.externalId
+                }
+              }) 
+            })
+            .catch(err => console.log("gagal 1", err))  
           })
-          .catch(err => console.log("gagal", err))  
+          .catch(err => console.log("gagal 2", err))  
         }, 
       }
