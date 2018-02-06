@@ -11,20 +11,20 @@ module.exports = {
   createInvoice(req, res) {
     let dataAmount = req.body.amount
     return payment
-      .create({
-        invoiceId: "null",
+    .create({
+      invoiceId: "null",
+      status: "PENDING",
+      amount: req.body.amount,
+      availableBanks: "null",
+    })
+    .then(dataPayment => {
+      let decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
+      db.transaction.create({
+        paymentId: dataPayment.id,
+        productId: req.body.productId,
+        userId: decoded.id,
         status: "PENDING",
-        amount: req.body.amount,
-        availableBanks: "null",
-      })
-      .then(dataPayment => {
-        let decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
-        db.transaction.create({
-          paymentId: dataPayment.id,
-          productId: req.body.productId,
-          userId: decoded.id,
-          status: "PENDING",
-          aladinPrice: req.body.amount
+        aladinPrice: req.body.amount
         })
         .then(dataTransaction => {
           let dataStrPaymentID = dataTransaction.dataValues.paymentId.toString()
@@ -49,7 +49,6 @@ module.exports = {
             invoice = data.id,
             banksArr_Obj = data.available_banks
             banksStr = JSON.stringify(banksArr_Obj)
-
             db.payment.update({
               invoiceId: invoice,
               availableBanks: banksStr
@@ -59,17 +58,17 @@ module.exports = {
               }
             })
             .then((data)=>{
-                  db.payment
-                  .findById(dataPayment.id)
-                  .then(data => {
-                    if (!data) {
-                      return res.status(404).send({
-                        message: 'Data Not Found',
-                      });
-                    }
-                    return res.status(200).send(data);
-                  })
-                  .catch(error => res.status(400).send(error));
+              db.payment
+              .findById(dataPayment.id)
+              .then(data => {
+                if (!data) {
+                  return res.status(404).send({
+                    message: 'Data Not Found',
+                  });
+                }
+                return res.status(200).send(data);
+              })
+              .catch(error => res.status(400).send(error));
             })
             .catch(err => console.log(err)) 
           })
@@ -77,12 +76,12 @@ module.exports = {
         })
         .catch(err => res.status(400).send(err));
       })
-  }, 
+    }, 
 
-  retrieveInvoice(req, res) {
-    console.log("data", invoice)
-    console.log("bank", banksStr)
-    return payment
+    retrieveInvoice(req, res) {
+      console.log("data", invoice)
+      console.log("bank", banksStr)
+      return payment
       .findById(req.params.id)
       .then(data => {
         if (!data) {
@@ -93,50 +92,52 @@ module.exports = {
         return res.status(200).send(data);
       })
       .catch(error => res.status(400).send(error));
-  },  
+    },  
 
-  updateStatus(req, res) {
-    axios({
-      method: 'GET',
-      url: `https://api.xendit.co/v2/invoices/${req.params.invoice}`,
-      headers: {
-        authorization: "Basic eG5kX2RldmVsb3BtZW50X09ZcUFmTDBsMDdldmxjNXJkK0FhRW1URGI5TDM4Tko4bFhiZytSeGkvR2JlOExHb0NBUitndz09Og=="        
-      }
-    })
-    .then(({data}) => {
-      db.payment.update({
-        status: data.status
-      },{
-        where:{
-          id: req.params.id
+  
+    updateStatus(req, res) {
+      axios({
+        method: 'GET',
+        url: `https://api.xendit.co/v2/invoices/${req.params.invoice}`,
+        headers: {
+          authorization: "Basic eG5kX2RldmVsb3BtZW50X09ZcUFmTDBsMDdldmxjNXJkK0FhRW1URGI5TDM4Tko4bFhiZytSeGkvR2JlOExHb0NBUitndz09Og=="        
         }
       })
-      .then((data)=>{
-        console.log(data)
-        res.send(data)
+      .then(({data}) => {
+        db.payment.update({
+          status: data.status
+        },{
+          where:{
+            id: req.params.id
+          }
+        })
+        .then((data)=>{
+          console.log(data)
+          res.send(data)
+        })
+        .catch(err => console.log(err)) 
       })
       .catch(err => console.log(err)) 
-    })
-    .catch(err => console.log(err)) 
-  }, 
+    }, 
 
-  createCallback(req, res) {
-    //TODO: CHECKING HEADER
-    if(req.headers['x-callback-token']!==undefined&&req.headers['x-callback-token']===process.env.XENDIT_VALIDATION_TOKEN)
-    {      
-      //TODO: GET BODY RESPONSES
-      const body = req.body;
-      const paymentId = body.external_id;
-      console.log("testing")
-      //TODO: UPDATE ORDER IF STATUS COMPLETED
-      return payment    
-      .findById(paymentId)
-          .then(data => {
-            if (!data) {
-              return res.status(404).send({
-                message: 'Id Not Found',
-              });
-            }else{              
+  
+    createCallback(req, res) {
+      //TODO: CHECKING HEADER
+      if(req.headers['x-callback-token']!==undefined&&req.headers['x-callback-token']===process.env.XENDIT_VALIDATION_TOKEN)
+      {      
+        //TODO: GET BODY RESPONSES
+        const body = req.body;
+        const paymentId = body.external_id;
+        console.log("testing")
+        //TODO: UPDATE ORDER IF STATUS COMPLETED
+        return payment    
+        .findById(paymentId)
+        .then(data => {
+          if (!data) {
+            return res.status(404).send({
+              message: 'Id Not Found',
+            });
+          }else{              
             if(data.status === 'PENDING'&& req.body.status === 'COMPLETED'){
               //TODO: UPDATE PAYMENT;
               //TODO: SENDING EMAIL TO USER.
@@ -148,26 +149,22 @@ module.exports = {
                 }
               })
               .then(() => {
-
-                  db.transaction.update({
-                    status: req.body.status
-                  },{
-                    where:{
-                      paymentId: paymentId
-                    }
-                  })
-                  .then((result) => {
-
-                    // getPayment.updated = req.body.updated;
-                    // getPayment.save();
-                    //TODO: POST TO API PULSA.              
-                    console.log("sukses")
-                    // return res.status(200).send(data)
-                    return res.status(200).send(result)
-                    
-                  })
-                  .catch(error => res.status(400).send(error));
-
+                db.transaction.update({
+                  status: req.body.status
+                },{    
+                  where:{    
+                    paymentId: paymentId
+                  }
+                })
+                .then((result) => {
+                  // getPayment.updated = req.body.updated;
+                  // getPayment.save();                  
+                  //TODO: POST TO API PULSA.                               
+                  console.log("sukses")                
+                  // return res.status(200).send(data)                  
+                  return res.status(200).send(result)                  
+                })
+                .catch(error => res.status(400).send(error));
                 // }
               })
               .catch(error => res.status(400).send(error));
@@ -177,8 +174,8 @@ module.exports = {
             }
           }})
           .catch(error => res.status(400).send(error)); 
-    }
-    return res.status(500).send('Invalid Credentials')
+        }
+        return res.status(500).send('Invalid Credentials')
 
     // Contoh payload yang dikirim dari xendit:
     // {
@@ -198,7 +195,6 @@ module.exports = {
     //   adjusted_received_amount: 47500,
     //   updated: "2016-10-10T08:15:03.404Z",
     //   created: "2016-10-10T08:15:03.404Z"
-    // }
   }, 
 };
 
