@@ -1,6 +1,7 @@
 const https = require ('https')
 const CircularJSON = require('circular-json')
 const axios = require ('axios')
+var convert = require('xml-js')
 
 module.exports = {
   pulsa(req, res) {
@@ -21,7 +22,9 @@ module.exports = {
     })
     .then((data) => {
       let json = CircularJSON.stringify(data);
-      res.send(json);
+      let dataJson = JSON.parse(json)
+      // res.send(convert.xml2json(dataJson.config.data, { compact: true }));
+      res.send(dataJson.config)
     })
     .catch(err => console.log(err))
   }

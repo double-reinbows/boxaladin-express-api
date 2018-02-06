@@ -17,16 +17,33 @@ module.exports = {
       },
     })
     .then(({data})=>{
-            console.log("sukses")
-            res.status(200).send({data})
+            console.log('Response Xendit CC charges:', data)
+
             db.payment.update({
               status: "COMPLETED",
             },{
               where:{
-                id: dataPayment.id
+                id: req.body.externalId
               }
             })
+            .then((data)=>{
+
+              db.transaction.update({
+                status: "COMPLETED",
+              },{
+                where:{
+                  paymentId: req.body.externalId
+                }
+              })
+              .then(data => {
+                console.log('Payment & Transaction updated!');
+                res.status(200).send({data})
+              })
+              .catch(err => console.log("Error update transaction:", err))
+
+            })
+            .catch(err => console.log("Error update payment:", err))
           })
-          .catch(err => console.log("gagal", err))
+          .catch(err => console.log("Error Xendit CC charges:", err))
         },
       }
