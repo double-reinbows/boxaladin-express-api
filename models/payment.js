@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'paymentId',
       as: 'transactions',
     });    
-    payment.hasOne(models.topup, {
+    payment.hasMany(models.topup, {
       foreignKey: 'paymentId',
       as: 'topups',
     });    

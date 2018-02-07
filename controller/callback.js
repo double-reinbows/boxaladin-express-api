@@ -35,36 +35,41 @@ module.exports = {
                   }
                 })
                 .then((resultTransaction) => {
-                  console.log("transakti", resultTransaction)
                   if(resultTransaction === null){
                     console.log("asd")
                     db.topup.findOne({
-                      // include:[
-                      //   {all:true}
-                      // ],
                       where:{
                         paymentId: paymentId
-                      }
+                      },
+                      include:[
+                        {all:true}
+                      ]
                     })
                     .then((resultTopUp)=>{
-                      console.log("resulttopup", resultTopUp)
+                      console.log("resulttopup", resultTopUp.dataValues.userId)
                       db.user.findOne({
                         where:{
-                          id: userId
+                          id: resultTopUp.dataValues.userId
                         }
                       })
                       .then((resultUser) => {
-                        console.log('aaaa',resultUser.firstName)
+                        console.log('aaaa', resultUser.dataValues.aladinKeys)
+                        console.log('bbb', resultTopUp.key.dataValues.keyAmount)
+                        var key = parseInt(resultUser.dataValues.aladinKeys) + parseInt(resultTopUp.key.dataValues.keyAmount)
                         db.user.update({
-                          aldinKeys: resultUser.aladinKeys + resultTopUp.keys.keyAmount
+                          aladinKeys: key
+                        },{
+                          where:{
+                            id: resultUser.dataValues.id
+                          }
                         })
                         .then((result) => {
                           console.log ('top up aladin keys berhasil')
                           res.send(result)
                         })
-                        .catch(error => res.status(400).send(error));
+                        .catch(error => console.log('error', error));
                       })
-                      .catch(error => res.status(400).send(error));
+                      .catch(error => console.log('error', error));
                     })
                     .catch(error => res.status(400).send(error));
                   } else {
