@@ -3,9 +3,11 @@ const router = express.Router();
 
 const xenditController = require('../controller/balance')
 const paymentController = require('../controller/payment')
+const callbackController = require('../controller/callback')
 const pulsaController = require('../controller/pulsa')
 const transactionController = require('../controller/transaction')
 const creditCardController = require('../controller/creditCard')
+const topUpController = require('../controller/aladinKey')
 
 const ctrl = require('../controller/indexCtrl')
 const phoneCtrl = require('../controller/otpCtrl')
@@ -32,10 +34,11 @@ router.get('/balance', xenditController.balance)
 router.post('/payment', paymentController.createInvoice)
 router.get('/payment/:id', paymentController.retrieveInvoice)
 router.get('/status/:id/:invoice', paymentController.updateStatus)
-router.post('/callbackurl', paymentController.createCallback)
-
-router.post('/creditcard', creditCardController.createCreditCard)
+router.post('/callbackurl', callbackController.createCallback)
+router.post('/creditCard', creditCardController.createCreditCard)
 // ---------------------------------------
+
+router.post('/topupKey', topUpController.topUpKeys)
 
 // ------------------pulsa routes----------------------------
 router.post('/pulsa', pulsaController.pulsa)

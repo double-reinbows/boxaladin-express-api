@@ -12,6 +12,10 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'paymentId',
       as: 'transactions',
     });    
+    payment.hasOne(models.topup, {
+      foreignKey: 'paymentId',
+      as: 'topups',
+    });    
   };
 
   return payment;

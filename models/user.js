@@ -76,6 +76,10 @@ module.exports = function(sequelize, DataTypes) {
       foreignKey: 'userId',
       as: 'transactions',
     });
+    user.hasMany(models.topup, {
+      foreignKey: 'userId',
+      as: 'topups',
+    });
   };
 
   return user;

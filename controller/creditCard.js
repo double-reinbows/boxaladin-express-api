@@ -18,7 +18,6 @@ module.exports = {
     })
     .then(({data})=>{
             console.log("sukses")
-            res.status(200).send({data})
             db.payment.update({
               status: "COMPLETED",
             },{
@@ -27,6 +26,7 @@ module.exports = {
               }
             })
             .then((data)=>{
+              res.status(200).send({data})
               db.transaction.update({
                 status: "COMPLETED",
               },{
