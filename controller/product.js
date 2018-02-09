@@ -100,7 +100,8 @@ module.exports = {
   					brand: result.brand.brandName,
   					category: result.category.categoryName,
   					brandId: result.brand.id,
-  					categoryId: result.category.id
+  					categoryId: result.category.id,
+            watching: 0
   				})
 
           res.status(201).send(data)

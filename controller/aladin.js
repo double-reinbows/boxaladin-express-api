@@ -35,7 +35,7 @@ module.exports = {
             // update di firebase
 
 						const productsRef = firebase.database().ref().child('products')
-						productsRef.child(result.id).set({
+						productsRef.child(result.id).update({
 							id: result.id,
 							productName: result.productName,
 							price: result.price,
