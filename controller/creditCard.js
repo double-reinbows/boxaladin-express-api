@@ -70,10 +70,6 @@ module.exports = {
         }
       })
       .then((data)=>{
-
-
-
-
         db.topup.findOne({
           where:{
             paymentId: req.body.externalId
@@ -109,10 +105,6 @@ module.exports = {
           .catch(error => console.log('error', error));
         })
         .catch(error => res.status(400).send(error));
-
-
-
-
       })
       .catch(err => console.log("Error update payment:", err))
     })

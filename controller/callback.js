@@ -100,6 +100,8 @@ module.exports = {
         } else {
             return res.status(500).send('Invalid Credentials')
         }
+  }, 
+}
 
     // Contoh payload yang dikirim dari xendit:
     // {
@@ -119,5 +121,3 @@ module.exports = {
     //   adjusted_received_amount: 47500,
     //   updated: "2016-10-10T08:15:03.404Z",
     //   created: "2016-10-10T08:15:03.404Z"
-  }, 
-}
