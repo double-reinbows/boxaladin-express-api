@@ -12,7 +12,8 @@ module.exports = (sequelize, DataTypes) => {
     description:DataTypes.STRING,
     stock:DataTypes.INTEGER,
     price:DataTypes.INTEGER,
-    aladinPrice:DataTypes.INTEGER
+    aladinPrice:DataTypes.INTEGER,
+    pulsaCode:DataTypes.STRING
   });
 
   product.associate = (models) => {

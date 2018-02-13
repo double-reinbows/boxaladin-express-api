@@ -34,7 +34,7 @@ router.get('/balance', xenditController.balance)
 router.post('/payment', paymentController.createInvoice)
 router.get('/payment/:id', paymentController.retrieveInvoice)
 router.get('/status/:id/:invoice', paymentController.updateStatus)
-router.post('/callbackurl', callbackController.createCallback)
+router.post('/callbackurl', callbackController.createCallbackXendit)
 router.post('/creditCard', creditCardController.createCreditCard)
 // ---------------------------------------
 

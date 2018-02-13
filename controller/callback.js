@@ -1,7 +1,10 @@
 const db = require('../models')
+const CircularJSON = require('circular-json')
+const convert = require('xml-js')
+const pulsa = require('./pulsa')
 
 module.exports = {
-    createCallback(req, res) {
+    createCallbackXendit(req, res) {
       //TODO: CHECKING HEADER
       if(req.headers['x-callback-token']!==undefined&&req.headers['x-callback-token']===process.env.XENDIT_VALIDATION_TOKEN)
       {      
@@ -73,19 +76,7 @@ module.exports = {
                     })
                     .catch(error => res.status(400).send(error));
                   } else {
-                    db.transaction.update({
-                      status: req.body.status
-                    },{
-                      where:{
-                        paymentId: paymentId
-                      }
-                    })
-                    .then((dataTransaction) => {
-                      console.log("update status transaksi")
-                      //TODO: POST TO API PULSA.                                                 
-                      res.send(dataTransaction)
-                    })
-                    .catch(error => res.status(400).send(error));
+                    pulsa.pulsa(req,res)
                   }
                 })
                 .catch(error => res.status(400).send(error));
@@ -100,6 +91,31 @@ module.exports = {
         } else {
             return res.status(500).send('Invalid Credentials')
         }
+  }, 
+
+  createCallbackPulsa(req, res) {
+    let json = CircularJSON.stringify(data.data);
+    let dataJson = JSON.parse(json)
+    let convertJson = convert.xml2json(dataJson, { compact: true})
+    let object = JSON.parse(convertJson)
+
+    if(object.message._text === "SUCCESS"){
+      db.transaction.update({
+        status: "SUCCESS"
+      },{
+        where:{
+          id: object.ref_id._text
+        }
+      })
+      .then((data) => {
+        console.log('request callback sukses')
+      })
+      .catch(err => res.send(err))
+    } else {
+      console.log("error / failed", object.message._text)
+    }
+  },
+}
 
     // Contoh payload yang dikirim dari xendit:
     // {
@@ -119,5 +135,3 @@ module.exports = {
     //   adjusted_received_amount: 47500,
     //   updated: "2016-10-10T08:15:03.404Z",
     //   created: "2016-10-10T08:15:03.404Z"
-  }, 
-}
