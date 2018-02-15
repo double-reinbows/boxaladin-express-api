@@ -22,6 +22,7 @@ module.exports = {
         paymentId: dataPayment.id,
         productId: req.body.productId,
         userId: decoded.id,
+        number: req.body.phoneNumber,
         status: "PENDING",
         aladinPrice: req.body.amount
         })

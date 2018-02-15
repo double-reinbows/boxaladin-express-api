@@ -4,6 +4,7 @@ const axios = require ('axios')
 var convert = require('xml-js')
 var toJson = require('xmljson').to_json
 const db = require('../models')
+const md5 = require('md5')
 
 module.exports = {
   pulsa(req, res) {
@@ -21,14 +22,17 @@ module.exports = {
       })
       .then(dataProduct => {
 
+        var sign = md5('081380572721' + '1945a66e211c9301' + dataTransaction.dataValues.id)
+        console.log(sign);
+        
         var pulsa = `<?xml version="1.0" ?>
                     <mp>
                       <commands>topup</commands>
                       <username>081380572721</username>
-                      <ref_id>${dataTransaction.id}</ref_id>
-                      <hp>${req.body.phoneNumber }</hp>
-                      <pulsa_code>${dataProduct.pulsaCode}</pulsa_code>
-                      <sign>b1b2cc42a395bec43ebab0f22ca80a75</sign>
+                      <ref_id>${dataTransaction.dataValues.id}</ref_id>
+                      <hp>${dataTransaction.dataValues.number}</hp>
+                      <pulsa_code>${dataProduct.dataValues.pulsaCode}</pulsa_code>
+                      <sign>${sign}</sign>
                     </mp>`
         axios.post('https://testprepaid.mobilepulsa.net/v1/legacy/index', pulsa, {
             headers: {
@@ -42,13 +46,14 @@ module.exports = {
           let convertJson = convert.xml2json(dataJson, { compact: true})
           let object = JSON.parse(convertJson)
 
-          console.log("object", object.mp.ref_id._text)
+          // console.log("object", object.mp.ref_id._text)
+          console.log("object", object)
 
           db.transaction.update({
-            status: object.message._text,
+            status: object.mp.message._text,
             },{
               where:{
-                id: object.ref_id._text
+                id: object.mp.ref_id._text
               }
             })
             .then((data)=>{

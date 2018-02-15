@@ -11,6 +11,7 @@ module.exports = {
         paymentId: req.body.paymentId,
         productId: req.body.productId,
         aladinPrice: req.body.aladinPrice,
+        number: req.body.phoneNumber,
         status: "PENDING",
       })
       .then(data => res.send(data))
