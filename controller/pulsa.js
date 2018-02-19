@@ -2,7 +2,6 @@ const https = require ('https')
 const CircularJSON = require('circular-json')
 const axios = require ('axios')
 var convert = require('xml-js')
-var toJson = require('xmljson').to_json
 const db = require('../models')
 const md5 = require('md5')
 
