@@ -14,6 +14,7 @@ module.exports = {
     },
     {
       brandName : 'Indosat',
+      brandLogo: 'https://upload.wikimedia.org/wikipedia/id/c/c0/Indosat_Ooredoo_logo.svg',
       createdAt : new Date(),
       updatedAt : new Date(),
     },
@@ -72,6 +73,7 @@ module.exports = {
     },
     {
       brandName : 'Indosat',
+      brandLogo: 'https://upload.wikimedia.org/wikipedia/id/c/c0/Indosat_Ooredoo_logo.svg',
       createdAt : new Date(),
       updatedAt : new Date(),
     },
