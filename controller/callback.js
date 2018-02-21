@@ -6,11 +6,11 @@ const pulsa = require('./pulsa')
 module.exports = {
     createCallbackXendit(req, res) {
       //TODO: CHECKING HEADER
-      if(req.headers['x-callback-token']!==undefined&&req.headers['x-callback-token']===process.env.XENDIT_VALIDATION_TOKEN)
+      if(req.headers['x-callback-token']!==undefined && req.headers['x-callback-token']===process.env.XENDIT_VALIDATION_TOKEN)
       {      
         //TODO: GET BODY RESPONSES
-        const body = req.body;
-        const paymentId = body.external_id;
+        // const body = req.body;
+        const paymentId = req.body.external_id;
         console.log("testing")
         //TODO: UPDATE ORDER IF STATUS COMPLETED
         db.payment    

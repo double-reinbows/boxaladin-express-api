@@ -2,7 +2,18 @@
 
 module.exports = {
   up : function (queryInterface, Sequelize) {
-    return queryInterface.bulkInsert('products', [
+    return queryInterface.bulkInsert('products', [{
+      productName : 'Pulsa Telkomsel 10.000',
+      categoryId : 1,
+      brandId : 1,
+      description : '',
+      stock : 100,
+      price : 10500,
+      aladinPrice : 10500,
+      pulsaCode: "htelkomsel10000",
+      createdAt : new Date(),
+      updatedAt : new Date(),
+    },
     {
       productName : 'Pulsa Telkomsel 50.000',
       categoryId : 1,
@@ -140,6 +151,18 @@ module.exports = {
 
   down : function (queryInterface, Sequelize) {
     queryInterface.bulkDelete('products', [
+      {
+        productName : 'Pulsa Telkomsel 10.000',
+        categoryId : 1,
+        brandId : 1,
+        description : '',
+        stock : 100,
+        price : 10500,
+        aladinPrice : 10500,
+        pulsaCode: "htelkomsel10000",
+        createdAt : new Date(),
+        updatedAt : new Date(),
+      },
       {
         productName : 'Pulsa Telkomsel 50.000',
         categoryId : 1,

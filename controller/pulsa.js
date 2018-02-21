@@ -47,6 +47,9 @@ module.exports = {
 
           // console.log("object", object.mp.ref_id._text)
           console.log("object", object)
+          console.log('id', dataTransaction.dataValues.id)
+          console.log('number', dataTransaction.dataValues.number)
+          console.log('pulsacode', dataProduct.dataValues.pulsaCode)
 
           db.transaction.update({
             status: object.mp.message._text,
