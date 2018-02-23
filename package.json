@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "start": "nodemon ./bin/www",
+    "serve": "NODE_ENV=production nodemon ./bin/www",
     "test": "NODE_ENV=test mocha --timeout 25000"
   },
   "dependencies": {

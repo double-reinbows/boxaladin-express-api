@@ -1,11 +1,11 @@
 {
   "development": {
-  "username": "boxaladin",
-  "password": "kolorijo",
-  "database": "ebdb",
-  "host": "aa47g9rsg7sv0g.cbo164jcsisu.ap-southeast-1.rds.amazonaws.com",
-  "port": "5432",
-  "dialect": "postgres"
+    "username": "boxaladin",
+    "password": "kolorijo",
+    "database": "ebdb",
+    "host": "aa47g9rsg7sv0g.cbo164jcsisu.ap-southeast-1.rds.amazonaws.com",
+    "port": "5432",
+    "dialect": "postgres"
   },
   "test": {
     "username": "root",
@@ -15,10 +15,11 @@
     "dialect": "mysql"
   },
   "production": {
-    "username": "root",
-    "password": null,
-    "database": "database_production",
-    "host": "127.0.0.1",
-    "dialect": "mysql"
+    "username": "boxaladin",
+    "password": "kolorijo",
+    "database": "ebdb",
+    "host": "aa1js0qqvhvh9jw.cbo164jcsisu.ap-southeast-1.rds.amazonaws.com",
+    "port": 5432,
+    "dialect": "postgres"
   }
 }
