@@ -14,6 +14,21 @@ module.exports = {
     .catch(err => res.send(err))
   },
 
+  byUser: (req, res) => {
+    const decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
+
+    Model.win.findAll({
+      where: {
+        userId: decoded.id
+      },
+      include: [
+        { all: true }
+      ]
+    })
+    .then(result => res.send(result))
+    .catch(err => res.send(err))
+  },
+
   create: (req, res) => {
     const decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
 
@@ -34,7 +49,20 @@ module.exports = {
       req.body.star = parseInt(req.body.star)
 
       Model.win.create(req.body)
-      .then(result => res.send(result))
+      .then(result => {
+
+        Model.win.findOne({
+          where: {
+            id: result.id
+          },
+          include: [
+            { all: true }
+          ]
+        })
+        .then(result => res.send(result))
+        .catch(err => res.send(err))
+
+      })
       .catch(err => res.send(err))
 
     })
