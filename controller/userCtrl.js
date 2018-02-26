@@ -44,3 +44,32 @@ exports.getUser = (req, res) => {
   })
   .catch(err => res.send(err))
 }
+
+exports.decreaseCoin = (req, res) => {
+  const decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
+
+  db.user.findOne({
+    where: {
+      id: decoded.id
+    }
+  })
+  .then(result => {
+
+    result.update({
+      coin: req.body.coin > 0 ? req.body.coin - 1 : 0
+    })
+    .then(() => {
+      console.log({ message: 'coin updated' })
+      return res.send({ message: 'coin updated' })
+    })
+    .catch(err => {
+      console.log(err)
+      return res.send(err)
+    })
+
+  })
+  .catch(err => {
+    console.log(err)
+    return res.send(err)    
+  })
+}
