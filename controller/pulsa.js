@@ -59,6 +59,7 @@ module.exports = {
               }
             })
             .then((data)=>{
+              console.log('sukses')
               res.send(object.mp);
             })
             .catch(err => res.send(err))

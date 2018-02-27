@@ -47,6 +47,8 @@ router.post('/creditCardTopup', creditCardController.createCreditCardTopup)
 
 // ------------------pulsa routes----------------------------
 router.post('/pulsa', pulsaController.pulsa)
+router.post('/pulsacallbackurl', callbackController.createCallbackPulsa)
+
 // -----------------------------------------------------------
 
 // ------------------transaction routes----------------------------

@@ -18,7 +18,7 @@
     "username": "boxaladin",
     "password": "kolorijo",
     "database": "ebdb",
-    "host": "aa1js0qqvhvh9jw.cbo164jcsisu.ap-southeast-1.rds.amazonaws.com",
+    "host": "aa1qn5xt9zcigg8.cbo164jcsisu.ap-southeast-1.rds.amazonaws.com",
     "port": 5432,
     "dialect": "postgres"
   }
