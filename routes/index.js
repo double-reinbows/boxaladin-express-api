@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const xmlparser = require('express-xml-bodyparser')
 
 const xenditController = require('../controller/balance')
 const paymentController = require('../controller/payment')
@@ -90,5 +91,10 @@ router.get('/api/product/:id', productController.retrieve);
 router.post('/api/product', productController.create);
 router.put('/api/product/:id', productController.update);
 router.delete('/api/product/:id', productController.destroy);
+
+router.post('/xml', (req, res) => {
+  console.log('INI REQUEST XML:', req.body)
+  return res.send(req.body)
+})
 
 module.exports = router;

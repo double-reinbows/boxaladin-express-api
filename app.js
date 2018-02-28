@@ -7,6 +7,8 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 require('dotenv').config()
 var firebase = require('firebase')
+var admin = require("firebase-admin")
+var xmlparser = require('express-xml-bodyparser')
 
 // Initialize Firebase
 var config = {
@@ -38,6 +40,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(xmlparser());
 
 
 app.use('/', index);
