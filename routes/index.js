@@ -135,7 +135,7 @@ router.post('/kirimpulsa', (req, res) => {
           console.log('number', req.body.hp)
           console.log('pulsacode', req.body.pulsa_code)
 
-          res.send('done')
+          res.send(object.mp)
         })
         .catch(err => console.log(err))
 
