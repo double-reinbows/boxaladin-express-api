@@ -21,7 +21,7 @@ module.exports = {
       })
       .then(dataProduct => {
 
-        var sign = md5('081380572721' + '1945a66e211c9301' + dataTransaction.dataValues.id)
+        var sign = md5('081380572721' + 'e106e106e517d3a2160d' + dataTransaction.dataValues.id)
         console.log(sign);
         
         var pulsa = `<?xml version="1.0" ?>
@@ -33,7 +33,7 @@ module.exports = {
                       <pulsa_code>${dataProduct.dataValues.pulsaCode}</pulsa_code>
                       <sign>${sign}</sign>
                     </mp>`
-        axios.post('https://testprepaid.mobilepulsa.net/v1/legacy/index', pulsa, {
+        axios.post('https://api.mobilepulsa.net/v1/legacy/index', pulsa, {
             headers: {
                 'Content-Type': 'text/xml',
             },

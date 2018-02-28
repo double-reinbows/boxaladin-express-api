@@ -94,7 +94,7 @@ module.exports = {
   }, 
 
   createCallbackPulsa(req, res) {
-
+    console.log('data', req.body)
     let json = CircularJSON.stringify(data.data);
     let dataJson = JSON.parse(json)
     let convertJson = convert.xml2json(dataJson, { compact: true})
