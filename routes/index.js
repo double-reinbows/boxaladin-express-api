@@ -106,30 +106,38 @@ router.post('/xml', (req, res) => {
 router.post('/kirimpulsa', (req, res) => {
 
   var sign = md5('081380572721' + 'e106e106e517d3a2160d' + req.body.ref_id)
-  
-  var pulsa = `<?xml version="1.0" ?>
-              <mp>
-                <commands>topup</commands>
-                <username>081380572721</username>
-                <ref_id>${req.body.ref_id}</ref_id>
-                <hp>${req.body.hp}</hp>
-                <pulsa_code>${req.body.pulsa_code}</pulsa_code>
-                <sign>${sign}</sign>
-              </mp>`
-  axios.post('https://api.mobilepulsa.net/v1/legacy/index', pulsa, {
-      headers: {
-          'Content-Type': 'text/xml',
-      },
-      httpsAgent: new https.Agent({ rejectUnauthorized: false })
-  })
-  .then(resp => {
-    console.log('response dari request pulsa:', resp)
-    return res.send(resp)
-  })
-  .catch(err => {
-    console.log('error request pulsa:', err)
-    return res.send(err)
-  })
+        console.log(sign);
+        
+        var pulsa = `<?xml version="1.0" ?>
+                    <mp>
+                      <commands>topup</commands>
+                      <username>081380572721</username>
+                      <ref_id>${req.body.ref_id}</ref_id>
+                      <hp>${req.body.hp}</hp>
+                      <pulsa_code>${req.body.pulsa_code}</pulsa_code>
+                      <sign>${sign}</sign>
+                    </mp>`
+        axios.post('https://api.mobilepulsa.net/v1/legacy/index', pulsa, {
+            headers: {
+                'Content-Type': 'text/xml',
+            },
+            httpsAgent: new https.Agent({ rejectUnauthorized: false })
+        })
+        .then((data) => {
+          let json = CircularJSON.stringify(data.data);
+          let dataJson = JSON.parse(json)
+          let convertJson = convert.xml2json(dataJson, { compact: true})
+          let object = JSON.parse(convertJson)
+
+          // console.log("object", object.mp.ref_id._text)
+          console.log("object", object)
+          console.log('id', req.body.ref_id)
+          console.log('number', req.body.hp)
+          console.log('pulsacode', req.body.pulsa_code)
+
+          res.send('done')
+        })
+        .catch(err => console.log(err))
 
 })
 
