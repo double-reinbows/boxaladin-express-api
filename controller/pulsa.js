@@ -51,7 +51,7 @@ module.exports = {
           console.log('number', dataTransaction.dataValues.number)
           console.log('pulsacode', dataProduct.dataValues.pulsaCode)
 
-          
+
           db.transaction.update({
             status: object.mp.message._text,
             },{
