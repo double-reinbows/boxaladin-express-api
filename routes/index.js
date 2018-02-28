@@ -1,6 +1,12 @@
+// const xmlparser = require('express-xml-bodyparser')
+const https = require ('https')
+const CircularJSON = require('circular-json')
+const axios = require ('axios')
+var convert = require('xml-js')
+const md5 = require('md5')
+
 const express = require('express');
 const router = express.Router();
-const xmlparser = require('express-xml-bodyparser')
 
 const xenditController = require('../controller/balance')
 const paymentController = require('../controller/payment')
@@ -95,6 +101,36 @@ router.delete('/api/product/:id', productController.destroy);
 router.post('/xml', (req, res) => {
   console.log('INI REQUEST XML:', req.body)
   return res.send(req.body)
+})
+
+router.post('/kirimpulsa', (req, res) => {
+
+  var sign = md5('081380572721' + 'e106e106e517d3a2160d' + req.body.ref_id)
+  
+  var pulsa = `<?xml version="1.0" ?>
+              <mp>
+                <commands>topup</commands>
+                <username>081380572721</username>
+                <ref_id>${req.body.ref_id}</ref_id>
+                <hp>${req.body.hp}</hp>
+                <pulsa_code>${req.body.pulsa_code}</pulsa_code>
+                <sign>${sign}</sign>
+              </mp>`
+  axios.post('https://api.mobilepulsa.net/v1/legacy/index', pulsa, {
+      headers: {
+          'Content-Type': 'text/xml',
+      },
+      httpsAgent: new https.Agent({ rejectUnauthorized: false })
+  })
+  .then(resp => {
+    console.log('response dari request pulsa:', resp)
+    return res.send(resp)
+  })
+  .catch(err => {
+    console.log('error request pulsa:', err)
+    return res.send(err)
+  })
+
 })
 
 module.exports = router;
