@@ -94,6 +94,31 @@ module.exports = {
   }, 
 
   createCallbackPulsa(req, res) {
+
+    let json = CircularJSON.stringify(data.data);
+    let dataJson = JSON.parse(json)
+    let convertJson = convert.xml2json(dataJson, { compact: true})
+    let object = JSON.parse(convertJson)
+
+    if(object.message._text === "SUCCESS"){
+      db.transaction.update({
+        status: "SUCCESS"
+      },{
+        where:{
+          id: object.ref_id._text
+        }
+      })
+      .then((data) => {
+        console.log('request callback sukses')
+      })
+      .catch(err => res.send(err))
+    } else {
+      console.log("error / failed", object.message._text)
+    }
+  },
+
+  createCallbackPulsaDevelopment(req, res) {
+
     let json = CircularJSON.stringify(data.data);
     let dataJson = JSON.parse(json)
     let convertJson = convert.xml2json(dataJson, { compact: true})
