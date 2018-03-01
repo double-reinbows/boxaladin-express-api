@@ -1,11 +1,3 @@
-// const xmlparser = require('express-xml-bodyparser')
-// const https = require ('https')
-// const CircularJSON = require('circular-json')
-// const axios = require ('axios')
-// var convert = require('xml-js')
-// const md5 = require('md5')
-// const xml = require("xml-parse");
-
 const express = require('express');
 const router = express.Router();
 
@@ -97,21 +89,5 @@ router.get('/api/product/:id', productController.retrieve);
 router.post('/api/product', productController.create);
 router.put('/api/product/:id', productController.update);
 router.delete('/api/product/:id', productController.destroy);
-
-// router.post('/xml', (req, res) => {
-  
-//   let parsedXML = xml.parse(req.body);
-
-//   let convertJson = convert.xml2json(parsedXML[2].childNodes[0].text, { compact: true})
-//   let object = JSON.parse(convertJson)
-//   let idTransaction = object.ref_id._text
-//   console.log("id", idTransaction)
-
-//   let response =  parsedXML[2].childNodes[9].childNodes[0].text
-//   console.log("response", response);
-
-// return res.send(req.body)
-
-// })
 
 module.exports = router;
