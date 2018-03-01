@@ -5,7 +5,7 @@
   "scripts": {
     "start": "nodemon ./bin/www",
     "serve": "NODE_ENV=production nodemon ./bin/www",
-    "test": "NODE_ENV=test mocha --timeout 25000"
+    "test": "NODE_ENV=test mocha --timeout 1000"
   },
   "dependencies": {
     "aws-sdk": "^2.180.0",
@@ -34,7 +34,7 @@
     "sequelize": "^4.28.6",
     "serve-favicon": "~2.4.2",
     "xml-js": "^1.6.2",
-    "xml2json": "^0.11.0",
-    "xmljson": "^0.2.0"
+    "xml-parse": "^0.3.1",
+    "xml2json": "^0.11.0"
   }
 }

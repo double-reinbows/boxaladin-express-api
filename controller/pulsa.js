@@ -21,7 +21,7 @@ module.exports = {
       })
       .then(dataProduct => {
 
-        var sign = md5('081380572721' + 'e106e106e517d3a2160d' + dataTransaction.dataValues.id)
+        var sign = md5('081380572721' + process.env.PULSA_PRODUCTION_KEY + dataTransaction.dataValues.id)
         console.log(sign);
         
         var pulsa = `<?xml version="1.0" ?>

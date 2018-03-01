@@ -2,6 +2,7 @@ const db = require('../models')
 const CircularJSON = require('circular-json')
 const convert = require('xml-js')
 const pulsa = require('./pulsa')
+const xml = require("xml-parse");
 
 module.exports = {
     createCallbackXendit(req, res) {
@@ -94,44 +95,23 @@ module.exports = {
   }, 
 
   createCallbackPulsa(req, res) {
-    console.log('CALLBACK pulsa:', req)
-    console.log('CALLBACK PULSA:', req.body)
 
-    // let json = CircularJSON.stringify(data.data);
-    // let dataJson = JSON.parse(json)
-    // let convertJson = convert.xml2json(dataJson, { compact: true})
-    // let object = JSON.parse(convertJson)
+    let parsedXML = xml.parse(req.body);
 
-    // if(object.message._text === "SUCCESS"){
-    //   db.transaction.update({
-    //     status: "SUCCESS"
-    //   },{
-    //     where:{
-    //       id: object.ref_id._text
-    //     }
-    //   })
-    //   .then((data) => {
-    //     console.log('request callback sukses')
-    //   })
-    //   .catch(err => res.send(err))
-    // } else {
-    //   console.log("error / failed", object.message._text)
-    // }
-  },
-
-  createCallbackPulsaDevelopment(req, res) {
-
-    let json = CircularJSON.stringify(data.data);
-    let dataJson = JSON.parse(json)
-    let convertJson = convert.xml2json(dataJson, { compact: true})
+    let convertJson = convert.xml2json(parsedXML[2].childNodes[0].text, { compact: true})
     let object = JSON.parse(convertJson)
+    let idTransaction = object.ref_id._text
+    console.log("id", idTransaction)
 
-    if(object.message._text === "SUCCESS"){
+    let response =  parsedXML[2].childNodes[9].childNodes[0].text
+    console.log("response", response);
+
+    if(response === "00"){
       db.transaction.update({
         status: "SUCCESS"
       },{
         where:{
-          id: object.ref_id._text
+          id: idTransaction
         }
       })
       .then((data) => {
@@ -139,9 +119,10 @@ module.exports = {
       })
       .catch(err => res.send(err))
     } else {
-      console.log("error / failed", object.message._text)
+      console.log("error / failed")
     }
   },
+
 }
 
     // Contoh payload yang dikirim dari xendit:
