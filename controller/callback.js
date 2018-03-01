@@ -95,39 +95,32 @@ module.exports = {
   }, 
 
   createCallbackPulsa(req, res) {
-    console.log('CALLBACK PULSA:', req.body)
 
-    var parsedXML = xml.parse(req.body);
-    console.log('parse', parsedXML)
-
-    let id = parsedXML[2].childNodes[0].text
-    console.log('id', id)
+    let parsedXML = xml.parse(req.body);
+    
+    let convertJson = convert.xml2json(parsedXML[2].childNodes[0].text, { compact: true})
+    let object = JSON.parse(convertJson)
+    let idTransaction = object.ref_id._text
+    console.log("id", idTransaction)
 
     let response =  parsedXML[2].childNodes[9].childNodes[0].text
-    console.log("convertxml", response);
+    console.log("response", response);
 
-    return res.send(response)
-
-    // let json = CircularJSON.stringify(data.data);
-    // let dataJson = JSON.parse(json)
-    // let convertJson = convert.xml2json(dataJson, { compact: true})
-    // let object = JSON.parse(convertJson)
-
-    // if(response === 00){
-    //   db.transaction.update({
-    //     status: "SUCCESS"
-    //   },{
-    //     where:{
-    //       id: object.ref_id._text
-    //     }
-    //   })
-    //   .then((data) => {
-    //     console.log('request callback sukses')
-    //   })
-    //   .catch(err => res.send(err))
-    // } else {
-    //   console.log("error / failed", object.message._text)
-    // }
+    if(response === 00){
+      db.transaction.update({
+        status: "SUCCESS"
+      },{
+        where:{
+          id: idTransaction
+        }
+      })
+      .then((data) => {
+        console.log('request callback sukses')
+      })
+      .catch(err => res.send(err))
+    } else {
+      console.log("error / failed")
+    }
   },
 
 }
