@@ -98,43 +98,22 @@ module.exports = {
     console.log('CALLBACK PULSA:', req.body)
 
     var parsedXML = xml.parse(req.body);
-    console.log("convertxml", parsedXML[2].childNodes[9].childNodes[0].text);
-    return res.send(parsedXML[2].childNodes[9].childNodes[0].text)
+    console.log('parse', parsedXML)
 
-    // ->
-    // <?xml version="1.0" encoding="utf-8"?>
-    // <Message>Hello, World!</Message>
+    let id = parsedXML[2].childNodes[0].text
+    console.log('id', id)
+
+    let response =  parsedXML[2].childNodes[9].childNodes[0].text
+    console.log("convertxml", response);
+    
+    return res.send(response)
 
     // let json = CircularJSON.stringify(data.data);
     // let dataJson = JSON.parse(json)
     // let convertJson = convert.xml2json(dataJson, { compact: true})
     // let object = JSON.parse(convertJson)
 
-    // if(object.message._text === "SUCCESS"){
-    //   db.transaction.update({
-    //     status: "SUCCESS"
-    //   },{
-    //     where:{
-    //       id: object.ref_id._text
-    //     }
-    //   })
-    //   .then((data) => {
-    //     console.log('request callback sukses')
-    //   })
-    //   .catch(err => res.send(err))
-    // } else {
-    //   console.log("error / failed", object.message._text)
-    // }
-  },
-
-  createCallbackPulsaDevelopment(req, res) {
-
-    let json = CircularJSON.stringify(data.data);
-    let dataJson = JSON.parse(json)
-    let convertJson = convert.xml2json(dataJson, { compact: true})
-    let object = JSON.parse(convertJson)
-
-    if(object.message._text === "SUCCESS"){
+    if(response === 00){
       db.transaction.update({
         status: "SUCCESS"
       },{
@@ -150,6 +129,7 @@ module.exports = {
       console.log("error / failed", object.message._text)
     }
   },
+
 }
 
     // Contoh payload yang dikirim dari xendit:
