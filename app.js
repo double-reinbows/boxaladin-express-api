@@ -10,6 +10,13 @@ var firebase = require('firebase')
 var admin = require("firebase-admin")
 var xmlparser = require('express-xml-bodyparser')
 
+// Initialize Firebase Admin
+var serviceAccount = require("./boxaladin-auction-firebase-adminsdk-kr4x0-a14e997d4b.json")
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: "https://boxaladin-auction.firebaseio.com"
+})
+
 // Initialize Firebase
 var config = {
   apiKey: "AIzaSyDjiWTez3r_lZreCZUvIUhaSj8-rIWfhgw",
