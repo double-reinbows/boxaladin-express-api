@@ -97,7 +97,7 @@ module.exports = {
   createCallbackPulsa(req, res) {
 
     let parsedXML = xml.parse(req.body);
-    
+
     let convertJson = convert.xml2json(parsedXML[2].childNodes[0].text, { compact: true})
     let object = JSON.parse(convertJson)
     let idTransaction = object.ref_id._text
@@ -106,7 +106,7 @@ module.exports = {
     let response =  parsedXML[2].childNodes[9].childNodes[0].text
     console.log("response", response);
 
-    if(response === 00){
+    if(response === "00"){
       db.transaction.update({
         status: "SUCCESS"
       },{
