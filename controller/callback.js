@@ -105,7 +105,7 @@ module.exports = {
 
     let response =  parsedXML[2].childNodes[9].childNodes[0].text
     console.log("convertxml", response);
-    
+
     return res.send(response)
 
     // let json = CircularJSON.stringify(data.data);
@@ -113,21 +113,21 @@ module.exports = {
     // let convertJson = convert.xml2json(dataJson, { compact: true})
     // let object = JSON.parse(convertJson)
 
-    if(response === 00){
-      db.transaction.update({
-        status: "SUCCESS"
-      },{
-        where:{
-          id: object.ref_id._text
-        }
-      })
-      .then((data) => {
-        console.log('request callback sukses')
-      })
-      .catch(err => res.send(err))
-    } else {
-      console.log("error / failed", object.message._text)
-    }
+    // if(response === 00){
+    //   db.transaction.update({
+    //     status: "SUCCESS"
+    //   },{
+    //     where:{
+    //       id: object.ref_id._text
+    //     }
+    //   })
+    //   .then((data) => {
+    //     console.log('request callback sukses')
+    //   })
+    //   .catch(err => res.send(err))
+    // } else {
+    //   console.log("error / failed", object.message._text)
+    // }
   },
 
 }
