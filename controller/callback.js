@@ -7,7 +7,7 @@ const xml = require("xml-parse");
 module.exports = {
     createCallbackXendit(req, res) {
       //TODO: CHECKING HEADER
-      if(req.headers['x-callback-token']!==undefined && req.headers['x-callback-token']===process.env.XENDIT_VALIDATION_TOKEN)
+      if(req.headers['x-callback-token']!==undefined && req.headers['x-callback-token']===process.env.XENDIT_PRODUCTION_TOKEN)
       {      
         //TODO: GET BODY RESPONSES
         // const body = req.body;
@@ -22,7 +22,7 @@ module.exports = {
               message: 'Id Not Found',
             });
           }else{              
-            if(data.status === 'PENDING'&& req.body.status === 'COMPLETED'){
+            if(data.status === 'PENDING'&& req.body.status === 'PAID'){
               //TODO: UPDATE PAYMENT;
               //TODO: SENDING EMAIL TO USER.
               db.payment.update({
@@ -106,7 +106,7 @@ module.exports = {
     let response =  parsedXML[2].childNodes[9].childNodes[0].text
     console.log("response", response);
 
-    if(response === "00"){
+    if(response === '00'){
       db.transaction.update({
         status: "SUCCESS"
       },{
@@ -119,7 +119,7 @@ module.exports = {
       })
       .catch(err => res.send(err))
     } else {
-      console.log("error / failed")
+      console.log("error / failed", response)
     }
   },
 
