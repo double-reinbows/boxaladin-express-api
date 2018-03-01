@@ -1,9 +1,13 @@
 // const xmlparser = require('express-xml-bodyparser')
-const https = require ('https')
-const CircularJSON = require('circular-json')
-const axios = require ('axios')
-var convert = require('xml-js')
-const md5 = require('md5')
+// const https = require ('https')
+// const CircularJSON = require('circular-json')
+// const axios = require ('axios')
+// var convert = require('xml-js')
+// const md5 = require('md5')
+// var data2xml = require('data2xml');
+// var convertxml = data2xml();
+// var str2json = require('string-to-json');
+// const xml = require("xml-parse");
 
 const express = require('express');
 const router = express.Router();
@@ -98,47 +102,11 @@ router.post('/api/product', productController.create);
 router.put('/api/product/:id', productController.update);
 router.delete('/api/product/:id', productController.destroy);
 
-router.post('/xml', (req, res) => {
-  console.log('INI REQUEST XML:', req.body)
-  return res.send(req.body)
-})
+// router.post('/xml', (req, res) => {
+// var parsedXML = xml.parse(req.body);
+// console.log("convertxml", parsedXML[2].childNodes[9].childNodes[0].text);
+//  return res.send(parsedXML[2].childNodes[9].childNodes[0].text)
 
-router.post('/kirimpulsa', (req, res) => {
-
-  var sign = md5('081380572721' + 'e106e106e517d3a2160d' + req.body.ref_id)
-        console.log(sign);
-        
-        var pulsa = `<?xml version="1.0" ?>
-                    <mp>
-                      <commands>topup</commands>
-                      <username>081380572721</username>
-                      <ref_id>${req.body.ref_id}</ref_id>
-                      <hp>${req.body.hp}</hp>
-                      <pulsa_code>${req.body.pulsa_code}</pulsa_code>
-                      <sign>${sign}</sign>
-                    </mp>`
-        axios.post('https://api.mobilepulsa.net/v1/legacy/index', pulsa, {
-            headers: {
-                'Content-Type': 'text/xml',
-            },
-            httpsAgent: new https.Agent({ rejectUnauthorized: false })
-        })
-        .then((data) => {
-          let json = CircularJSON.stringify(data.data);
-          let dataJson = JSON.parse(json)
-          let convertJson = convert.xml2json(dataJson, { compact: true})
-          let object = JSON.parse(convertJson)
-
-          // console.log("object", object.mp.ref_id._text)
-          console.log("object", object)
-          console.log('id', req.body.ref_id)
-          console.log('number', req.body.hp)
-          console.log('pulsacode', req.body.pulsa_code)
-
-          res.send(object.mp)
-        })
-        .catch(err => console.log(err))
-
-})
+// })
 
 module.exports = router;

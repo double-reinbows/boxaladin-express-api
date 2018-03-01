@@ -2,6 +2,7 @@ const db = require('../models')
 const CircularJSON = require('circular-json')
 const convert = require('xml-js')
 const pulsa = require('./pulsa')
+const xml = require("xml-parse");
 
 module.exports = {
     createCallbackXendit(req, res) {
@@ -94,8 +95,15 @@ module.exports = {
   }, 
 
   createCallbackPulsa(req, res) {
-    console.log('CALLBACK pulsa:', req)
     console.log('CALLBACK PULSA:', req.body)
+
+    var parsedXML = xml.parse(req.body);
+    console.log("convertxml", parsedXML[2].childNodes[9].childNodes[0].text);
+    return res.send(parsedXML[2].childNodes[9].childNodes[0].text)
+
+    // ->
+    // <?xml version="1.0" encoding="utf-8"?>
+    // <Message>Hello, World!</Message>
 
     // let json = CircularJSON.stringify(data.data);
     // let dataJson = JSON.parse(json)
