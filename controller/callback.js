@@ -6,14 +6,9 @@ const xml = require("xml-parse");
 
 module.exports = {
     createCallbackXendit(req, res) {
-      //TODO: CHECKING HEADER
       if(req.headers['x-callback-token']!==undefined && req.headers['x-callback-token']===process.env.XENDIT_PRODUCTION_TOKEN)
       {      
-        //TODO: GET BODY RESPONSES
-        // const body = req.body;
         const paymentId = req.body.external_id;
-        console.log("testing")
-        //TODO: UPDATE ORDER IF STATUS COMPLETED
         db.payment    
         .findById(paymentId)
         .then(data => {
@@ -23,8 +18,6 @@ module.exports = {
             });
           }else{              
             if(data.status === 'PENDING'&& req.body.status === 'PAID'){
-              //TODO: UPDATE PAYMENT;
-              //TODO: SENDING EMAIL TO USER.
               db.payment.update({
                 status: req.body.status
               },{
@@ -40,7 +33,6 @@ module.exports = {
                 })
                 .then((resultTransaction) => {
                   if(resultTransaction === null){
-                    console.log("asd")
                     db.topup.findOne({
                       where:{
                         paymentId: paymentId
@@ -50,15 +42,12 @@ module.exports = {
                       ]
                     })
                     .then((resultTopUp)=>{
-                      console.log("resulttopup", resultTopUp.dataValues.userId)
                       db.user.findOne({
                         where:{
                           id: resultTopUp.dataValues.userId
                         }
                       })
                       .then((resultUser) => {
-                        console.log('aaaa', resultUser.dataValues.aladinKeys)
-                        console.log('bbb', resultTopUp.key.dataValues.keyAmount)
                         var key = parseInt(resultUser.dataValues.aladinKeys) + parseInt(resultTopUp.key.dataValues.keyAmount)
                         db.user.update({
                           aladinKeys: key
@@ -71,9 +60,9 @@ module.exports = {
                           console.log ('top up aladin keys berhasil')
                           res.send(result)
                         })
-                        .catch(error => console.log('error', error));
+                        .catch(error =>res.status(400).send(error));
                       })
-                      .catch(error => console.log('error', error));
+                      .catch(error => res.status(400).send(error));
                     })
                     .catch(error => res.status(400).send(error));
                   } else {
@@ -84,8 +73,7 @@ module.exports = {
               })
               .catch(error => res.status(400).send(error));
             } else {
-              console.log("'if' ga jalan, jdi kluar body")
-              return res.send(body)
+              return res.send("Callback Xendit Failed")
             }
           }})
           .catch(error => res.status(400).send(error)); 
@@ -101,10 +89,7 @@ module.exports = {
     let convertJson = convert.xml2json(parsedXML[2].childNodes[0].text, { compact: true})
     let object = JSON.parse(convertJson)
     let idTransaction = object.ref_id._text
-    console.log("id", idTransaction)
-
     let response =  parsedXML[2].childNodes[9].childNodes[0].text
-    console.log("response", response);
 
     if(response === '00'){
       db.transaction.update({
@@ -119,7 +104,17 @@ module.exports = {
       })
       .catch(err => res.send(err))
     } else {
-      console.log("error / failed", response)
+      db.transaction.update({
+        status: response
+      },{
+        where:{
+          id: idTransaction
+        }
+      })
+      .then((data) => {
+        console.log("error / failed", response)
+      })
+      .catch(err => res.send(err))
     }
   },
 
