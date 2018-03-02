@@ -3,8 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "nodemon ./bin/www",
-    "serve": "NODE_ENV=production nodemon ./bin/www",
+    "dev": "nodemon ./bin/www",
+    "start": "node ./bin/www",
+    "serve": "NODE_ENV=production node ./bin/www",
     "test": "NODE_ENV=test mocha --timeout 1000"
   },
   "dependencies": {
