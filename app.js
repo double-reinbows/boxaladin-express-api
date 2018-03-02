@@ -5,7 +5,11 @@ var logger = require('morgan');
 var cors = require('cors')
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-require('dotenv').config()
+var isDevelop = process.env.NODE_ENV || 'development';
+var envPath = isDevelop ? path.resolve('.env.dev') : path.resolve('.env');
+console.log('author: ',process.env.AUTHOR);
+console.log('envPath: ',envPath);
+require('dotenv').config({path: envPath})
 var firebase = require('firebase')
 var admin = require("firebase-admin")
 var xmlparser = require('express-xml-bodyparser')
