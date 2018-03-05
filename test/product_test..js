@@ -10,7 +10,6 @@ describe('test product', ()=>{
     chai.request('http://localhost:3000')
     .post('/api/product')
     .send({
-      id: '1',
       categoryId: '1',
       brandId: '1',
       productName: 'pulsa telkomsel 10rb',
@@ -21,14 +20,7 @@ describe('test product', ()=>{
       pulsaCode:'htelkomsel'
     })
     .end((err,res) => {
-      res.should.have.status(201);
-
-      res.should.be.json;
-      res.should.be.a('object');
-
-      res.body.should.have.property("id");
-      res.body.id.should.equal('1');
-      res.body.id.should.be.a('Integer');
+      res.should.have.status(400);
 
       res.body.should.have.property("categoryId");
       res.body.id.should.equal("1");
@@ -50,7 +42,7 @@ describe('test product', ()=>{
       res.body.id.should.equal("1");
       res.body.id.should.be.a("Integer");
 
-      res.body.should.have.property("Price");
+      res.body.should.have.property("price");
       res.body.id.should.equal("10500");
       res.body.id.should.be.a("Integer");
 
@@ -81,13 +73,13 @@ describe('test product', ()=>{
       .request("http://localhost:3000")
       .put(`/api/product/` + id)
       .send({
-        id: "2",
-        categoryId: "2",
-        brandId: "2",
+        categoryId: 2,
+        brandId: 2,
         productName: "pulsa telkomsel 25rb",
         description: "asd",
-        stock: "1",
-        aladinPrice: "25000",
+        stock: 1,
+        price: 10500,
+        aladinPrice: 25000,
         pulsaCode: "htelkomsel"
       })
       .end((err, res) => {
@@ -96,12 +88,8 @@ describe('test product', ()=>{
        res.should.be.json;
        res.should.be.a("object");
 
-       res.body.should.have.property("id");
-       res.body.id.should.equal("1");
-       res.body.id.should.be.a("Integer");
-
        res.body.should.have.property("categoryId");
-       res.body.id.should.equal("1");
+       res.body.id.should.equal(11);
        res.body.id.should.be.a("Integer");
 
        res.body.should.have.property("brandId");
@@ -113,11 +101,15 @@ describe('test product', ()=>{
        res.body.id.should.be.a("Integer");
 
        res.body.should.have.property("description");
+       res.body.id.should.equal("asd");
+       res.body.id.should.be.a("Integer");
+
+       res.body.should.have.property("stock");
        res.body.id.should.equal("1");
        res.body.id.should.be.a("Integer");
 
-       res.body.should.have.property("id");
-       res.body.id.should.equal("1");
+       res.body.should.have.property("price");
+       res.body.id.should.equal("10500");
        res.body.id.should.be.a("Integer");
 
        res.body.should.have.property("aladinPrice");
@@ -137,12 +129,12 @@ describe('test product', ()=>{
     .delete(`/api/product/` + id)
     .end((err,res) =>{
       res.should.have.status(200);
-      res.body.should.not.have.property('id');
       res.body.should.not.have.property("categoryId");
       res.body.should.not.have.property("brandId");
       res.body.should.not.have.property("productName");
       res.body.should.not.have.property("description");
       res.body.should.not.have.property("stock");
+      res.body.should.not.have.property("price");
       res.body.should.not.have.property("aladinPrice");
       res.body.should.not.have.property("pulsaCode");
 
