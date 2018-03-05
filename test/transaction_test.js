@@ -39,10 +39,10 @@ describe('test transaction', ()=>{
       res.body.status.should.equal('PENDING');
       res.body.status.should.be.a("String");
 
-      id = res.body.id
-      done()
-    })
-  })
+//       id = res.body.id
+//       done()
+//     })
+//   })
 
   it('successfully read all pending transaction', function (done) {
     chai.request('http://localhost:3000')
@@ -74,4 +74,4 @@ describe('test transaction', ()=>{
   });
 
 
-})
+// })
