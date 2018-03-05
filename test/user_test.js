@@ -4,7 +4,6 @@ var should = chai.should()
 
 chai.use(chaiHttp);
 
- var number= 0812345678
 describe('test user', ()=>{
   it('successfully create new user', function (done) {
     chai.request('http://localhost:3000')
