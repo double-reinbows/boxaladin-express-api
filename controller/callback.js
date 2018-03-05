@@ -1,24 +1,140 @@
-module.exports = {
-  createCallback(req, res) {
-    //TODO: CHECKING HEADER
-    console.log(req.headers);
-    if(req.headers['x-callback-token']!==undefined&&req.headers['x-callback-token']==='eG5kX2RldmVsb3BtZW50X1A0cURmT3NzME9DcGw4UnRLclJPSGphUVlOQ2s5ZE41bFNmaytSMWw5V2JlK3JTaUN3WjNqdz09Og=='){
-      //TODO: GET BODY RESPONSES
-      const body = req.body;
-      //TODO: UPDATE ORDER IF STATUS COMPLETED
-      const paymentId = req.body.external_id;
-      const getPayment = Payment.find(payment_id);
-      if(req.body.status === 'COMPLETED'&&getPayment.status === 'PENDING'){
-        //TODO: UPDATE PAYMENT;
-        //TODO: SENDING EMAIL TO USER.
-        getPayment.status = 'COMPLETED';
-        getPayment.updated = req.body.updated;
-        getPayment.save();
-        //TODO: POST TO API PULSA.
-      }
+const db = require('../models')
+const CircularJSON = require('circular-json')
+const convert = require('xml-js')
+const pulsa = require('./pulsa')
+const xml = require("xml-parse");
 
-      return res.send(body)
-    }
-    return res.status(500).send('Invalid Credentials')
+module.exports = {
+    createCallbackXendit(req, res) {
+      if(req.headers['x-callback-token']!==undefined && req.headers['x-callback-token']===process.env.XENDIT_PRODUCTION_TOKEN)
+      {      
+        const paymentId = req.body.external_id;
+        db.payment    
+        .findById(paymentId)
+        .then(data => {
+          if (!data) {
+            return res.status(404).send({
+              message: 'Id Not Found',
+            });
+          }else{              
+            if(data.status === 'PENDING'&& req.body.status === 'PAID'){
+              db.payment.update({
+                status: req.body.status
+              },{
+                where:{
+                  id: paymentId
+                }
+              })
+              .then(() => {
+                db.transaction.findOne({    
+                  where:{    
+                    paymentId: paymentId
+                  }
+                })
+                .then((resultTransaction) => {
+                  if(resultTransaction === null){
+                    db.topup.findOne({
+                      where:{
+                        paymentId: paymentId
+                      },
+                      include:[
+                        {all:true}
+                      ]
+                    })
+                    .then((resultTopUp)=>{
+                      db.user.findOne({
+                        where:{
+                          id: resultTopUp.dataValues.userId
+                        }
+                      })
+                      .then((resultUser) => {
+                        var key = parseInt(resultUser.dataValues.aladinKeys) + parseInt(resultTopUp.key.dataValues.keyAmount)
+                        db.user.update({
+                          aladinKeys: key
+                        },{
+                          where:{
+                            id: resultUser.dataValues.id
+                          }
+                        })
+                        .then((result) => {
+                          console.log ('top up aladin keys berhasil')
+                          res.send(result)
+                        })
+                        .catch(error =>res.status(400).send(error));
+                      })
+                      .catch(error => res.status(400).send(error));
+                    })
+                    .catch(error => res.status(400).send(error));
+                  } else {
+                    pulsa.pulsa(req,res)
+                  }
+                })
+                .catch(error => res.status(400).send(error));
+              })
+              .catch(error => res.status(400).send(error));
+            } else {
+              return res.send("Callback Xendit Failed")
+            }
+          }})
+          .catch(error => res.status(400).send(error)); 
+        } else {
+            return res.status(500).send('Invalid Credentials')
+        }
   }, 
+
+  createCallbackPulsa(req, res) {
+
+    let parsedXML = xml.parse(req.body);
+
+    let convertJson = convert.xml2json(parsedXML[2].childNodes[0].text, { compact: true})
+    let object = JSON.parse(convertJson)
+    let idTransaction = object.ref_id._text
+    let response =  parsedXML[2].childNodes[9].childNodes[0].text
+
+    if(response === '00'){
+      db.transaction.update({
+        status: "SUCCESS"
+      },{
+        where:{
+          id: idTransaction
+        }
+      })
+      .then((data) => {
+        console.log('request callback sukses')
+      })
+      .catch(err => res.send(err))
+    } else {
+      db.transaction.update({
+        status: response
+      },{
+        where:{
+          id: idTransaction
+        }
+      })
+      .then((data) => {
+        console.log("error / failed", response)
+      })
+      .catch(err => res.send(err))
+    }
+  },
+
 }
+
+    // Contoh payload yang dikirim dari xendit:
+    // {
+    //   id: "579c8d61f23fa4ca35e52da4",
+    //   user_id: "5781d19b2e2385880609791c",
+    //   external_id: "invoice_123124123",
+    //   is_high: true,
+    //   status: "COMPLETED",
+    //   merchant_name: "Xendit",
+    //   amount: 50000,
+    //   payer_email: "albert@xendit.co",
+    //   description: "This is a description",
+    //   fees_paid_amount: 2500,
+    //   paid_amount: 50000,
+    //   payment_method: "POOL",
+    //   bank_code: "BCA",
+    //   adjusted_received_amount: 47500,
+    //   updated: "2016-10-10T08:15:03.404Z",
+    //   created: "2016-10-10T08:15:03.404Z"

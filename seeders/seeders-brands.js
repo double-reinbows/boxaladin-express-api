@@ -4,21 +4,25 @@ module.exports = {
   up : function (queryInterface, Sequelize) {
     return queryInterface.bulkInsert('brands', [{
       brandName : 'Telkomsel',
+      brandLogo: 'https://s3-ap-southeast-1.amazonaws.com/iconpulsa/telkomsel.svg',
       createdAt : new Date(),
       updatedAt : new Date(),
     },
     {
       brandName : 'XL',
+      brandLogo: 'https://s3-ap-southeast-1.amazonaws.com/iconpulsa/xl.svg',
       createdAt : new Date(),
       updatedAt : new Date(),
     },
     {
       brandName : 'Indosat',
+      brandLogo: 'https://s3-ap-southeast-1.amazonaws.com/iconpulsa/Indosat2.svg',
       createdAt : new Date(),
       updatedAt : new Date(),
     },
     {
       brandName : 'Tri',
+      brandLogo: 'https://s3-ap-southeast-1.amazonaws.com/iconpulsa/Tri.svg',
       createdAt : new Date(),
       updatedAt : new Date(),
     },
@@ -29,11 +33,13 @@ module.exports = {
     },
     {
       brandName : 'Smartfren',
+      brandLogo: 'https://s3-ap-southeast-1.amazonaws.com/iconpulsa/Smart.svg',
       createdAt : new Date(),
       updatedAt : new Date(),
     },
     {
       brandName : 'Bolt',
+      brandLogo: 'https://s3-ap-southeast-1.amazonaws.com/iconpulsa/Bolt.svg',
       createdAt : new Date(),
       updatedAt : new Date(),
     },
@@ -72,6 +78,7 @@ module.exports = {
     },
     {
       brandName : 'Indosat',
+      brandLogo: 'https://upload.wikimedia.org/wikipedia/id/c/c0/Indosat_Ooredoo_logo.svg',
       createdAt : new Date(),
       updatedAt : new Date(),
     },

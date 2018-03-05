@@ -5,8 +5,21 @@ var logger = require('morgan');
 var cors = require('cors')
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-require('dotenv').config()
+var isDevelop = process.env.NODE_ENV || 'development';
+var envPath = isDevelop ? path.resolve('.env.dev') : path.resolve('.env');
+console.log('author: ',process.env.AUTHOR);
+console.log('envPath: ',envPath);
+require('dotenv').config({path: envPath})
 var firebase = require('firebase')
+var admin = require("firebase-admin")
+var xmlparser = require('express-xml-bodyparser')
+
+// Initialize Firebase Admin
+var serviceAccount = require("./boxaladin-auction-firebase-adminsdk-kr4x0-a14e997d4b.json")
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: "https://boxaladin-auction.firebaseio.com"
+})
 
 // Initialize Firebase
 var config = {
@@ -21,6 +34,8 @@ firebase.initializeApp(config);
 
 var index = require('./routes/index');
 var users = require('./routes/users');
+var win = require('./routes/win');
+var reward = require('./routes/reward');
 
 var app = express();
 app.use(cors())
@@ -36,10 +51,14 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(xmlparser());
+app.use(bodyParser.text());
 
 
 app.use('/', index);
 app.use('/users', users);
+app.use('/win', win);
+app.use('/reward', reward);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

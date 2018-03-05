@@ -9,6 +9,9 @@ const ctrl = require('../controller/userCtrl')
 //   res.send('respond with a resource');
 // });
 
+router.get('/info', ctrl.getUser)
 router.get('/:username', auth.authUser, ctrl.getUserData)
+
+router.put('/coin', ctrl.decreaseCoin)
 
 module.exports = router;

@@ -3,8 +3,11 @@ const router = express.Router();
 
 const xenditController = require('../controller/balance')
 const paymentController = require('../controller/payment')
+const callbackController = require('../controller/callback')
 const pulsaController = require('../controller/pulsa')
-// const callbackController = require('../controller/callback')
+const transactionController = require('../controller/transaction')
+const creditCardController = require('../controller/creditCard')
+const topUpController = require('../controller/aladinKey')
 
 const ctrl = require('../controller/indexCtrl')
 const phoneCtrl = require('../controller/otpCtrl')
@@ -31,11 +34,27 @@ router.get('/balance', xenditController.balance)
 router.post('/payment', paymentController.createInvoice)
 router.get('/payment/:id', paymentController.retrieveInvoice)
 router.get('/status/:id/:invoice', paymentController.updateStatus)
-router.post('/callbackurl', paymentController.createCallback)
+router.post('/callbackurl', callbackController.createCallbackXendit)
+router.post('/creditCard', creditCardController.createCreditCard)
 // ---------------------------------------
+
+router.post('/topupKey', topUpController.topUpKeys)
+router.get('/voucheraladinkey', topUpController.all)
+router.get('/topup/user', topUpController.allByUser)
+router.get('/topup/userpending', topUpController.allPendingByUser)
+router.get('/topup/:id', topUpController.byId)
+router.post('/creditCardTopup', creditCardController.createCreditCardTopup)
 
 // ------------------pulsa routes----------------------------
 router.post('/pulsa', pulsaController.pulsa)
+router.post('/pulsacallbackurl', callbackController.createCallbackPulsa)
+// -----------------------------------------------------------
+
+// ------------------transaction routes----------------------------
+router.post('/transaction', transactionController.create)
+router.get('/transaction/userPending', transactionController.allPendingByUser)
+router.get('/transaction/user', transactionController.allByUser)
+router.get('/transaction/:id', transactionController.byId)
 // -----------------------------------------------------------
 
 router.post('/changePrimary', phoneCtrl.changePrimary)

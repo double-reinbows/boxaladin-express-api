@@ -23,6 +23,15 @@ module.exports = {
 				})
 				.then(product => {
 
+					// kalau harga sudah 10.000 maka tidak turunkan harga lagi
+					if (product.aladinPrice <= 10000) {
+						console.log('minimum price...........................')
+						return res.send({
+							message: 'success',
+							data: product
+					})
+					}
+
 					product.update({
 						aladinPrice: product.aladinPrice - 500
 					}, {
@@ -35,7 +44,7 @@ module.exports = {
             // update di firebase
 
 						const productsRef = firebase.database().ref().child('products')
-						productsRef.child(result.id).set({
+						productsRef.child(result.id).update({
 							id: result.id,
 							productName: result.productName,
 							price: result.price,

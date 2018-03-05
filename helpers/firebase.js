@@ -30,7 +30,9 @@ module.exports = {
 					brand: data.brand.brandName,
 					category: data.category.categoryName,
 					brandId: data.brand.id,
-					categoryId: data.category.id
+					categoryId: data.category.id,
+					watching: 0,
+					brandLogo: data.brand.brandLogo
 				})
 			})
 

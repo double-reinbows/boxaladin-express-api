@@ -36,6 +36,10 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false
       },
+      pulsaCode: {
+        type: Sequelize.STRING,
+        allowNull: false
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

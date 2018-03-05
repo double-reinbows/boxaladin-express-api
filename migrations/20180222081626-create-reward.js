@@ -1,19 +1,30 @@
 'use strict';
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('brands', {
+    return queryInterface.createTable('rewards', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      brandName: {
+      rewardName: {
         type: Sequelize.STRING
       },
-      brandLogo: {
-        allowNull: true,
+      description: {
         type: Sequelize.STRING
+      },
+      image: {
+        type: Sequelize.STRING
+      },
+      active1: {
+        type: Sequelize.BOOLEAN
+      },
+      active2: {
+        type: Sequelize.BOOLEAN
+      },
+      active3: {
+        type: Sequelize.BOOLEAN
       },
       createdAt: {
         allowNull: false,
@@ -26,6 +37,6 @@ module.exports = {
     });
   },
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('brands');
+    return queryInterface.dropTable('rewards');
   }
 };

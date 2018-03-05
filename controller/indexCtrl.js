@@ -155,9 +155,10 @@ exports.signup = (req, res) => {
             primary: true
           })
           .then(result => {
-            res.send({
+            res.status(200).send({
               message: 'register success',
-              token: token
+              token: token,
+              email:data.email
             })
           })
       })

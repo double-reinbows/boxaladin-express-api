@@ -1,35 +1,23 @@
 'use strict';
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('transactions', {
+    return queryInterface.createTable('wins', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      paymentId: {
-        allowNull: false,
-        type: Sequelize.INTEGER
-      },
-      productId: {
-        allowNull: true,
-        type: Sequelize.INTEGER
-      },
       userId: {
-        allowNull: false,
         type: Sequelize.INTEGER
       },
-      aladinPrice: {
-        allowNull: true,
+      rewardId: {
+        type: Sequelize.INTEGER
+      },
+      star: {
         type: Sequelize.INTEGER
       },
       status: {
-        allowNull: false,
-        type: Sequelize.STRING
-      },
-      number: {
-        allowNull: true,
         type: Sequelize.STRING
       },
       createdAt: {
@@ -43,6 +31,6 @@ module.exports = {
     });
   },
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('transactions');
+    return queryInterface.dropTable('wins');
   }
 };
