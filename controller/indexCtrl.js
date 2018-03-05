@@ -146,21 +146,18 @@ exports.signup = (req, res) => {
           },
           process.env.JWT_SECRET
         )
-        db.phonenumber
-          .create({
+        db.phonenumber.create({
             userId: data.id,
             number: req.body.phonenumber,
             verified: false,
             otp: randomOtp,
             primary: true
           })
-          .then(result => {
-            res.status(200).send({
-              message: 'register success',
-              token: token,
-              email:data.email
-            })
+          .then(dataPhone => {
+            var decoded = jwt.verify(token, process.env.JWT_SECRET)
+            res.status(200).send(decoded)
           })
+          .catch(error => res.status(400).send(error));
       })
     })
 }
