@@ -8,7 +8,6 @@ chai.use(chaiHttp);
 describe('test transaction', ()=>{
   it('successfully create new transaction', function (done) {
     chai.request('http://localhost:3000')
-
     .post('/transaction')
     .send({
       userId: '1',
