@@ -2,7 +2,7 @@
 
 const hasher = require('../helpers/aladin_hash')
 
-const PASSWORD = hasher('jakarta')
+const PASSWORD = hasher('boxaladin')
 
 module.exports = {
   up: function (queryInterface, Sequelize) {
@@ -19,17 +19,30 @@ module.exports = {
 
     return queryInterface.bulkInsert('users', [{
       username: 'tezaharsony',
-      first_name: 'teja',
-      family_name: 'harsony',
+      firstName: 'teja',
+      familyName: 'harsony',
       password : PASSWORD,
-      typed_email : 'teza.harsony230394@gmail.com',
+      typedEmail : 'teza.harsony230394@gmail.com',
       sex: 'M',
       email: 'tezaharsony230394@gmail.com',
       salt: '12345678',
-      coin: '89',
+      coin: '5',
       createdAt: new Date(),
       updatedAt: new Date(),
-      emailVerificationStatus: false
+      emailVerified: false
+    }, {
+      username: 'thoriq',
+      firstName: 'thoriq',
+      familyName: 'faizal',
+      password : PASSWORD,
+      typedEmail : 'thoriqnfaizal@gmail.com',
+      sex: 'M',
+      email: 'thoriqnfaizal@gmail.com',
+      salt: '12345678',
+      coin: '5',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      emailVerified: false
     }], {})
   },
 

@@ -12,49 +12,53 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false
       },
-      first_name: {
+      firstName: {
         type: Sequelize.STRING,
         allowNull: true
       },
-      family_name: {
+      familyName: {
         type: Sequelize.STRING,
         allowNull: true
-      },
-      password: {
-        type: Sequelize.STRING,
-        allowNull: false
-      },
-      typed_email: {
-        type: Sequelize.STRING,
-        allowNull: true
-      },
-      username_changed: {
-        type: Sequelize.BOOLEAN,
-        defaultValue: false
       },
       sex: {
         type: Sequelize.ENUM,
         values: ['M','F'],
         allowNull: true
       },
-      account_provider: {
-        type: Sequelize.STRING,
-        allowNull: true
-      },
-      aladin_keys: {
-        type: Sequelize.INTEGER
-      },
-      email_token: {
-        type: Sequelize.STRING,
-        allowNull: true
-      },
-      salt: {
+      password: {
         type: Sequelize.STRING,
         allowNull: false
       },
       email: {
         type: Sequelize.STRING,
         allowNull: true
+      },
+      emailVerified: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false
+      },
+      typedEmail: {
+        type: Sequelize.STRING,
+        allowNull: true
+      },
+      usernameChanged: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
+      },
+      accountProvider: {
+        type: Sequelize.STRING,
+        allowNull: true
+      },
+      aladinKeys: {
+        type: Sequelize.INTEGER
+      },
+      emailToken: {
+        type: Sequelize.STRING,
+        allowNull: true
+      },
+      salt: {
+        type: Sequelize.STRING,
+        allowNull: false
       },
       coin: {
         type: Sequelize.INTEGER,
@@ -66,10 +70,6 @@ module.exports = {
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE
-      },
-      emailVerificationStatus: {
-        type: Sequelize.BOOLEAN,
-        allowNull: false
       }
     });
   },

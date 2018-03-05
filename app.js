@@ -6,6 +6,18 @@ var cors = require('cors')
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 require('dotenv').config()
+var firebase = require('firebase')
+
+// Initialize Firebase
+var config = {
+  apiKey: "AIzaSyDjiWTez3r_lZreCZUvIUhaSj8-rIWfhgw",
+  authDomain: "boxaladin-auction.firebaseapp.com",
+  databaseURL: "https://boxaladin-auction.firebaseio.com",
+  projectId: "boxaladin-auction",
+  storageBucket: "boxaladin-auction.appspot.com",
+  messagingSenderId: "912503242137"
+};
+firebase.initializeApp(config);
 
 var index = require('./routes/index');
 var users = require('./routes/users');
@@ -21,7 +33,7 @@ app.set('view engine', 'jade');
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 

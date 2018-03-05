@@ -4,65 +4,79 @@ module.exports = function(sequelize, DataTypes) {
   var user = sequelize.define('user', {
     username: {
       type: DataTypes.STRING,
-      allowNull:false
-    },
-    first_name: {
-      type: DataTypes.STRING,
-      allowNull: true
-    },
-    family_name: {
-      type: DataTypes.STRING,
-      allowNull: true
-    },
-    password: {
-      type: DataTypes.STRING,
       allowNull: false
     },
-    typed_email: {
+    firstName: {
       type: DataTypes.STRING,
       allowNull: true
     },
-    username_changed: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false
+    familyName: {
+      type: DataTypes.STRING,
+      allowNull: true
     },
     sex: {
       type: DataTypes.ENUM,
       values: ['M','F'],
       allowNull: true
     },
-    account_provider: {
+    password: {
       type: DataTypes.STRING,
-      allowNull: true
-    },
-    aladin_keys: DataTypes.INTEGER,
-    email_token: {
-      type: DataTypes.STRING,
-      allowNull: true
-    },
-    salt: {
-      type:DataTypes.STRING,
       allowNull: false
     },
     email: {
       type: DataTypes.STRING,
-      unique: true
+      allowNull: true
     },
-    coin : {
-      type: DataTypes.STRING,
-    },
-    emailVerificationStatus: {
+    emailVerified: {
       type: DataTypes.BOOLEAN,
       allowNull: false
+    },
+    typedEmail: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    usernameChanged: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
+    accountProvider: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    aladinKeys: {
+      type: DataTypes.INTEGER
+    },
+    emailToken: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    salt: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    coin: {
+      type: DataTypes.INTEGER,
+    },
+    createdAt: {
+      allowNull: false,
+      type: DataTypes.DATE
+    },
+    updatedAt: {
+      allowNull: false,
+      type: DataTypes.DATE
     }
   });
 
   user.associate = (models) => {
-     user.hasMany(models.phonenumber, {
-       foreignKey: 'userId',
-       as: 'phonenumbers',
-     });
-   };
+    user.hasMany(models.phonenumber, {
+      foreignKey: 'userId',
+      as: 'phonenumbers',
+    });
+    user.hasMany(models.transaction, {
+      foreignKey: 'userId',
+      as: 'transactions',
+    });
+  };
 
   return user;
 };
