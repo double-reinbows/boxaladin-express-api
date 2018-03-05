@@ -118,7 +118,7 @@ exports.signup = (req, res) => {
 
       gmailDotCheck(req.body)
 
-      req.body.password = hash(req.body.password)
+      // let hashedPass = hash(req.body.password)
       var salt = Math.floor(Math.random() * 90000) + 10000
       var randomOtp = Math.floor(Math.random() * 900000) + 100000
       req.body.salt = salt
@@ -142,7 +142,7 @@ exports.signup = (req, res) => {
             email: data.email,
             firstName: data.firstName,
             familyName: data.familyName,
-            sex: data.sex
+            sex: data.sex,
           },
           process.env.JWT_SECRET
         )
@@ -156,6 +156,8 @@ exports.signup = (req, res) => {
           .then(dataPhone => {
             var decoded = jwt.verify(token, process.env.JWT_SECRET)
             res.status(200).send(decoded)
+            console.log('decoded', decoded)
+            console.log('pass1', hashedPass)
           })
           .catch(error => res.status(400).send(error));
       })

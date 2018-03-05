@@ -5,7 +5,6 @@ var users = Math.floor(Math.random() * 100000);
 var assert = require("assert");
 var expect = chai.expect;
 
-
 chai.use(chaiHttp);
 
 describe('test user', ()=>{
@@ -14,7 +13,7 @@ describe('test user', ()=>{
     .post('/signup')
     .send({
       username: 'user'+users,
-      password: 'boxaladin',
+      //  testing password dibuat allownull true di model dan migration
       email: users+'@gmail.com',
       firstName: 'user',
       familyName: 'aaa',
@@ -29,26 +28,22 @@ describe('test user', ()=>{
       res.body.username.should.equal('user'+users);
       res.body.username.should.be.a('String');
 
-      // res.body.should.have.property("password");
-      // res.body.password.should.equal('boxaladin');
-      // res.body.password.should.be.a('String');
+      res.body.should.have.property("email");
+      res.body.email.should.equal(users+'@gmail.com');
+      res.body.email.should.be.a('String');
 
-      // res.body.should.have.property("email");
-      // res.body.email.should.equal(users+'@gmail.com');
-      // res.body.email.should.be.a('String');
+      res.body.should.have.property("firstName");
+      res.body.firstName.should.equal('user');
+      res.body.firstName.should.be.a('String');
 
-      // res.body.should.have.property("firstName");
-      // res.body.firstName.should.equal('user');
-      // res.body.firstName.should.be.a('String');
+      res.body.should.have.property("familyName");
+      res.body.familyName.should.equal('aaa');
+      res.body.familyName.should.be.a('String');
 
-      // res.body.should.have.property("familyName");
-      // res.body.familyName.should.equal('aaa');
-      // res.body.familyName.should.be.a('String');
-
-      // res.body.should.have.property("sex");
-      // res.body.sex.should.equal('M');
-      // res.body.sex.should.be.a('String');
-      // id = res.body.id
+      res.body.should.have.property("sex");
+      res.body.sex.should.equal('M');
+      res.body.sex.should.be.a('String');
+      id = res.body.id
 
       done()
 
