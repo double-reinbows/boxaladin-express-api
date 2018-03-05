@@ -78,10 +78,11 @@ module.exports = {
         description: req.body.description,
         stock: req.body.stock,
         price: req.body.price,
-        aladinPrice: req.body.price
+        aladinPrice: req.body.price,
+        pulsaCode: req.body.pulsaCode
       })
       .then(data => {
-        console.log(data);
+        console.log("thoriiiiiiq", data)
         product.findOne({
           where: {
             id: data.id
@@ -91,6 +92,7 @@ module.exports = {
           ]
         })
         .then(result => {
+                  console.log('123')
           const productsRef = firebase.database().ref().child('products')
   				productsRef.child(result.id).set({
   					id: result.id,
@@ -106,6 +108,9 @@ module.exports = {
   				})
 
           res.status(201).send(data)
+          console.log("1", result)
+          console.log('123')
+          console.log("data", data)
         })
       })
       .catch(err => res.status(400).send(err));

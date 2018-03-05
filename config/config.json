@@ -4,11 +4,7 @@
     "password": null,
     "database": "boxaladin",
     "host": "127.0.0.1",
-<<<<<<< HEAD
     "port": 5432,
-=======
-    "port": "5432",
->>>>>>> 864dd5042f9530ef62aa9145f673cf6c77a089a9
     "dialect": "postgres"
   },
   "test": {

@@ -10,49 +10,49 @@ describe('test product', ()=>{
     chai.request('http://localhost:3000')
     .post('/api/product')
     .send({
-      categoryId: '1',
-      brandId: '1',
+      categoryId: 2,
+      brandId: 2,
       productName: 'pulsa telkomsel 10rb',
       description:'asd',
-      stock:'1',
-      price:'10500',
-      aladinPrice:'10000',
+      stock:1,
+      price:10500,
+      aladinPrice:10500,
       pulsaCode:'htelkomsel'
     })
     .end((err,res) => {
-      res.should.have.status(400);
+      res.should.have.status(201);
 
       res.body.should.have.property("categoryId");
-      res.body.id.should.equal("1");
-      res.body.id.should.be.a("Integer");
+      res.body.categoryId.should.equal(2);
+      res.body.categoryId.should.be.a("Number");
 
       res.body.should.have.property("brandId");
-      res.body.id.should.equal("1");
-      res.body.id.should.be.a("Integer");
+      res.body.brandId.should.equal(2);
+      res.body.brandId.should.be.a("Number");
       
       res.body.should.have.property("productName");
-      res.body.id.should.equal("pulsa telkomsel 10rb");
-      res.body.id.should.be.a("String");
+      res.body.productName.should.equal("pulsa telkomsel 10rb");
+      res.body.productName.should.be.a("String");
 
       res.body.should.have.property("description");
-      res.body.id.should.equal("asd");
-      res.body.id.should.be.a("String");
+      res.body.description.should.equal("asd");
+      res.body.description.should.be.a("String");
       
       res.body.should.have.property("stock");
-      res.body.id.should.equal("1");
-      res.body.id.should.be.a("Integer");
+      res.body.stock.should.equal(1);
+      res.body.stock.should.be.a("Number");
 
       res.body.should.have.property("price");
-      res.body.id.should.equal("10500");
-      res.body.id.should.be.a("Integer");
+      res.body.price.should.equal(10500);
+      res.body.price.should.be.a("Number");
 
       res.body.should.have.property("aladinPrice");
-      res.body.id.should.equal("10000");
-      res.body.id.should.be.a("Integer");
+      res.body.aladinPrice.should.equal(10500);
+      res.body.aladinPrice.should.be.a("Number");
       
-      res.body.should.have.property("pulsaCode");
-      res.body.id.should.equal("htelkomsel");
-      res.body.id.should.be.a("String");
+      // res.body.should.have.property("pulsaCode");
+      // res.body.pulsaCode.should.equal("htelkomsel");
+      // res.body.pulsaCode.should.be.a("String");
 
       id = res.body.id
       done()
@@ -85,42 +85,36 @@ describe('test product', ()=>{
       .end((err, res) => {
        res.should.have.status(200);
 
-       res.should.be.json;
-       res.should.be.a("object");
-
        res.body.should.have.property("categoryId");
-       res.body.id.should.equal(11);
-       res.body.id.should.be.a("Integer");
+       res.body.categoryId.should.equal(2);
+       res.body.categoryId.should.be.a("Number");
 
-       res.body.should.have.property("brandId");
-       res.body.id.should.equal("1");
-       res.body.id.should.be.a("Integer");
+      //  res.body.should.have.property("brandId");
+      //  res.body.brandId.should.equal(2);
+      //  res.body.brandId.should.be.a("Number");
 
-       res.body.should.have.property("productName");
-       res.body.id.should.equal("pulsa telkomsel 10rb");
-       res.body.id.should.be.a("Integer");
+      //  res.body.should.have.property("productName");
+      //  res.body.productName.should.equal("pulsa telkomsel 25rb");
+      //  res.body.productName.should.be.a("String");
 
-       res.body.should.have.property("description");
-       res.body.id.should.equal("asd");
-       res.body.id.should.be.a("Integer");
+      //  res.body.should.have.property("description");
+      //  res.body.description.should.equal("asd");
+      //  res.body.description.should.be.a("String");
 
-       res.body.should.have.property("stock");
-       res.body.id.should.equal("1");
-       res.body.id.should.be.a("Integer");
+      //  res.body.should.have.property("stock");
+      //  res.body.stock.should.equal(1);
+      //  res.body.stock.should.be.a("Number");
 
-       res.body.should.have.property("price");
-       res.body.id.should.equal("10500");
-       res.body.id.should.be.a("Integer");
+      //  res.body.should.have.property("price");
+      //  res.body.price.should.equal(10500);
+      //  res.body.price.should.be.a("Number");
 
-       res.body.should.have.property("aladinPrice");
-       res.body.id.should.equal("1");
-       res.body.id.should.be.a("Integer");
-
-       res.body.should.have.property("pulsaCode");
-       res.body.id.should.equal("1");
-       res.body.id.should.be.a("Integer");
+      //  res.body.should.have.property("aladinPrice");
+      //  res.body.aladinPrice.should.equal(10500);
+      //  res.body.aladinPrice.should.be.a("Number");
 
        id = res.body.id;
+       done()
       });
   })
 
