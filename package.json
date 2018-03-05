@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "nodemon ./bin/www",
+    "start": "node ./bin/www",
     "serve": "NODE_ENV=production nodemon ./bin/www",
     "test": "NODE_ENV=test mocha --timeout 10000",
     "dev": "NODE_ENV=development AUTHOR=pewe nodemon ./bin/www"
