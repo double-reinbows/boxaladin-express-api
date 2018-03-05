@@ -14,7 +14,7 @@ module.exports = {
       },
       number: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
       },
       verified: {
         type: Sequelize.BOOLEAN,

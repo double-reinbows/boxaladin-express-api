@@ -3,8 +3,8 @@
     "username": "boxaladin",
     "password": "kolorijo",
     "database": "ebdb",
-    "host": "aa47g9rsg7sv0g.cbo164jcsisu.ap-southeast-1.rds.amazonaws.com",
-    "port": "5432",
+    "host": "aa1js0qqvhvh9jw.cbo164jcsisu.ap-southeast-1.rds.amazonaws.com",
+    "port": 5432,
     "dialect": "postgres"
   },
   "test": {
