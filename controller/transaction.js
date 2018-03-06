@@ -7,16 +7,18 @@ module.exports = {
     var decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
     return transaction
       .create({
-        userId: req.body.id,
+        userId: decoded.id,
         paymentId: req.body.paymentId,
         productId: req.body.productId,
         aladinPrice: req.body.aladinPrice,
         number: req.body.phoneNumber,
         status: "PENDING",
       })
-      .then(data => res.send(data))
-
-      .catch(err => res.status(400).send(err));
+      .then((data) => {
+        res.status(200).send(data)
+        console.log(data)
+      })
+      .catch(err => console.log(err))
   },
 
   allPendingByUser(req, res) {
@@ -24,17 +26,18 @@ module.exports = {
     return transaction
       .findAll({
         where: {
-          userId: req.body.id,
+          userId: decoded.id,
           status: "PENDING"
         },
         include: [{ all: true }]
       })
-      .then(data => {
-        data.map(transaction => {
-          transaction.payment.availableBanks = JSON.parse(transaction.payment.availableBanks);
-        });
+      .then((data) => {
+        // data.map(transaction => {
+        //   transaction.payment.availableBanks = JSON.parse(transaction.payment.availableBanks);
+        // });
 
         res.send(data);
+        console.log(data)
       })
 
       .catch(err => res.status(400).send(err));

@@ -1,9 +1,9 @@
 {
   "development": {
-    "username": "boxaladin",
-    "password": "kolorijo",
+    "username": "postgres",
+    "password": null,
     "database": "boxaladin",
-    "host": "boxaladin-develop.cbo164jcsisu.ap-southeast-1.rds.amazonaws.com",
+    "host": "127.0.0.1",
     "port": 5432,
     "dialect": "postgres"
   },
