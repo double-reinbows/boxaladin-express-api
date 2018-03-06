@@ -7,7 +7,7 @@ module.exports = {
     var decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
     return transaction
       .create({
-        userId: decoded.id,
+        userId: req.body.id,
         paymentId: req.body.paymentId,
         productId: req.body.productId,
         aladinPrice: req.body.aladinPrice,
@@ -24,22 +24,20 @@ module.exports = {
     return transaction
       .findAll({
         where: {
-          userId: decoded.id,
-          status: 'PENDING'
+          userId: req.body.id,
+          status: "PENDING"
         },
-        include: [
-          { all: true }
-        ]
+        include: [{ all: true }]
       })
       .then(data => {
         data.map(transaction => {
-          transaction.payment.availableBanks = JSON.parse(transaction.payment.availableBanks)
-        })
+          transaction.payment.availableBanks = JSON.parse(transaction.payment.availableBanks);
+        });
 
-        res.send(data)
+        res.send(data);
       })
 
-      .catch(err => res.status(400).send(err))
+      .catch(err => res.status(400).send(err));
   },
 
   allByUser(req, res) {
@@ -47,7 +45,7 @@ module.exports = {
     return transaction
       .findAll({
         where: {
-          userId: decoded.id
+          userId: req.body.id
         },
         include: [
           { all: true }

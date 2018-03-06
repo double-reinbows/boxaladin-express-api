@@ -14,8 +14,10 @@ describe('test category', ()=>{
     })
     .end((err,res) => {
       res.should.have.status(201);
+
       res.should.be.json;
-      res.should.be.a('object');      
+      res.should.be.a('object');
+            
       res.body.should.have.property("categoryName");
       res.body.categoryName.should.equal('asus');
       res.body.categoryName.should.be.a('String');

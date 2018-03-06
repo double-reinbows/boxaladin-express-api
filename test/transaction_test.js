@@ -1,72 +1,89 @@
-// var chai = require('chai');
-// var chaiHttp = require('chai-http');
-// var should = chai.should()
+var chai = require("chai");
+var chaiHttp = require("chai-http");
+var should = chai.should();
 
-// chai.use(chaiHttp);
+chai.use(chaiHttp);
 
+describe("test brand", () => {
+  it("successfully create new brand", function(done) {
+    chai
+      .request("http://localhost:3000")
+      .post("/transaction")
+      .send({
+        paymentId: 2,
+        productId: 2,
+        userId: 2,
+        aladinPrice: 10500,
+        number: 082297677300,
+        status: "pending"
+      })
+      .end((err, res) => {
+        // res.should.have.status(201);
 
-// describe('test transaction', ()=>{
-//   it('successfully create new transaction', function (done) {
-//     chai.request('http://localhost:3000')
+        res.body.should.have.property("paymentId");
+        res.body.paymentId.should.equal(2);
+        res.body.paymentId.should.be.a("Number");
 
-//     .post('/transaction')
-//     .send({
-//       userId: '1',
-//       paymentId: '1',
-//       productId: '1',
-//       aladinPrice: '10000',
-//       number: '08121377713',
-//       status: 'PENDING'
-//     })
-//     .end((err,res) => {
-//       res.should.have.status(201);   
-//       res.body.should.have.property("userId");
-//       res.body.userId.should.equal('1');
-//       res.body.userId.should.be.a('Integer');
-//       res.body.should.have.property("paymentId");
-//       res.body.paymentId.should.equal('1');
-//       res.body.paymentId.should.be.a('Integer');
-//       res.body.should.have.property("productId");
-//       res.body.productId.should.equal('1');
-//       res.body.productId.should.be.a('Integer');
-//       res.body.should.have.property("aladinPrice");
-//       res.body.aladinPrice.should.equal('10000');
-//       res.body.aladinPrice.should.be.a('Integer');
-//       res.body.should.have.property("number");
-//       res.body.number.should.equal('08121377713');
-//       res.body.number.should.be.a('Integer');
-//       res.body.should.have.property("status");
-//       res.body.status.should.equal('PENDING');
-//       res.body.status.should.be.a('Integer');
+        res.body.should.have.property("productId");
+        res.body.productId.should.equal(2);
+        res.body.productId.should.be.a("Number");
 
-//       id = res.body.id
-//       done()
-//     })
-//   })
+        res.body.should.have.property("userId");
+        res.body.userId.should.equal(2);
+        res.body.userId.should.be.a("Number");
 
-//   it('successfully read all transaction', function (done) {
-//     chai.request('http://localhost:3000')
-//     .get('/transaction')
-//     .end((err,res) => {
-//       res.should.have.status(201)
-//       done()
-//     })
-//   })
+        res.body.should.have.property("aladinPrice");
+        res.body.aladinPrice.should.equal(2);
+        res.body.aladinPrice.should.be.a("String");
 
-//   it('successfully delete transaction', function(done) {
-//     chai.request('http://localhost:3000')
-//     .delete(`/api/brand/` + id)
-//     .end((err,res) =>{
-//       res.should.have.status(200)
-//       res.body.should.not.have.property('userId')
-//       res.body.should.not.have.property('paymentId')
-//       res.body.should.not.have.property('productId')
-//       res.body.should.not.have.property('aladinPrice')
-//       res.body.should.not.have.property('number')
-//       res.body.should.not.have.property('status')
+        res.body.should.have.property("number");
+        res.body.number.should.equal("082297677300");
+        res.body.number.should.be.a("String");
 
-//       done()
-//     })
-//   })
+        res.body.should.have.property("status");
+        res.body.status.should.equal("pending");
+        res.body.status.should.be.a("String");
 
-// })
+        id = res.body.id;
+        done();
+      });
+  });
+
+//   it("successfully read all brand", function(done) {
+//     chai
+//       .request("http://localhost:3000")
+//       .get("/api/brand")
+//       .end((err, res) => {
+//         res.should.have.status(201);
+//         done();
+//       });
+//   });
+
+//   it("successfully update brand", function(done) {
+//     chai
+//       .request("http://localhost:3000")
+//       .put(`/api/brand/` + id)
+//       .send({
+//         brandName: "asd"
+//       })
+//       .end((err, res) => {
+//         res.should.have.status(2s00);
+//         res.should.be.json;
+//         res.should.be.a("object");
+//         res.body.should.have.property("brandName");
+//         res.body.brandName.should.equal("asd");
+//         done();
+//       });
+//   });
+
+//   it("successfully delete brand", function(done) {
+//     chai
+//       .request("http://localhost:3000")
+//       .delete(`/api/brand/` + id)
+//       .end((err, res) => {
+//         res.should.have.status(200);
+//         res.body.should.not.have.property("brandName");
+//         done();
+//       });
+//   });
+});

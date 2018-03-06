@@ -78,10 +78,10 @@ module.exports = {
         description: req.body.description,
         stock: req.body.stock,
         price: req.body.price,
-        aladinPrice: req.body.price
+        aladinPrice: req.body.price,
+        pulsaCode: req.body.pulsaCode
       })
       .then(data => {
-        console.log(data);
         product.findOne({
           where: {
             id: data.id
