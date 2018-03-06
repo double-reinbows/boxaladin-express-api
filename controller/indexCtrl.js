@@ -40,7 +40,6 @@ exports.getAll = (req, res) => {
 exports.signin = (req, res) => {
   let hashedPass = hash(req.body.password)
   db.user.findOne({where: {username: req.body.username}}).then(user => {
-    console.log(user)
     if (user == null) {
       res.send({
         message: 'username not found'
@@ -57,16 +56,21 @@ exports.signin = (req, res) => {
           emailVerified: user.emailVerified
         },
         process.env.JWT_SECRET
-      )
-
-      res.send({
+      );
+      res.send(
+      {
         message: 'login success',
         token: token
-      })
+      }
+      // user.dataValues
+    )
+       console.log("AAAAAAAAAA", user.dataValues)
     } else if (user.password.substr(6) !== hashedPass.substr(6)) {
-      res.send({
-        message: 'password incorrect'
-      })
+      res.send(
+        user.dataValues
+        // message: 'password incorrect'
+      )
+      console.log("AAAAAAAAAAasdasdasdasdasd",user.dataValues)
     }
   })
 }
