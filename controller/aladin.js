@@ -1,6 +1,7 @@
 const db = require('../models')
 const jwt = require('jsonwebtoken')
 const firebase = require('firebase')
+    // "host": "boxaladin-develop.cbo164jcsisu.ap-southeast-1.rds.amazonaws.com",
 
 module.exports = {
 	decreaseAladinPrice: (req, res) => {
