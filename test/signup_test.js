@@ -18,12 +18,9 @@
 //       firstName: 'user',
 //       familyName: 'aaa',
 //       sex: 'M',
-//       // number: '0812345678'
 //     })
 //     .end((err,res) => {  
-//       // assert.equal({message: 'register success'}.should.have.property('user'+users));
 //       res.should.have.status(200)
-//       // expect({message: 'register success'})
 //       res.body.should.have.property('username');
 //       res.body.username.should.equal('user'+users);
 //       res.body.username.should.be.a('String');
@@ -44,9 +41,7 @@
 //       res.body.sex.should.equal('M');
 //       res.body.sex.should.be.a('String');
 //       id = res.body.id
-
 //       done()
-
 //     })
 //   })
 
