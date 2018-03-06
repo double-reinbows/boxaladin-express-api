@@ -8,7 +8,7 @@ module.exports = (sequelize, DataTypes) => {
   });
 
   reward.associate = (models) => {
-    reward.hasMany(models.win, {
+    reward.hasMany(models.claim, {
       foreignKey: 'rewardId',
       as: 'claims',
     })
