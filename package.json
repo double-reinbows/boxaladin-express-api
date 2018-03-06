@@ -37,5 +37,8 @@
     "xml-js": "^1.6.2",
     "xml-parse": "^0.3.1",
     "xml2json": "^0.11.0"
+  },
+  "devDependencies": {
+    "pg": "^7.4.1"
   }
 }

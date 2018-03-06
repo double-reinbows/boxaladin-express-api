@@ -4,15 +4,13 @@ module.exports = (sequelize, DataTypes) => {
     rewardName: DataTypes.STRING,
     description: DataTypes.STRING,
     image: DataTypes.STRING,
-    active1: DataTypes.BOOLEAN,
-    active2: DataTypes.BOOLEAN,
-    active3: DataTypes.BOOLEAN
+    aladinKey: DataTypes.INTEGER,
   });
 
   reward.associate = (models) => {
     reward.hasMany(models.win, {
       foreignKey: 'rewardId',
-      as: 'wins',
+      as: 'claims',
     })
   };
   

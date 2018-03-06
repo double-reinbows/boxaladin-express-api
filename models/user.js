@@ -80,6 +80,17 @@ module.exports = function(sequelize, DataTypes) {
       foreignKey: 'userId',
       as: 'topups',
     });
+    
+    user.hasMany(models.win, {
+      foreignKey: 'userId',
+      as: 'wins',
+    });
+
+    user.hasMany(models.claim, {
+      foreignKey: 'userId',
+      as: 'claims',
+    });
+
   };
 
   return user;

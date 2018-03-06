@@ -17,14 +17,8 @@ module.exports = {
       image: {
         type: Sequelize.STRING
       },
-      active1: {
-        type: Sequelize.BOOLEAN
-      },
-      active2: {
-        type: Sequelize.BOOLEAN
-      },
-      active3: {
-        type: Sequelize.BOOLEAN
+      aladinKey: {
+        type: Sequelize.INTEGER
       },
       createdAt: {
         allowNull: false,
