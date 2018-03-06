@@ -3,17 +3,10 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-<<<<<<< HEAD
-    "dev": "nodemon ./bin/www",
-    "start": "node ./bin/www",
-    "serve": "NODE_ENV=production node ./bin/www",
-    "test": "NODE_ENV=test mocha --timeout 1000"
-=======
     "start": "nodemon ./bin/www",
     "serve": "NODE_ENV=production nodemon ./bin/www",
     "test": "NODE_ENV=test mocha --timeout 10000",
     "dev": "NODE_ENV=development AUTHOR=pewe nodemon ./bin/www"
->>>>>>> 9fb3216aa50f352f69b4406a9e071e33582c29c7
   },
   "dependencies": {
     "aws-sdk": "^2.180.0",
