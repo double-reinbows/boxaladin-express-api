@@ -64,6 +64,7 @@ module.exports = {
           .then(result => {
 
             return res.send({
+              freekey: freekeyResult,
               msg: 'user free keys updated'
             })
 
