@@ -3,9 +3,10 @@ var chaiHttp = require("chai-http");
 var should = chai.should();
 var payment = require('../controller/payment')
 var modelPayment = require('../models').payment;
-var token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwidXNlcm5hbWUiOiJhbmRyZXciLCJlbWFpbCI6ImFuZHJld0BnbWFpbC5jb20iLCJmaXJzdE5hbWUiOiJhbmRyZXciLCJmYW1pbHlOYW1lIjoiYW5kcmV3Iiwic2V4IjoiTSIsImVtYWlsVmVyaWZpZWQiOmZhbHNlLCJpYXQiOjE1MjAzMjIyNjR9.ywca-7HPFy5BMdx9sLffb5IOjAvOzPlnnu9ULo2BfpY'
+var token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwidXNlcm5hbWUiOiJhbmRyZXciLCJlbWFpbCI6ImFuZHJld0BnbWFpbC5jb20iLCJmaXJzdE5hbWUiOiJhbmRyZXciLCJmYW1pbHlOYW1lIjoiYW5kcmV3Iiwic2V4IjoiTSIsImVtYWlsVmVyaWZpZWQiOmZhbHNlLCJpYXQiOjE1MjAzOTc2Mjh9.tkm5Grgwzd_jkqtqKNaimGZQhY97UW37BmTPfHtgaoI'
 
-chai.use(chaiHttp);
+// untuk tes transaction dibagian controller get pending dan all user, 
+// bagian mapping data parse avail bank di comment
 
 describe("test transaction", () => {
   before(function(){
@@ -14,9 +15,6 @@ describe("test transaction", () => {
       status: "PENDING",
       amount: 50000,
       availableBanks: "[{'name': 'BCA', 'number':'123'}, {'name': 'BCA', 'number':'123'}]"
-    })
-    .then((data) => {
-      console.log(data)
     })
   });
   it("successfully create new transaction", function(done) {
@@ -33,14 +31,6 @@ describe("test transaction", () => {
       })
       .end((err, res) => {
         res.should.have.status(200);
-
-        res.body.should.have.property("paymentId");
-        res.body.paymentId.should.equal(2);
-        res.body.paymentId.should.be.a("Number");
-
-        res.body.should.have.property("productId");
-        res.body.productId.should.equal(2);
-        res.body.productId.should.be.a("Number");
 
         res.body.should.have.property("userId");
         res.body.userId.should.equal(4);
@@ -74,24 +64,18 @@ describe("test transaction", () => {
       });
   });
 
-//   it("successfully update brand", function(done) {
-//     chai
-//       .request("http://localhost:3000")
-//       .put(`/api/brand/` + id)
-//       .send({
-//         brandName: "asd"
-//       })
-//       .end((err, res) => {
-//         res.should.have.status(2s00);
-//         res.should.be.json;
-//         res.should.be.a("object");
-//         res.body.should.have.property("brandName");
-//         res.body.brandName.should.equal("asd");
-//         done();
-//       });
-//   });
+  it("successfully read alluser", function(done) {
+    chai
+      .request("http://localhost:3000")
+      .get(`/transaction/user`)
+      .set('token', token)
+      .end((err, res) => {
+        res.should.have.status(200);
+        done();
+      });
+  });
 
-//   it("successfully delete brand", function(done) {
+//   it("successfully read 1 user", function(done) {
 //     chai
 //       .request("http://localhost:3000")
 //       .delete(`/api/brand/` + id)

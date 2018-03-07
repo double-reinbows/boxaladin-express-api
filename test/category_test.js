@@ -7,7 +7,8 @@ chai.use(chaiHttp);
 
 describe('test category', ()=>{
   it('successfully create new category', function (done) {
-    chai.request('http://localhost:3000')
+    chai
+    .request('http://localhost:3000')
     .post('/api/category')
     .send({
       categoryName: 'asus'

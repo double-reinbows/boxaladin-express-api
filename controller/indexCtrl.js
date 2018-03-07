@@ -40,7 +40,6 @@ exports.getAll = (req, res) => {
 exports.signin = (req, res) => {
   let hashedPass = hash(req.body.password)
   db.user.findOne({where: {username: req.body.username}}).then(user => {
-    console.log(user)
     if (user == null) {
       res.send({
         message: 'username not found'
@@ -57,12 +56,14 @@ exports.signin = (req, res) => {
           emailVerified: user.emailVerified
         },
         process.env.JWT_SECRET
-      )
-
-      res.send({
+      );
+      res.send(
+      {
         message: 'login success',
         token: token
-      })
+      }
+      // user.dataValues
+    )
     } else if (user.password.substr(6) !== hashedPass.substr(6)) {
       res.send({
         message: 'password incorrect'
@@ -155,12 +156,12 @@ exports.signup = (req, res) => {
             primary: true
           })
           .then(dataPhone => {
-            var decoded = jwt.verify(token, process.env.JWT_SECRET)
             res.status(200).send(token)
+            console.log('decoded', token)
           })
-          .catch(error => res.status(400).send(error));
+          .catch(error => res.status(400).send('gagal', error));
       })
-      .catch(error => res.status(400).send(error));
+      .catch(error => res.status(400).send('failed', error));
     })
 }
 
