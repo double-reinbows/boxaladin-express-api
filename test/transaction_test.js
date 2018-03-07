@@ -1,58 +1,35 @@
 var chai = require("chai");
 var chaiHttp = require("chai-http");
 var should = chai.should();
-var payment = require('../controller/payment')
-var modelPayment = require('../models').payment;
-var token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwidXNlcm5hbWUiOiJhbmRyZXciLCJlbWFpbCI6ImFuZHJld0BnbWFpbC5jb20iLCJmaXJzdE5hbWUiOiJhbmRyZXciLCJmYW1pbHlOYW1lIjoiYW5kcmV3Iiwic2V4IjoiTSIsImVtYWlsVmVyaWZpZWQiOmZhbHNlLCJpYXQiOjE1MjAzMjIyNjR9.ywca-7HPFy5BMdx9sLffb5IOjAvOzPlnnu9ULo2BfpY'
-
-// var decoded = jwt.verify(token, process.env.JWT_SECRET);
+var payment = require("../controller/payment");
+var modelPayment = require("../models").payment;
+var token =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwidXNlcm5hbWUiOiJhbmRyZXciLCJlbWFpbCI6ImFuZHJld0BnbWFpbC5jb20iLCJmaXJzdE5hbWUiOiJhbmRyZXciLCJmYW1pbHlOYW1lIjoiYW5kcmV3Iiwic2V4IjoiTSIsImVtYWlsVmVyaWZpZWQiOmZhbHNlLCJpYXQiOjE1MjAzOTc2Mjh9.tkm5Grgwzd_jkqtqKNaimGZQhY97UW37BmTPfHtgaoI";
 
 describe("test transaction", () => {
-  before(function(){
+  before(function() {
     modelPayment.create({
       invoiceId: 1,
       status: "PENDING",
       amount: 50000,
-      availableBanks: "[{'name': 'BCA', 'number':'123'}, {'name': 'BCA', 'number':'123'}]"
-    })
-    .then((data) => {
-      console.log(data)
-    })
+      availableBanks:
+        "[{'name': 'BCA', 'number':'123'}, {'name': 'BCA', 'number':'123'}]"
+    });
   });
   it("successfully create new transaction", function(done) {
     chai
       .request("http://localhost:3000")
       .post("/transaction")
-      .set('token', token)
+      .set("token", token)
       .send({
         paymentId: 2,
         productId: 2,
         aladinPrice: 50000,
-        phoneNumber: '6282297677300',
+        phoneNumber: "6282297677300",
         status: "PENDING"
       })
       .end((err, res) => {
         res.should.have.status(200);
-
-// describe("test brand", () => {
-//   it("successfully create new brand", function(done) {
-//     chai
-//       .request("http://localhost:3000")
-//       .post("/transaction")
-//       .send({
-//         paymentId: 2,
-//         productId: 2,
-//         userId: decoded.id,
-//         aladinPrice: 10500,
-//         number: 082297677300,
-//         status: "pending"
-//       })
-//       .end((err, res) => {
-//         // res.should.have.status(201);
-
-//         res.body.should.have.property("paymentId");
-//         res.body.paymentId.should.equal(2);
-//         res.body.paymentId.should.be.a("Number");
 
         res.body.should.have.property("userId");
         res.body.userId.should.equal(4);
@@ -63,58 +40,48 @@ describe("test transaction", () => {
         res.body.aladinPrice.should.be.a("Number");
 
         res.body.should.have.property("number");
-        res.body.number.should.equal('6282297677300');
+        res.body.number.should.equal("6282297677300");
         res.body.number.should.be.a("String");
 
         res.body.should.have.property("status");
         res.body.status.should.equal("PENDING");
         res.body.status.should.be.a("String");
 
-//         res.body.should.have.property("status");
-//         res.body.status.should.equal("pending");
-//         res.body.status.should.be.a("String");
-
-//         id = res.body.id;
-//         done();
-//       });
-//   });
+        id = res.body.id;
+        done();
+      });
+  });
 
   it("successfully read all transaction with Pending user", function(done) {
     chai
       .request("http://localhost:3000")
       .get("/transaction/userPending")
-      .set('token', token)
+      .set("token", token)
       .end((err, res) => {
         res.should.have.status(200);
         done();
       });
   });
 
-//   it("successfully read alluser", function(done) {
-//     chai
-//       .request("http://localhost:3000")
-//       .put(`/api/brand/` + id)
-//       .send({
-//         brandName: "asd"
-//       })
-//       .end((err, res) => {
-//         res.should.have.status(2s00);
-//         res.should.be.json;
-//         res.should.be.a("object");
-//         res.body.should.have.property("brandName");
-//         res.body.brandName.should.equal("asd");
-//         done();
-//       });
-//   });
+  it("successfully read alluser", function(done) {
+    chai
+      .request("http://localhost:3000")
+      .get(`/transaction/user`)
+      .set("token", token)
+      .end((err, res) => {
+        res.should.have.status(200);
+        done();
+      });
+  });
 
-//   it("successfully read 1 user", function(done) {
-//     chai
-//       .request("http://localhost:3000")
-//       .delete(`/api/brand/` + id)
-//       .end((err, res) => {
-//         res.should.have.status(200);
-//         res.body.should.not.have.property("brandName");
-//         done();
-//       });
-//   });
-// });
+  //   it("successfully read 1 user", function(done) {
+  //     chai
+  //       .request("http://localhost:3000")
+  //       .delete(`/api/brand/` + id)
+  //       .end((err, res) => {
+  //         res.should.have.status(200);
+  //         res.body.should.not.have.property("brandName");
+  //         done();
+  //       });
+  //   });
+});

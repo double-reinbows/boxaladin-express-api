@@ -23,11 +23,24 @@ const aladinController = require('../controller/aladin')
 router.post('/unlockPrice', aladinController.decreaseAladinPrice)
 router.get('/firebase', firebaseHelper.syncToFirebase)
 
-router.get('/allPhone', phoneCtrl.all)
-router.get('/', ctrl.getAll)
-router.get('/emailVerification', ctrl.verifyEmail)
-router.get('/phoneNumbers', phoneCtrl.getPhoneByUser)
+router.get("/", ctrl.getAll);
+router.post("/signin", ctrl.signin);
+router.post("/signup", ctrl.signup);
+
+
+router.get("/emailVerification", ctrl.verifyEmail);
+
+//-------------------phone routes-------------------------
+router.get('/allPhone', phoneCtrl.all);
+router.get("/phoneNumbers", phoneCtrl.getPhoneByUser);
+router.post('/phonenumber', phoneHelper.checkDuplicate, phoneHelper.checkAlready, phoneCtrl.postPhoneNumber)
+router.put('/phone/:id', phoneHelper.checkDuplicate, phoneHelper.checkAlready, phoneCtrl.changePhone)
 router.delete('/phone/:id', phoneCtrl.removePhone)
+
+router.post("/changePrimary", phoneCtrl.changePrimary);
+router.post("/smsVerification", phoneCtrl.sendSmsVerification);
+router.post("/phoneVerification", phoneCtrl.verifyPhoneNumber);
+
 
 //-------------------xendit routes-------------------------
 router.get('/balance', xenditController.balance)
@@ -56,20 +69,6 @@ router.get('/transaction/userPending', transactionController.allPendingByUser)
 router.get('/transaction/user', transactionController.allByUser)
 router.get('/transaction/:id', transactionController.byId)
 // -----------------------------------------------------------
-
-router.post('/changePrimary', phoneCtrl.changePrimary)
-router.post('/smsVerification', phoneCtrl.sendSmsVerification)
-router.post('/phoneVerification', phoneCtrl.verifyPhoneNumber)
-router.post('/signin', ctrl.signin)
-
-/**
- * Endpoint post user data/info ketika signup
- */
-router.post('/signup', ctrl.signup)
-router.post('/phonenumber', phoneHelper.checkDuplicate, phoneHelper.checkAlready, phoneCtrl.postPhoneNumber)
-
-router.put('/phone/:id', phoneHelper.checkDuplicate, phoneHelper.checkAlready, phoneCtrl.changePhone)
-
 
 router.get('/api/category', categoryController.list);
 router.get('/api/category/:id', categoryController.retrieve);
