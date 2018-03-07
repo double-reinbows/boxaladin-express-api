@@ -55,7 +55,7 @@ module.exports = {
               },
             })
             .then(({data}) => {
-              console.log('userAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', {data})
+              console.log('userAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', data)
               console.log('statusAAAAAAAAAAAAAAAAAAAAAAAAAAAA', data.status)
               invoice = data.id,
               banksArr_Obj = data.available_banks
@@ -71,25 +71,25 @@ module.exports = {
                   id: dataPayment.id
                 }
               })
-              .then((data)=>{
+              .then((dataAxios)=>{
                 db.transaction.findOne({
                   where: {
                     paymentId: dataPayment.id
                   }
                 })
-                .then(data => {
-                  if (!data) {
+                .then(dataTransaksi => {
+                  if (!dataTransaksi) {
                     return res.status(404).send({
                       message: 'Data Not Found',
                     });
                   }
-                  return res.status(200).send({data});
+                  return res.status(200).send(dataTransaksi);
                 })
                 .catch(error => res.status(400).send(error));
               })
-              .catch(err => console.log(err))
+              .catch(error => res.status(400).send(error));
             })
-            .catch(err => console.log(err))
+            .catch(error => res.status(400).send(error));
           })
           .catch(err => res.status(400).console.log(err));
         })
