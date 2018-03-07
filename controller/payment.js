@@ -27,59 +27,75 @@ module.exports = {
         aladinPrice: req.body.amount
         })
         .then(dataTransaction => {
-          let dataStrPaymentID = dataTransaction.dataValues.paymentId.toString()
-          axios({
-            method: 'POST',
-            url: `https://api.xendit.co/v2/invoices`,
-            headers: {
-              authorization: "Basic eG5kX2RldmVsb3BtZW50X09ZcUFmTDBsMDdldmxjNXJkK0FhRW1URGI5TDM4Tko4bFhiZytSeGkvR2JlOExHb0NBUitndz09Og=="
-            },
-            data: {
-              // external_id: "paymentId no" +""+ dataStrPaymentID,
-              external_id: dataStrPaymentID,
-              amount: req.body.amount,
-              payer_email: decoded.email,
-              // --------description = description dari product-------------
-              description: "asd"
-            },
+          console.log(dataTransaction.dataValues.productId)
+          db.product.findOne({
+            where:{
+              id: dataTransaction.dataValues.productId
+            }
           })
-          .then(({data}) => {
-            console.log('user', decoded.email)
-            console.log('status', data.status)
-            invoice = data.id,
-            banksArr_Obj = data.available_banks
-            banksStr = JSON.stringify(banksArr_Obj)
-            db.payment.update({
-              invoiceId: invoice,
-              availableBanks: banksStr
-            },{
-              where:{
-                id: dataPayment.id
-              }
+          .then((resultProduct) => {
+            console.log(resultProduct.dataValues.productName.toString())
+            console.log('AAAAAAAAAAAAAa', req.body.amount)
+            let dataStrPaymentID = dataTransaction.dataValues.paymentId.toString()
+            console.log(dataStrPaymentID)
+            console.log(req.body.amount)
+            console.log(decoded.email)
+            console.log(resultProduct.dataValues.productName)
+            axios({
+              method: 'POST',
+              url: `https://api.xendit.co/v2/invoices`,
+              headers: {
+                authorization: "Basic eG5kX2RldmVsb3BtZW50X09ZcUFmTDBsMDdldmxjNXJkK0FhRW1URGI5TDM4Tko4bFhiZytSeGkvR2JlOExHb0NBUitndz09Og=="
+              },
+              data: {
+                external_id: dataStrPaymentID,
+                amount: req.body.amount,
+                payer_email: decoded.email,
+                description: resultProduct.dataValues.productName
+              },
             })
-            .then((data)=>{
-              db.transaction
-              .findOne({
-                where: {
-                  paymentId: dataPayment.id
+            .then(({data}) => {
+              console.log('userAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', {data})
+              console.log('statusAAAAAAAAAAAAAAAAAAAAAAAAAAAA', data.status)
+              invoice = data.id,
+              banksArr_Obj = data.available_banks
+              banksStr = JSON.stringify(banksArr_Obj)
+              console.log('IDDDDDDDDDDDD', invoice)
+              console.log (banksStr)
+              console.log(dataPayment.id)
+              db.payment.update({
+                invoiceId: invoice,
+                availableBanks: banksStr
+              },{
+                where:{
+                  id: dataPayment.id
                 }
               })
-              .then(data => {
-                if (!data) {
-                  return res.status(404).send({
-                    message: 'Data Not Found',
-                  });
-                }
-                return res.status(200).send(data);
+              .then((data)=>{
+                db.transaction.findOne({
+                  where: {
+                    paymentId: dataPayment.id
+                  }
+                })
+                .then(data => {
+                  if (!data) {
+                    return res.status(404).send({
+                      message: 'Data Not Found',
+                    });
+                  }
+                  return res.status(200).send({data});
+                })
+                .catch(error => res.status(400).send(error));
               })
-              .catch(error => res.status(400).send(error));
+              .catch(err => console.log(err))
             })
             .catch(err => console.log(err))
           })
-          .catch(err => console.log(err))
+          .catch(err => res.status(400).console.log(err));
         })
-        .catch(err => res.status(400).send(err));
+        .catch(err => res.status(400).console.log(err));
       })
+      .catch(err => res.status(400).console.log(err));
     },
 
     retrieveInvoice(req, res) {
