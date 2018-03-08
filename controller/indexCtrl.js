@@ -64,10 +64,12 @@ exports.signin = (req, res) => {
       }
       // user.dataValues
     )
+    console.log('aaa', user.dataValues)
     } else if (user.password.substr(6) !== hashedPass.substr(6)) {
       res.send({
         message: 'password incorrect'
       })
+      console.log('bbb', hashedPass)
     }
   })
 }
@@ -156,8 +158,11 @@ exports.signup = (req, res) => {
             primary: true
           })
           .then(dataPhone => {
-            res.status(200).send(token)
-            console.log('decoded', token)
+            res.status(200).send({
+              message: "Signup Berhasil",
+              token
+            })
+            console.log('token', token)
           })
           .catch(error => res.status(400).send('gagal', error));
       })

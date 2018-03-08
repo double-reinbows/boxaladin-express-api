@@ -23,25 +23,29 @@ describe('test user', ()=>{
     })
     .end((err,res) => {  
       res.should.have.status(200)
-      res.body.should.have.property('username');
-      res.body.username.should.equal('user'+users);
-      res.body.username.should.be.a('String');
+      res.body.should.be.a('object');
 
-      res.body.should.have.property("email");
-      res.body.email.should.equal(users+'@gmail.com');
-      res.body.email.should.be.a('String');
+      res.body.should.have.property('message').eql('Signup Berhasil');
 
-      res.body.should.have.property("firstName");
-      res.body.firstName.should.equal('user');
-      res.body.firstName.should.be.a('String');
+      // res.body.should.have.property('username');
+      // res.body.username.should.equal('user'+users);
+      // res.body.username.should.be.a('String');
 
-      res.body.should.have.property("familyName");
-      res.body.familyName.should.equal('aaa');
-      res.body.familyName.should.be.a('String');
+      // res.body.should.have.property("email");
+      // res.body.email.should.equal(users+'@gmail.com');
+      // res.body.email.should.be.a('String');
 
-      res.body.should.have.property("sex");
-      res.body.sex.should.equal('M');
-      res.body.sex.should.be.a('String');
+      // res.body.should.have.property("firstName");
+      // res.body.firstName.should.equal('user');
+      // res.body.firstName.should.be.a('String');
+
+      // res.body.should.have.property("familyName");
+      // res.body.familyName.should.equal('aaa');
+      // res.body.familyName.should.be.a('String');
+
+      // res.body.should.have.property("sex");
+      // res.body.sex.should.equal('M');
+      // res.body.sex.should.be.a('String');
       id = res.body.id
 
       done()

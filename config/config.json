@@ -15,11 +15,11 @@
     "dialect": "postgres"
   },
   "production": {
-    "username": "boxaladin",
-    "password": "kolorijo",
-    "database": "ebdb",
-    "host": "aa1qn5xt9zcigg8.cbo164jcsisu.ap-southeast-1.rds.amazonaws.com",
-    "port": 5432,
+    "username": "postgres",
+    "password": "anak223",
+    "database": "boxaladin",
+    "host": "localhost",
+    "port": "5432",
     "dialect": "postgres"
   }
 }
