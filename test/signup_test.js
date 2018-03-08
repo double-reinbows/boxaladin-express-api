@@ -9,7 +9,7 @@ var expect = chai.expect;
 
 chai.use(chaiHttp);
 
-describe('test user', ()=>{
+describe('test Signup', ()=>{
   it('successfully create new user', function (done) {
     chai.request('http://localhost:3000')
     .post('/signup')

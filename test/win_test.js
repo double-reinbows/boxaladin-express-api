@@ -12,6 +12,8 @@ describe('test win', ()=>{
     .get('/win')
     .end((err,res) => {
       res.should.have.status(200)
+      res.should.be.a('object');
+
       done()
     })
   })
@@ -22,6 +24,8 @@ describe('test win', ()=>{
     .set('token', token)
     .end((err,res) => {
       res.should.have.status(200)
+      res.should.be.a('object');
+
       done()
     })
   })
