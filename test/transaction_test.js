@@ -1,72 +1,88 @@
-var chai = require('chai');
-var chaiHttp = require('chai-http');
-var should = chai.should()
+var chai = require("chai");
+var chaiHttp = require("chai-http");
+var should = chai.should();
+var payment = require('../controller/payment')
+var modelPayment = require('../models').payment;
+var token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwidXNlcm5hbWUiOiJhbmRyZXciLCJlbWFpbCI6ImFuZHJld0BnbWFpbC5jb20iLCJmaXJzdE5hbWUiOiJhbmRyZXciLCJmYW1pbHlOYW1lIjoiYW5kcmV3Iiwic2V4IjoiTSIsImVtYWlsVmVyaWZpZWQiOmZhbHNlLCJpYXQiOjE1MjAzOTc2Mjh9.tkm5Grgwzd_jkqtqKNaimGZQhY97UW37BmTPfHtgaoI'
 
-chai.use(chaiHttp);
+// untuk tes transaction dibagian controller get pending dan all user, 
+// bagian mapping data parse avail bank di comment
 
-
-describe('test transaction', ()=>{
-  it('successfully create new transaction', function (done) {
-    chai.request('http://localhost:3000')
-
-    .post('/transaction')
-    .send({
-      userId: '1',
-      paymentId: '1',
-      productId: '1',
-      aladinPrice: '10000',
-      number: '08121377713',
-      status: 'PENDING'
+describe("test transaction", () => {
+  before(function(){
+    modelPayment.create({
+      invoiceId: 1,
+      status: "PENDING",
+      amount: 50000,
+      availableBanks: "[{'name': 'BCA', 'number':'123'}, {'name': 'BCA', 'number':'123'}]"
     })
-    .end((err,res) => {
-      res.should.have.status(201);   
-      res.body.should.have.property("userId");
-      res.body.userId.should.equal('1');
-      res.body.userId.should.be.a('Integer');
-      res.body.should.have.property("paymentId");
-      res.body.paymentId.should.equal('1');
-      res.body.paymentId.should.be.a('Integer');
-      res.body.should.have.property("productId");
-      res.body.productId.should.equal('1');
-      res.body.productId.should.be.a('Integer');
-      res.body.should.have.property("aladinPrice");
-      res.body.aladinPrice.should.equal('10000');
-      res.body.aladinPrice.should.be.a('Integer');
-      res.body.should.have.property("number");
-      res.body.number.should.equal('08121377713');
-      res.body.number.should.be.a('Integer');
-      res.body.should.have.property("status");
-      res.body.status.should.equal('PENDING');
-      res.body.status.should.be.a('Integer');
+  });
+  it("successfully create new transaction", function(done) {
+    chai
+      .request("http://localhost:3000")
+      .post("/transaction")
+      .set('token', token)
+      .send({
+        paymentId: 2,
+        productId: 2,
+        aladinPrice: 50000,
+        phoneNumber: '6282297677300',
+        status: "PENDING"
+      })
+      .end((err, res) => {
+        res.should.have.status(200);
 
-      id = res.body.id
-      done()
-    })
-  })
+        res.body.should.have.property("userId");
+        res.body.userId.should.equal(4);
+        res.body.userId.should.be.a("Number");
 
-  it('successfully read all transaction', function (done) {
-    chai.request('http://localhost:3000')
-    .get('/transaction')
-    .end((err,res) => {
-      res.should.have.status(201)
-      done()
-    })
-  })
+        res.body.should.have.property("aladinPrice");
+        res.body.aladinPrice.should.equal(50000);
+        res.body.aladinPrice.should.be.a("Number");
 
-  it('successfully delete transaction', function(done) {
-    chai.request('http://localhost:3000')
-    .delete(`/api/brand/` + id)
-    .end((err,res) =>{
-      res.should.have.status(200)
-      res.body.should.not.have.property('userId')
-      res.body.should.not.have.property('paymentId')
-      res.body.should.not.have.property('productId')
-      res.body.should.not.have.property('aladinPrice')
-      res.body.should.not.have.property('number')
-      res.body.should.not.have.property('status')
+        res.body.should.have.property("number");
+        res.body.number.should.equal('6282297677300');
+        res.body.number.should.be.a("String");
 
-      done()
-    })
-  })
+        res.body.should.have.property("status");
+        res.body.status.should.equal("PENDING");
+        res.body.status.should.be.a("String");
 
-})
+        id = res.body.id;
+        done();
+      });
+  });
+
+  it("successfully read all transaction with Pending user", function(done) {
+    chai
+      .request("http://localhost:3000")
+      .get("/transaction/userPending")
+      .set('token', token)
+      .end((err, res) => {
+        res.should.have.status(200);
+        done();
+      });
+  });
+
+  it("successfully read alluser", function(done) {
+    chai
+      .request("http://localhost:3000")
+      .get(`/transaction/user`)
+      .set('token', token)
+      .end((err, res) => {
+        res.should.have.status(200);
+        done();
+      });
+  });
+
+//   it("successfully read 1 user", function(done) {
+//     chai
+//       .request("http://localhost:3000")
+//       .delete(`/api/brand/` + id)
+//       .end((err, res) => {
+//         res.should.have.status(200);
+//         res.body.should.not.have.property("brandName");
+//         done();
+//       });
+//   });
+});

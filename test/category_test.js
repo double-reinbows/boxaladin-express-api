@@ -7,15 +7,18 @@ chai.use(chaiHttp);
 
 describe('test category', ()=>{
   it('successfully create new category', function (done) {
-    chai.request('http://localhost:3000')
+    chai
+    .request('http://localhost:3000')
     .post('/api/category')
     .send({
       categoryName: 'asus'
     })
     .end((err,res) => {
       res.should.have.status(201);
+
       res.should.be.json;
-      res.should.be.a('object');      
+      res.should.be.a('object');
+            
       res.body.should.have.property("categoryName");
       res.body.categoryName.should.equal('asus');
       res.body.categoryName.should.be.a('String');

@@ -14,9 +14,10 @@ module.exports = {
         number: req.body.phoneNumber,
         status: "PENDING",
       })
-      .then(data => res.send(data))
-
-      .catch(err => res.status(400).send(err));
+      .then((data) => {
+        res.status(200).send(data)
+      })
+      .catch(err => console.log(err))
   },
 
   allPendingByUser(req, res) {
@@ -25,21 +26,18 @@ module.exports = {
       .findAll({
         where: {
           userId: decoded.id,
-          status: 'PENDING'
+          status: "PENDING"
         },
-        include: [
-          { all: true }
-        ]
+        include: [{ all: true }]
       })
-      .then(data => {
+      .then((data) => {
         data.map(transaction => {
-          transaction.payment.availableBanks = JSON.parse(transaction.payment.availableBanks)
-        })
-
-        res.send(data)
+          transaction.payment.availableBanks = JSON.parse(transaction.payment.availableBanks);
+        });
+        res.send(data);
       })
 
-      .catch(err => res.status(400).send(err))
+      .catch(err => res.status(400).console.log(err));
   },
 
   allByUser(req, res) {
@@ -47,7 +45,7 @@ module.exports = {
     return transaction
       .findAll({
         where: {
-          userId: decoded.id
+          userId: req.body.id
         },
         include: [
           { all: true }
@@ -57,7 +55,6 @@ module.exports = {
         data.map(transaction => {
           transaction.payment.availableBanks = JSON.parse(transaction.payment.availableBanks)
         })
-
         res.send(data)
       })
 

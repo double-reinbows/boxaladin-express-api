@@ -40,7 +40,6 @@ exports.getAll = (req, res) => {
 exports.signin = (req, res) => {
   let hashedPass = hash(req.body.password)
   db.user.findOne({where: {username: req.body.username}}).then(user => {
-    console.log(user)
     if (user == null) {
       res.send({
         message: 'username not found'
@@ -57,16 +56,20 @@ exports.signin = (req, res) => {
           emailVerified: user.emailVerified
         },
         process.env.JWT_SECRET
-      )
-
-      res.send({
+      );
+      res.send(
+      {
         message: 'login success',
         token: token
-      })
+      }
+      // user.dataValues
+    )
+    console.log('aaa', user.dataValues)
     } else if (user.password.substr(6) !== hashedPass.substr(6)) {
       res.send({
         message: 'password incorrect'
       })
+      console.log('bbb', hashedPass)
     }
   })
 }
@@ -133,7 +136,8 @@ exports.signup = (req, res) => {
         process.env.JWT_SECRET
       )
 
-      db.user.create(req.body).then(data => {
+      db.user.create(req.body)
+      .then(data => {
         sendEmailVerification(data.email, data.email_token)
         var token = jwt.sign(
           {
@@ -142,26 +146,27 @@ exports.signup = (req, res) => {
             email: data.email,
             firstName: data.firstName,
             familyName: data.familyName,
-            sex: data.sex
+            sex: data.sex,
           },
           process.env.JWT_SECRET
         )
-        db.phonenumber
-          .create({
+        db.phonenumber.create({
             userId: data.id,
             number: req.body.phonenumber,
             verified: false,
             otp: randomOtp,
             primary: true
           })
-          .then(result => {
+          .then(dataPhone => {
             res.status(200).send({
-              message: 'register success',
-              token: token,
-              email:data.email
+              message: "Signup Berhasil",
+              token
             })
+            console.log('token', token)
           })
+          .catch(error => res.status(400).send('gagal', error));
       })
+      .catch(error => res.status(400).send('failed', error));
     })
 }
 

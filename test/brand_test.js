@@ -14,11 +14,12 @@ describe('test brand', ()=>{
     })
     .end((err,res) => {
       res.should.have.status(201);
-      res.should.be.json;
-      res.should.be.a('object');      
+
+
       res.body.should.have.property("brandName");
       res.body.brandName.should.equal('mouse');
       res.body.brandName.should.be.a('String');
+      
       id = res.body.id
       done()
     })
