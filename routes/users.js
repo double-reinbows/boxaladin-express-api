@@ -13,5 +13,6 @@ router.get('/info', ctrl.getUser)
 router.get('/:username', auth.authUser, ctrl.getUserData)
 
 router.put('/coin', ctrl.decreaseCoin)
+router.put('/upcoin', ctrl.buyCoinWithAladinKey)
 
 module.exports = router;
