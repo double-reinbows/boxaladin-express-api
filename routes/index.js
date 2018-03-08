@@ -32,8 +32,10 @@ router.delete('/phone/:id', phoneCtrl.removePhone)
 //-------------------xendit routes-------------------------
 router.get('/balance', xenditController.balance)
 router.post('/payment', paymentController.createInvoice)
+router.post('/payment2', paymentController.createInvoice2)
+
 router.get('/payment/:id', paymentController.retrieveInvoice)
-router.get('/status/:id/:invoice', paymentController.updateStatus)
+// router.get('/status/:id/:invoice', paymentController.updateStatus)
 router.post('/callbackurl', callbackController.createCallbackXendit)
 router.post('/creditCard', creditCardController.createCreditCard)
 // ---------------------------------------

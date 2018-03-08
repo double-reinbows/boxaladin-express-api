@@ -45,7 +45,7 @@ module.exports = {
               method: 'POST',
               url: `https://api.xendit.co/v2/invoices`,
               headers: {
-                authorization: "Basic eG5kX2RldmVsb3BtZW50X09ZcUFmTDBsMDdldmxjNXJkK0FhRW1URGI5TDM4Tko4bFhiZytSeGkvR2JlOExHb0NBUitndz09Og=="
+                authorization: process.env.XENDIT_PRODUCTION_AUTHORIZATION
               },
               data: {
                 external_id: dataStrPaymentID,
@@ -115,28 +115,25 @@ module.exports = {
     },
 
 
-    updateStatus(req, res) {
+    createInvoice2(req, res) {
       axios({
-        method: 'GET',
-        url: `https://api.xendit.co/v2/invoices/${req.params.invoice}`,
+        method: 'POST',
+        url: `https://api.xendit.co/v2/invoices`,
         headers: {
-          authorization: "Basic eG5kX2RldmVsb3BtZW50X09ZcUFmTDBsMDdldmxjNXJkK0FhRW1URGI5TDM4Tko4bFhiZytSeGkvR2JlOExHb0NBUitndz09Og=="
-        }
+          authorization: process.env.XENDIT_DEVELOPMENT_AUTHORIZATION
+        },
+        data: {
+          external_id: req.body.externalId,
+          amount: req.body.amount,
+          payer_email: req.body.email,
+          description: req.body.description
+        },
       })
       .then(({data}) => {
-        db.payment.update({
-          status: data.status
-        },{
-          where:{
-            id: req.params.id
-          }
-        })
-        .then((data)=>{
-          console.log(data)
-          res.send(data)
-        })
-        .catch(err => console.log(err))
+        res.send(data),
+        console.log(data)
       })
-      .catch(err => console.log(err))
-    },
-};
+      .catch((error) => res.status(400).send(error));
+}
+
+}
