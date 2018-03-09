@@ -1,6 +1,6 @@
 const db = require('../models')
 const jwt = require('jsonwebtoken')
-
+const AWS = require('aws-sdk')
 exports.all = (req, res) => {
   db.phonenumber.findAll({
     include: [
@@ -70,7 +70,7 @@ exports.sendSmsVerification = (req, res) => {
         // console.log('Data buat kirim OTP:', data)
         // awsSendSms(data.number, data.otp)
         awsSendSms(data.number, data.otp)
-        res.send({message: 'OTP sent'})
+        return res.send({ message: 'OTP sent' })
       })
       .catch(err => res.send(err))
 
@@ -81,12 +81,13 @@ exports.sendSmsVerification = (req, res) => {
 }
 
 const awsSendSms = (phonenumber, otp) => {
-  var AWS = require('aws-sdk');
-    AWS.config.region = 'ap-southeast-1';
-    AWS.config.update({
-      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
-    });
+
+  AWS.config.region = 'ap-southeast-1';
+  AWS.config.update({
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+  });
+
   var sns = new AWS.SNS();
 
   var MessageType = {
@@ -96,24 +97,30 @@ const awsSendSms = (phonenumber, otp) => {
   };
   
   sns.setSMSAttributes(MessageType, function(err, data) {
-    if (err) console.log(err, err.stack); // an error occurred
-    else     console.log(data);           // successful response
-  });
-
-  var Message = {
-    Message: `box aladin OTP: ${otp}`,
-    MessageStructure: 'string',
-    PhoneNumber: `${phonenumber}`,
-    Subject: 'your subject',
-  }
-  sns.publish(Message, function(err, data) {
     if (err) {
       console.log(err, err.stack); // an error occurred
     } else {
       console.log(data);           // successful response
     }
   });
+
+  var Message = {
+    Message: `Box Aladin OTP: ${otp}`,
+    MessageStructure: 'string',
+    PhoneNumber: `${phonenumber}`,
+    Subject: 'your subject',
+  }
+
+  sns.publish(Message, function(err, data) {
+    if (err) {
+      return console.log(err, err.stack); // an error occurred
+    } else {
+      return console.log(data);           // successful response
+    }
+  });
+
   console.log('SEND SMS FROM AWS TO:', phonenumber, otp);
+
 }
 
 exports.getPhoneByUser = (req, res) => {
