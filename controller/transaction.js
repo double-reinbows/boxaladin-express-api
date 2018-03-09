@@ -16,7 +16,6 @@ module.exports = {
       })
       .then((data) => {
         res.status(200).send(data)
-        console.log(data)
       })
       .catch(err => console.log(err))
   },
@@ -32,15 +31,13 @@ module.exports = {
         include: [{ all: true }]
       })
       .then((data) => {
-        // data.map(transaction => {
-        //   transaction.payment.availableBanks = JSON.parse(transaction.payment.availableBanks);
-        // });
-
+        data.map(transaction => {
+          transaction.payment.availableBanks = JSON.parse(transaction.payment.availableBanks);
+        });
         res.send(data);
-        console.log(data)
       })
 
-      .catch(err => res.status(400).send(err));
+      .catch(err => res.status(400).console.log(err));
   },
 
   allByUser(req, res) {
@@ -58,7 +55,6 @@ module.exports = {
         data.map(transaction => {
           transaction.payment.availableBanks = JSON.parse(transaction.payment.availableBanks)
         })
-
         res.send(data)
       })
 

@@ -74,3 +74,36 @@ exports.decreaseCoin = (req, res) => {
   })
 }
 
+exports.buyCoinWithAladinKey = (req, res) => {
+  
+  const decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
+
+  db.user.findOne({
+    where: {
+      id: decoded.id
+    }
+  })
+  .then(result => {
+    
+    result.update({
+      aladinKeys: result.aladinKeys - req.body.key,
+      coin: result.coin + (req.body.key * 10),
+    })
+    .then(updateResult => {
+      
+      console.log(updateResult)
+      return res.send({ message: 'coin updated' })
+      
+    })
+    .catch(err => {
+      console.log(err)
+      return res.send(err)
+    })
+
+  })
+  .catch(err => {
+    console.log(err)
+    return res.send(err)
+  })
+  
+}

@@ -64,13 +64,12 @@ exports.signin = (req, res) => {
       }
       // user.dataValues
     )
-       console.log("AAAAAAAAAA", user.dataValues)
+    console.log('aaa', user.dataValues)
     } else if (user.password.substr(6) !== hashedPass.substr(6)) {
-      res.send(
-        user.dataValues
-        // message: 'password incorrect'
-      )
-      console.log("AAAAAAAAAAasdasdasdasdasd",user.dataValues)
+      res.send({
+        message: 'password incorrect'
+      })
+      console.log('bbb', hashedPass)
     }
   })
 }
@@ -159,12 +158,15 @@ exports.signup = (req, res) => {
             primary: true
           })
           .then(dataPhone => {
-            var decoded = jwt.verify(token, process.env.JWT_SECRET)
-            res.status(200).send(token)
+            res.status(200).send({
+              message: "Signup Berhasil",
+              token
+            })
+            console.log('token', token)
           })
-          .catch(error => res.status(400).send(error));
+          .catch(error => res.status(400).send('gagal', error));
       })
-      .catch(error => res.status(400).send(error));
+      .catch(error => res.status(400).send('failed', error));
     })
 }
 
