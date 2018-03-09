@@ -74,15 +74,4 @@ describe("test transaction", () => {
         done();
       });
   });
-
-//   it("successfully read 1 user", function(done) {
-//     chai
-//       .request("http://localhost:3000")
-//       .delete(`/api/brand/` + id)
-//       .end((err, res) => {
-//         res.should.have.status(200);
-//         res.body.should.not.have.property("brandName");
-//         done();
-//       });
-//   });
-});
+})
