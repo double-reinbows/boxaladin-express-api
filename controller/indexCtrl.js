@@ -129,7 +129,7 @@ exports.signup = (req, res) => {
       req.body.aladinKeys = 0
       req.body.coin = 0
 
-      req.body.email_token = jwt.sign(
+      req.body.emailToken = jwt.sign(
         {
           email: req.body.email,
           username: req.body.username
@@ -139,7 +139,7 @@ exports.signup = (req, res) => {
 
       db.user.create(req.body)
       .then(data => {
-        sendEmailVerification(data.email, data.email_token)
+        sendEmailVerification(data.email, data.emailToken)
         var token = jwt.sign(
           {
             id: data.id,
@@ -171,15 +171,15 @@ exports.signup = (req, res) => {
     })
 }
 
-const sendEmailVerification = (email_address, email_token) => {
+const sendEmailVerification = (email_address, emailToken) => {
   // const decoded = jwt.verify(req.body.token, process.env.JWT_SECRET)
 
-  // const email_token = jwt.sign({
+  // const emailToken = jwt.sign({
   //   email: decoded.email,
   //   username: decoded.username
   // }, process.env.JWT_SECRET)
 
-  // kirim link ${process.env.BA_API_HOST}/emailVerification?encoded=${email_token} via email ke email_address
+  // kirim link ${process.env.BA_API_HOST}/emailVerification?encoded=${emailToken} via email ke email_address
   AWS.config.update({
     region: 'us-west-2',
     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
@@ -197,13 +197,13 @@ const sendEmailVerification = (email_address, email_token) => {
           Charset: 'UTF-8',
           Data: `Click this link to verify your email address: ${
             process.env.BA_WEB_HOST
-          }/emailVerification?encoded=${email_token}`
+          }/emailVerification?encoded=${emailToken}`
         },
         Text: {
           Charset: 'UTF-8',
           Data: `Click this link to verify your email address: ${
             process.env.BA_WEB_HOST
-          }/emailVerification?encoded=${email_token}`
+          }/emailVerification?encoded=${emailToken}`
         }
       },
       Subject: {
