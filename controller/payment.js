@@ -45,7 +45,7 @@ module.exports = {
               method: 'POST',
               url: `https://api.xendit.co/v2/invoices`,
               headers: {
-                authorization: process.env.XENDIT_PRODUCTION_AUTHORIZATION
+                authorization: process.env.XENDIT_DEVELOPMENT_AUTHORIZATION
               },
               data: {
                 external_id: dataStrPaymentID,
@@ -91,11 +91,11 @@ module.exports = {
             })
             .catch(error => res.status(400).send(error));
           })
-          .catch(err => res.status(400).console.log(err));
+          .catch(err => res.status(400).send(err));
         })
-        .catch(err => res.status(400).console.log(err));
+        .catch(err => res.status(400).send(err));
       })
-      .catch(err => res.status(400).console.log(err));
+      .catch(err => res.status(400).send(err));
     },
 
     retrieveInvoice(req, res) {

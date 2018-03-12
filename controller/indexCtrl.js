@@ -127,6 +127,7 @@ exports.signup = (req, res) => {
       req.body.salt = salt
       req.body.emailVerified = false
       req.body.aladinKeys = 0
+      req.body.coin = 0
 
       req.body.email_token = jwt.sign(
         {
