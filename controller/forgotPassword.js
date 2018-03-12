@@ -40,10 +40,12 @@ module.exports = {
 
     const decoded = jwt.verify(req.query.encoded, process.env.JWT_SECRET)
     const newPassword = hash(req.body.password)
+    const newEmailToken = jwt.sign({
+      email: decoded.email,
+      username: decoded.username
+    }, process.env.JWT_SECRET)
 
-    db.user.update({
-      password: newPassword
-    }, {
+    db.user.findOne({
       where: {
         $and: [{
           username: decoded.username
@@ -52,7 +54,27 @@ module.exports = {
         }]
       }
     })
-    .then(result => res.send({ msg: 'password reset done' }))
+    .then(userResult => {
+      if (userResult.emailToken != req.query.encoded) {
+        return res.send({ msg: 'link expired' })
+      }
+
+      db.user.update({
+        password: newPassword,
+        emailToken: newEmailToken
+      }, {
+        where: {
+          $and: [{
+            username: decoded.username
+          }, {
+            email: decoded.email
+          }]
+        }
+      })
+      .then(result => res.send({ msg: 'password updated' }))
+      .catch(err => console.log(err))
+
+    })
     .catch(err => console.log(err))
 
   }
