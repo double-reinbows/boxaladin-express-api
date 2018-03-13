@@ -35,7 +35,8 @@ module.exports = {
       },
       emailVerified: {
         type: Sequelize.BOOLEAN,
-        allowNull: false
+        allowNull: false,
+        defaultValue: false
       },
       typedEmail: {
         type: Sequelize.STRING,
@@ -58,17 +59,17 @@ module.exports = {
       },
       salt: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
       },
       coin: {
         type: Sequelize.INTEGER,
       },
       createdAt: {
-        allowNull: false,
+        allowNull: true,
         type: Sequelize.DATE
       },
       updatedAt: {
-        allowNull: false,
+        allowNull: true,
         type: Sequelize.DATE
       }
     });
