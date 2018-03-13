@@ -53,11 +53,13 @@ module.exports = {
 							category: result.category.categoryName,
 							brandId: result.brand.id,
 							categoryId: result.category.id
-						})
+						}, function() {
 
-						res.send({
-							message: 'success',
-							data: result
+							return res.send({
+								message: 'success',
+								data: result
+							})
+
 						})
 					})
 					.catch(err => res.send(err))
