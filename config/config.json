@@ -8,10 +8,10 @@
     "dialect": "postgres"
   },
   "test": {
-    "username": "boxaladin",
-    "password": "kolorijo",
-    "database": "devboxaladin",
-    "host": "testboxaladin.cbo164jcsisu.ap-southeast-1.rds.amazonaws.com",
+    "username": "postgres",
+    "password": "anak223",
+    "database": "testboxaladin",
+    "host": "localhost",
     "dialect": "postgres"
   },
   "production": {

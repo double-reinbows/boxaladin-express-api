@@ -20,6 +20,11 @@ const productController = require('../controller/product')
 const firebaseHelper = require('../helpers/firebase')
 const aladinController = require('../controller/aladin')
 
+const forgotPassword = require('../controller/forgotPassword')
+
+router.post('/forgotpassword', forgotPassword.requestViaEmail)
+router.post('/resetpassword', forgotPassword.reset)
+
 router.post('/unlockPrice', aladinController.decreaseAladinPrice)
 router.get('/firebase', firebaseHelper.syncToFirebase)
 

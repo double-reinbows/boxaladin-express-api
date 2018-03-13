@@ -1,6 +1,7 @@
 const db = require('../models')
 const jwt = require('jsonwebtoken')
-const AWS = require('aws-sdk')
+const awsHelper = require('../helpers/aws')
+
 exports.all = (req, res) => {
   db.phonenumber.findAll({
     include: [
@@ -71,9 +72,7 @@ exports.sendSmsVerification = (req, res) => {
       
       db.phonenumber.findById(findResult.id)
       .then(data => {
-        // console.log('Data buat kirim OTP:', data)
-        // awsSendSms(data.number, data.otp)
-        awsSendSms(data.number, data.otp)
+        awsHelper.sendSMS(data.number, data.otp)
         return res.send({ message: 'OTP sent' })
       })
       .catch(err => res.send(err))
@@ -82,49 +81,6 @@ exports.sendSmsVerification = (req, res) => {
     .catch(err => res.send(err))
   })
   .catch(err => res.send(err))
-}
-
-const awsSendSms = (phonenumber, otp) => {
-
-  AWS.config.region = 'ap-southeast-1';
-  AWS.config.update({
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
-  });
-
-  var sns = new AWS.SNS();
-
-  var MessageType = {
-    attributes: {
-      'DefaultSMSType': 'Transactional',
-    }
-  };
-  
-  sns.setSMSAttributes(MessageType, function(err, data) {
-    if (err) {
-      console.log(err, err.stack); // an error occurred
-    } else {
-      console.log(data);           // successful response
-    }
-  });
-
-  var Message = {
-    Message: `Box Aladin OTP: ${otp}`,
-    MessageStructure: 'string',
-    PhoneNumber: `${phonenumber}`,
-    Subject: 'your subject',
-  }
-
-  sns.publish(Message, function(err, data) {
-    if (err) {
-      return console.log(err, err.stack); // an error occurred
-    } else {
-      return console.log(data);           // successful response
-    }
-  });
-
-  console.log('SEND SMS FROM AWS TO:', phonenumber, otp);
-
 }
 
 exports.getPhoneByUser = (req, res) => {
