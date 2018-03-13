@@ -29,8 +29,8 @@ let replace = string => {
 let hasher = pass => {
   const str = "0123456789abcdefghijklmnopqrstuvwxysABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
-  let capcay = str.repeat(5).split('').sort(randomSort).join('').slice(0, 6)
-  let acak = capcay.slice(0, 7)
+  let capcay = str.repeat(5).split('').sort(randomSort).join('').slice(0, 5)
+  let acak = capcay.slice(0, 6)
   let txt_password2 = acak + md5(pass)
   let txt_new_password = replace(txt_password2)
 

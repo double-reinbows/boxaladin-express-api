@@ -39,7 +39,17 @@ exports.getAll = (req, res) => {
 
 exports.signin = (req, res) => {
   let hashedPass = hash(req.body.password)
-  db.user.findOne({where: {username: req.body.username}}).then(user => {
+  db.user.findOne({
+    where: {
+      $or: [{
+        username: req.body.username
+      }, {
+        email: req.body.username,
+        emailVerified: true
+      }]
+    }
+  })
+  .then(user => {
     if (user == null) {
       res.send({
         message: 'username not found'
