@@ -42,8 +42,6 @@ exports.postPhoneNumber = (req, res) => {
         data.dataValues
         
       )
-
-      console.log("asdasdasda", data); 
     })
     .catch(err => console.log(err))
   })
@@ -190,7 +188,6 @@ exports.changePrimary = (req, res) => {
   db.phonenumber.findById(req.body.numberId)
   .then(findResult => {
     if (findResult.otp != req.body.otp) {
-      console.log('Wrong OTP');
       res.send({ message: 'Wrong OTP'})
     } else {
       
@@ -222,7 +219,6 @@ exports.changePrimary = (req, res) => {
 
         })
 
-        console.log('primary phone changed')
         res.send({ message: 'primary phone changed'})
 
       })

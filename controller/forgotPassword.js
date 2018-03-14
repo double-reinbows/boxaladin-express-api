@@ -16,7 +16,6 @@ module.exports = {
     .then(userResult => {
 
       if (userResult == null) {
-        console.log({ msg: 'email tidak ada' })
         return res.send({ msg: 'email tidak ada' })
       }
 
@@ -72,11 +71,9 @@ module.exports = {
         }
       })
       .then(result => res.send({ msg: 'password updated' }))
-      .catch(err => console.log(err))
-
+      .catch(err => res.send(err))
     })
-    .catch(err => console.log(err))
-
+    .catch(err => res.send(err))
   }
 
 }

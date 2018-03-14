@@ -6,7 +6,7 @@ const xml = require("xml-parse");
 
 module.exports = {
     createCallbackXendit(req, res) {
-      if(req.headers['x-callback-token']!==undefined && req.headers['x-callback-token']===process.env.XENDIT_DEVELOPMENT_TOKEN)
+      if(req.headers['x-callback-token']!==undefined && req.headers['x-callback-token']===process.env.XENDIT_PRODUCTION_TOKEN)
       {      
         const paymentId = req.body.external_id;
         db.payment    
@@ -57,7 +57,6 @@ module.exports = {
                           }
                         })
                         .then((result) => {
-                          console.log ('top up aladin keys berhasil')
                           res.send(result)
                         })
                         .catch(error =>res.status(400).send(error));

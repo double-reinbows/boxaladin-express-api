@@ -17,7 +17,6 @@ module.exports = {
       },
     })
     .then(({data})=>{
-      console.log("sukses")
       db.payment.update({
         status: "COMPLETED",
       },{
@@ -35,15 +34,14 @@ module.exports = {
           }
         })
         .then(data => {
-          console.log('Payment & Transaction updated!');
           res.status(200).send({data})
         })
-        .catch(err => console.log("Error update transaction:", err))
+				.catch(err => res.send(err))
 
       })
-      .catch(err => console.log("Error update payment:", err))
+      .catch(err => res.send(err))
     })
-    .catch(err => console.log("Error Xendit CC charges:", err))
+    .catch(err => res.send(err))
   },
 
   createCreditCardTopup(req, res) {
@@ -61,7 +59,6 @@ module.exports = {
       },
     })
     .then(({data})=>{
-      console.log("sukses")
       db.payment.update({
         status: "COMPLETED",
       },{
@@ -79,15 +76,12 @@ module.exports = {
           ]
         })
         .then((resultTopUp)=>{
-          console.log("resulttopup", resultTopUp.dataValues.userId)
           db.user.findOne({
             where:{
               id: resultTopUp.dataValues.userId
             }
           })
           .then((resultUser) => {
-            console.log('aaaa', resultUser.dataValues.aladinKeys)
-            console.log('bbb', resultTopUp.key.dataValues.keyAmount)
             var key = parseInt(resultUser.dataValues.aladinKeys) + parseInt(resultTopUp.key.dataValues.keyAmount)
             db.user.update({
               aladinKeys: key
@@ -97,18 +91,17 @@ module.exports = {
               }
             })
             .then((result) => {
-              console.log ('top up aladin keys berhasil')
               res.send(result)
             })
-            .catch(error => console.log('error', error));
+            .catch(err => res.send(err))
           })
-          .catch(error => console.log('error', error));
+          .catch(err => res.send(err))
         })
-        .catch(error => res.status(400).send(error));
+				.catch(err => res.send(err))
       })
-      .catch(err => console.log("Error update payment:", err))
+      .catch(err => res.send(err))
     })
-    .catch(err => console.log("Error Xendit CC charges:", err))
+    .catch(err => res.send(err))
   },
 
 }

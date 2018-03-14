@@ -12,6 +12,6 @@ module.exports = {
       .then(({data}) => {
         res.send(data)
       })
-      .catch(err => console.log(err))
+      .catch(err => res.send(err))
   }, 
 }
