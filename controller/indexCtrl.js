@@ -239,7 +239,7 @@ exports.verifyEmail = (req, res) => {
       },
       {
         where: {
-          $or: [
+          $and: [
             {
               username: decoded.username
             },
