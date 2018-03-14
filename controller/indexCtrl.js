@@ -52,7 +52,7 @@ exports.signin = (req, res) => {
   .then(user => {
     if (user == null) {
       res.send({
-        message: 'username not found'
+        message: 'username or email not found'
       })
     } else if (user.password.substr(6) === hashedPass.substr(6)) {
       let token = jwt.sign(

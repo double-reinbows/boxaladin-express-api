@@ -1,6 +1,6 @@
 const AWS = require('aws-sdk')
 
-exports.sendSMS = (phonenumber, otp) => {
+exports.sendSMS = (payload) => {
 
   AWS.config.region = 'ap-southeast-1';
   AWS.config.update({
@@ -25,9 +25,9 @@ exports.sendSMS = (phonenumber, otp) => {
   });
 
   var Message = {
-    Message: `Box Aladin OTP: ${otp}`,
+    Message: payload.message,
     MessageStructure: 'string',
-    PhoneNumber: `${phonenumber}`,
+    PhoneNumber: payload.phone,
     Subject: 'your subject',
   }
 
@@ -39,7 +39,7 @@ exports.sendSMS = (phonenumber, otp) => {
     }
   });
 
-  console.log('SEND SMS FROM AWS TO:', phonenumber, otp);
+  console.log('SEND SMS FROM AWS TO:', payload.phone, payload.messsage);
 
 }
 
@@ -72,7 +72,7 @@ exports.sendEmail = (payload) => {
         Data: payload.email_subject
       }
     },
-    ReturnPath: payload.email_source,
+    ReturnPath: payload.email_return_path,
     Source: payload.email_source
   }
   ses.sendEmail(params, (err, data) => {

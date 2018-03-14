@@ -24,7 +24,8 @@ module.exports = {
         email_destinations: [userResult.email],
         email_subject: `Box Aladin RESET PASSWORD`,
         email_text: `Click here to RESET Your password: ${process.env.BA_WEB_HOST}/resetpassword?encoded=${userResult.emailToken}`,
-        email_source: `teza.harsony230394@gmail.com`
+        email_source: `teza.harsony230394@gmail.com`,
+        email_return_path: `teza.harsony230394@gmail.com`,
       })
 
       return res.send({
