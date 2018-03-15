@@ -1,0 +1,25 @@
+{
+  "development": {
+    "username": "postgres",
+    "password": null,
+    "database": "boxaladin",
+    "host": "localhost",
+    "port": "5432",
+    "dialect": "postgres"
+  },
+  "test": {
+    "username": "postgres",
+    "password": "anak223",
+    "database": "testboxaladin",
+    "host": "localhost",
+    "dialect": "postgres"
+  },
+  "production": {
+    "username": "postgres",
+    "password": "anak223",
+    "database": "boxaladin",
+    "host": "localhost",
+    "port": "5432",
+    "dialect": "postgres"
+  }
+}

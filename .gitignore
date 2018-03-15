@@ -13,7 +13,6 @@ Desktop.ini
 .directory
 *~
 
-config.json
 # npm
 node_modules
 package-lock.json
