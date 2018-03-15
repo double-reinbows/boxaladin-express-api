@@ -103,7 +103,7 @@ exports.signup = (req, res) => {
           },
           {
             email: req.body.email,
-            emailVerified: true
+            // emailVerified: true
           }
         ]
       }
@@ -172,7 +172,7 @@ exports.signup = (req, res) => {
           })
           .catch(error => res.status(400).send('gagal', error));
       })
-      .catch(error => res.status(400).send('failed', error));
+      .catch(error => res.status(400).send('faileddddd', error));
     })
 }
 
