@@ -135,29 +135,39 @@ exports.signup = (req, res) => {
       req.body.aladinKeys = 0
       req.body.coin = 0
 
-      req.body.emailToken = jwt.sign(
-        {
-          email: req.body.email,
-          username: req.body.username
-        },
-        process.env.JWT_SECRET
-      )
-
+      // CREATE USER
       db.user.create(req.body)
       .then(data => {
-        sendEmailVerification(data.email, data.emailToken)
-        var token = jwt.sign(
-          {
-            id: data.id,
-            username: data.username,
-            email: data.email,
-            firstName: data.firstName,
-            familyName: data.familyName,
-            sex: data.sex,
+
+        var emailToken = jwt.sign({
+          id: data.id,
+          email: data.email
+        }, process.env.JWT_SECRET)
+
+        var token = jwt.sign({
+          id: data.id,
+          username: data.username,
+          email: data.email,
+          firstName: data.firstName,
+          familyName: data.familyName,
+          sex: data.sex,
+        },process.env.JWT_SECRET)
+
+        // UPDATE EMAIL TOKEN
+        db.user.update({
+          emailToken: emailToken
+        }, {
+          where: {
+            id: data.id
           },
-          process.env.JWT_SECRET
-        )
-        db.phonenumber.create({
+          returning: true
+        })
+        .then(userUpdateResult => {
+          
+          sendEmailVerification(data.email, emailToken)
+
+          // CREATE PHONE
+          db.phonenumber.create({
             userId: data.id,
             number: req.body.phonenumber,
             verified: false,
@@ -165,14 +175,29 @@ exports.signup = (req, res) => {
             primary: true
           })
           .then(dataPhone => {
-            res.status(200).send({
+  
+            
+            return res.status(200).send({
               message: "Signup Berhasil",
               token
             })
           })
-          .catch(error => res.status(400).send('gagal', error));
+          .catch(error => {
+            console.log('error create phone:', error)
+            return res.status(400).send(error)
+          });
+
+        })
+        .catch(err => {
+          console.log(err)
+          return res.send(err)
+        })
+
       })
-      .catch(error => res.status(400).send('faileddddd', error));
+      .catch(error => {
+        console.log('error create user:', error)
+        return res.status(400).send(error)
+      });
     })
 }
 
@@ -234,14 +259,7 @@ exports.verifyEmail = (req, res) => {
       },
       {
         where: {
-          $and: [
-            {
-              username: decoded.username
-            },
-            {
-              email: decoded.email
-            }
-          ]
+          id: decoded.id
         }
       }
     )
