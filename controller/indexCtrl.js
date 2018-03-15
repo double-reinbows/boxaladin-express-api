@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken')
 const AWS = require('aws-sdk')
 const db = require('../models')
 const hash = require('../helpers/aladin_hash')
+const { genRandomString } = require('../helpers/string')
 
 const SECRET = 'aradin'
 
@@ -95,23 +96,25 @@ exports.signup = (req, res) => {
    */
   db.user
     .findOne({
-      attributes: ['username', 'email'],
+      // attributes: ['username', 'email'],
       where: {
-        $or: [
-          {
-            username: req.body.username
-          },
-          {
-            email: req.body.email,
-            // emailVerified: true
-          }
-        ]
+        // $or: [
+        //   {
+        //     username: req.body.username
+        //   },
+        //   {
+        //     email: req.body.email,
+        //     // emailVerified: true
+        //   }
+        // ]
+        email: req.body.email,
+        emailVerified: true
       }
     })
     .then(found => {
       if (found) {
         let isUsed = {}
-        if (found.username === req.body.username) isUsed.username = true
+        // if (found.username === req.body.username) isUsed.username = true
         if (found.email === req.body.email) isUsed.email = true
         /**
          * Di sini res.send()-nya pakai return. Jadi klo conditional ini
@@ -134,15 +137,13 @@ exports.signup = (req, res) => {
       req.body.emailVerified = false
       req.body.aladinKeys = 0
       req.body.coin = 0
+      req.body.emailToken = genRandomString(128)
 
       // CREATE USER
       db.user.create(req.body)
       .then(data => {
 
-        var emailToken = jwt.sign({
-          id: data.id,
-          email: data.email
-        }, process.env.JWT_SECRET)
+        console.log('USER CREATED:', data)
 
         var token = jwt.sign({
           id: data.id,
@@ -154,17 +155,17 @@ exports.signup = (req, res) => {
         },process.env.JWT_SECRET)
 
         // UPDATE EMAIL TOKEN
-        db.user.update({
-          emailToken: emailToken
-        }, {
-          where: {
-            id: data.id
-          },
-          returning: true
-        })
-        .then(userUpdateResult => {
+        // db.user.update({
+        //   emailToken: emailToken
+        // }, {
+        //   where: {
+        //     id: data.id
+        //   },
+        //   returning: true
+        // })
+        // .then(userUpdateResult => {
           
-          sendEmailVerification(data.email, emailToken)
+          sendEmailVerification(data.email, data.emailToken)
 
           // CREATE PHONE
           db.phonenumber.create({
@@ -176,28 +177,33 @@ exports.signup = (req, res) => {
           })
           .then(dataPhone => {
   
-            
             return res.status(200).send({
               message: "Signup Berhasil",
               token
             })
+            
           })
           .catch(error => {
             console.log('error create phone:', error)
             return res.status(400).send(error)
           });
 
-        })
-        .catch(err => {
-          console.log(err)
-          return res.send(err)
-        })
+        // })
+        // .catch(err => {
+        //   console.log(err)
+        //   return res.send(err)
+        // })
 
       })
       .catch(error => {
         console.log('error create user:', error)
         return res.status(400).send(error)
       });
+
+    })
+    .catch(err => {
+      console.log('error find user:', err)
+      return res.send(err)
     })
 }
 
@@ -227,13 +233,13 @@ const sendEmailVerification = (email_address, emailToken) => {
           Charset: 'UTF-8',
           Data: `Click this link to verify your email address: ${
             process.env.BA_WEB_HOST
-          }/emailVerification?encoded=${emailToken}`
+          }/emailVerification?email=${email_address}&encoded=${emailToken}`
         },
         Text: {
           Charset: 'UTF-8',
           Data: `Click this link to verify your email address: ${
             process.env.BA_WEB_HOST
-          }/emailVerification?encoded=${emailToken}`
+          }/emailVerification?email=${email_address}&encoded=${emailToken}`
         }
       },
       Subject: {
@@ -251,7 +257,7 @@ const sendEmailVerification = (email_address, emailToken) => {
 }
 
 exports.verifyEmail = (req, res) => {
-  const decoded = jwt.verify(req.query.encoded, process.env.JWT_SECRET)
+  // const decoded = jwt.verify(req.query.encoded, process.env.JWT_SECRET)
   db.user
     .update(
       {
@@ -259,7 +265,8 @@ exports.verifyEmail = (req, res) => {
       },
       {
         where: {
-          id: decoded.id
+          email: req.query.email,
+          emailToken: req.query.encoded
         }
       }
     )
