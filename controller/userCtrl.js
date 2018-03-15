@@ -59,17 +59,14 @@ exports.decreaseCoin = (req, res) => {
       coin: req.body.coin > 0 ? req.body.coin - 1 : 0
     })
     .then(() => {
-      console.log({ message: 'coin updated' })
       return res.send({ message: 'coin updated' })
     })
     .catch(err => {
-      console.log(err)
       return res.send(err)
     })
 
   })
   .catch(err => {
-    console.log(err)
     return res.send(err)    
   })
 }

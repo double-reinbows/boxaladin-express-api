@@ -21,9 +21,7 @@ module.exports = {
       })
       .then(dataProduct => {
 
-        var sign = md5('081380572721' + process.env.PULSA_PRODUCTION_KEY + dataTransaction.dataValues.id)
-        console.log(sign);
-        
+        var sign = md5('081380572721' + process.env.PULSA_DEVELOPMENT_KEY + dataTransaction.dataValues.id)        
         var pulsa = `<?xml version="1.0" ?>
                     <mp>
                       <commands>topup</commands>
@@ -33,7 +31,7 @@ module.exports = {
                       <pulsa_code>${dataProduct.dataValues.pulsaCode}</pulsa_code>
                       <sign>${sign}</sign>
                     </mp>`
-        axios.post('https://api.mobilepulsa.net/v1/legacy/index', pulsa, {
+        axios.post('https://testprepaid.mobilepulsa.net/v1/legacy/index', pulsa, {
             headers: {
                 'Content-Type': 'text/xml',
             },
@@ -44,14 +42,6 @@ module.exports = {
           let dataJson = JSON.parse(json)
           let convertJson = convert.xml2json(dataJson, { compact: true})
           let object = JSON.parse(convertJson)
-
-          // console.log("object", object.mp.ref_id._text)
-          console.log("object", object)
-          console.log('id', dataTransaction.dataValues.id)
-          console.log('number', dataTransaction.dataValues.number)
-          console.log('pulsacode', dataProduct.dataValues.pulsaCode)
-
-
           db.transaction.update({
             status: object.mp.message._text,
             },{
@@ -60,15 +50,14 @@ module.exports = {
               }
             })
             .then((data)=>{
-              console.log('sukses')
               res.send(object.mp);
             })
             .catch(err => res.send(err))
         })
-        .catch(err => console.log(err))
+				.catch(err => res.send(err))
       })
-      .catch(err => console.log(err))
+      .catch(err => res.send(err))
     })
-    .catch(err => console.log(err))
+    .catch(err => res.send(err))
   }
 };

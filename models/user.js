@@ -29,7 +29,8 @@ module.exports = function(sequelize, DataTypes) {
     },
     emailVerified: {
       type: DataTypes.BOOLEAN,
-      allowNull: false
+      allowNull: false,
+      defaultValue: false
     },
     typedEmail: {
       type: DataTypes.STRING,
@@ -58,11 +59,11 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.INTEGER,
     },
     createdAt: {
-      allowNull: false,
+      allowNull: true,
       type: DataTypes.DATE
     },
     updatedAt: {
-      allowNull: false,
+      allowNull: true,
       type: DataTypes.DATE
     }
   });

@@ -10,20 +10,20 @@ module.exports = {
       },
       username: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true,
       },
       firstName: {
         type: Sequelize.STRING,
-        allowNull: true
+        allowNull: true,
       },
       familyName: {
         type: Sequelize.STRING,
-        allowNull: true
+        allowNull: true,
       },
       sex: {
         type: Sequelize.ENUM,
         values: ['M','F'],
-        allowNull: true
+        allowNull: true,
       },
       password: {
         type: Sequelize.STRING,
@@ -31,15 +31,18 @@ module.exports = {
       },
       email: {
         type: Sequelize.STRING,
-        allowNull: true
+        validate: {
+          isEmail: true
+        },
+        allowNull: false
       },
       emailVerified: {
         type: Sequelize.BOOLEAN,
-        allowNull: false
+        allowNull: false,
       },
       typedEmail: {
         type: Sequelize.STRING,
-        allowNull: true
+        allowNull: true,
       },
       usernameChanged: {
         type: Sequelize.BOOLEAN,
@@ -47,7 +50,7 @@ module.exports = {
       },
       accountProvider: {
         type: Sequelize.STRING,
-        allowNull: true
+        allowNull: true,
       },
       aladinKeys: {
         type: Sequelize.INTEGER
@@ -58,17 +61,17 @@ module.exports = {
       },
       salt: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: true
       },
       coin: {
         type: Sequelize.INTEGER,
       },
       createdAt: {
-        allowNull: false,
+        allowNull: true,
         type: Sequelize.DATE
       },
       updatedAt: {
-        allowNull: false,
+        allowNull: true,
         type: Sequelize.DATE
       }
     });

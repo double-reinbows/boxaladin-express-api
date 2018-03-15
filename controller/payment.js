@@ -27,20 +27,13 @@ module.exports = {
         aladinPrice: req.body.amount
         })
         .then(dataTransaction => {
-          console.log(dataTransaction.dataValues.productId)
           db.product.findOne({
             where:{
               id: dataTransaction.dataValues.productId
             }
           })
           .then((resultProduct) => {
-            console.log(resultProduct.dataValues.productName.toString())
-            console.log('AAAAAAAAAAAAAa', req.body.amount)
             let dataStrPaymentID = dataTransaction.dataValues.paymentId.toString()
-            console.log(dataStrPaymentID)
-            console.log(req.body.amount)
-            console.log(decoded.email)
-            console.log(resultProduct.dataValues.productName)
             axios({
               method: 'POST',
               url: `https://api.xendit.co/v2/invoices`,
@@ -55,14 +48,9 @@ module.exports = {
               },
             })
             .then(({data}) => {
-              console.log('userAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', data)
-              console.log('statusAAAAAAAAAAAAAAAAAAAAAAAAAAAA', data.status)
               invoice = data.id,
               banksArr_Obj = data.available_banks
               banksStr = JSON.stringify(banksArr_Obj)
-              console.log('IDDDDDDDDDDDD', invoice)
-              console.log (banksStr)
-              console.log(dataPayment.id)
               db.payment.update({
                 invoiceId: invoice,
                 availableBanks: banksStr
@@ -99,8 +87,6 @@ module.exports = {
     },
 
     retrieveInvoice(req, res) {
-      console.log("data", invoice)
-      console.log("bank", banksStr)
       return payment
       .findById(req.params.id)
       .then(data => {
@@ -113,27 +99,4 @@ module.exports = {
       })
       .catch(error => res.status(400).send(error));
     },
-
-
-    createInvoice2(req, res) {
-      axios({
-        method: 'POST',
-        url: `https://api.xendit.co/v2/invoices`,
-        headers: {
-          authorization: process.env.XENDIT_DEVELOPMENT_AUTHORIZATION
-        },
-        data: {
-          external_id: req.body.externalId,
-          amount: req.body.amount,
-          payer_email: req.body.email,
-          description: req.body.description
-        },
-      })
-      .then(({data}) => {
-        res.send(data),
-        console.log(data)
-      })
-      .catch((error) => res.status(400).send(error));
-}
-
-}
+  }

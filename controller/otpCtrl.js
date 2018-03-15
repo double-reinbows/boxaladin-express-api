@@ -36,10 +36,12 @@ exports.postPhoneNumber = (req, res) => {
       primary: primaryStatus
     })
     .then(data => {
-      res.send({
-        message: 'data added',
-        data: data
-      })
+      res.send(
+        // message: 'data added',
+        // data: data,
+        data.dataValues
+        
+      )
     })
     .catch(err => console.log(err))
   })
@@ -154,7 +156,9 @@ exports.removePhone = (req, res) => {
       id: req.params.id
     }
   })
-  .then(() => res.send({ message: 'Data removed'}))
+  .then(() => res.send(
+    { message: 'Data removed'}
+  ))
   .catch(err => res.send(err))
 }
 
@@ -175,10 +179,11 @@ exports.changePhone = (req, res) => {
       }
     })
     .then(data => {
-      res.send({
-        message: 'data changed',
-        data: data
-      })
+      res.send(
+        // message: 'data changed',
+        // data: data
+        data.dataValues
+      )
     })
     .catch(err => console.log(err))
   })
@@ -191,7 +196,6 @@ exports.changePrimary = (req, res) => {
   db.phonenumber.findById(req.body.numberId)
   .then(findResult => {
     if (findResult.otp != req.body.otp) {
-      console.log('Wrong OTP');
       res.send({ message: 'Wrong OTP'})
     } else {
       
@@ -223,7 +227,6 @@ exports.changePrimary = (req, res) => {
 
         })
 
-        console.log('primary phone changed')
         res.send({ message: 'primary phone changed'})
 
       })

@@ -17,7 +17,7 @@ module.exports = {
       .then((data) => {
         res.status(200).send(data)
       })
-      .catch(err => console.log(err))
+      .catch(err => res.send(err))
   },
 
   allPendingByUser(req, res) {
@@ -37,7 +37,7 @@ module.exports = {
         res.send(data);
       })
 
-      .catch(err => res.status(400).console.log(err));
+      .catch(err => res.status(400).send(err));
   },
 
   allByUser(req, res) {

@@ -36,7 +36,6 @@ let hasher = pass => {
 
   return txt_new_password
 }
-
 module.exports = hasher
 
 

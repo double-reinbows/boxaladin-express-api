@@ -25,7 +25,6 @@ module.exports = {
 
 					// kalau harga sudah 10.000 maka tidak turunkan harga lagi
 					if (product.aladinPrice <= 10000) {
-						console.log('minimum price...........................')
 						return res.send({
 							message: 'success',
 							data: product

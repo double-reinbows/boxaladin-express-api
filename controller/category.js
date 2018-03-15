@@ -2,7 +2,6 @@ const category = require('../models').category;
 
 module.exports = {
   list(req, res) {
-    console.log(category);
     return category.findAll()
       .then(data => res.status(201).send(data))
       .catch(err => res.status(400).send(err));

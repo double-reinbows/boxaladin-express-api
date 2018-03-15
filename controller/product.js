@@ -168,8 +168,6 @@ module.exports = {
           // hapus data di firebase sesuai id dari result
           const productsRef = firebase.database().ref().child('products')
   				productsRef.child(req.params.id).remove()
-
-          console.log('ID deleted product:', req.params.id);
           res.status(200).send({ message: 'product deleted successfully.' })
         })
         .catch(error => res.status(400).send(error));

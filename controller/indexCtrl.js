@@ -44,21 +44,22 @@ exports.signin = (req, res) => {
       $or: [{
         username: req.body.username
       }, {
-        email: req.body.username,
-        emailVerified: true
+        email:req.body.username,
+        // emailVerified: true
       }]
-    }
-  })
-  .then(user => {
+      }
+    })
+    .then(user => {
     if (user == null) {
       res.send({
         message: 'username or email not found'
+
       })
     } else if (user.password.substr(6) === hashedPass.substr(6)) {
       let token = jwt.sign(
         {
           id: user.id,
-          username: user.username,
+          username: user.username || user.email,
           email: user.email,
           firstName: user.firstName,
           familyName: user.familyName,
@@ -72,14 +73,11 @@ exports.signin = (req, res) => {
         message: 'login success',
         token: token
       }
-      // user.dataValues
     )
-    console.log('aaa', user.dataValues)
     } else if (user.password.substr(6) !== hashedPass.substr(6)) {
       res.send({
         message: 'password incorrect'
       })
-      console.log('bbb', hashedPass)
     }
   })
 }
@@ -95,7 +93,6 @@ exports.signup = (req, res) => {
    * Kalau balikannya gampang, bisa dipakai buat simplifikasi
    * kodingan di bawah.
    */
-  console.log('>checking...')
   db.user
     .findOne({
       attributes: ['username', 'email'],
@@ -106,7 +103,7 @@ exports.signup = (req, res) => {
           },
           {
             email: req.body.email,
-            emailVerified: true
+            // emailVerified: true
           }
         ]
       }
@@ -127,7 +124,6 @@ exports.signup = (req, res) => {
        * username dan/atau email belum terdaftar.
        * Lanjut ke registrasi (signup)
        */
-      console.log('>registering...')
 
       gmailDotCheck(req.body)
 
@@ -173,11 +169,10 @@ exports.signup = (req, res) => {
               message: "Signup Berhasil",
               token
             })
-            console.log('token', token)
           })
           .catch(error => res.status(400).send('gagal', error));
       })
-      .catch(error => res.status(400).send('failed', error));
+      .catch(error => res.status(400).send('faileddddd', error));
     })
 }
 

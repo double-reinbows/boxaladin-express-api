@@ -57,7 +57,6 @@ module.exports = {
                           }
                         })
                         .then((result) => {
-                          console.log ('top up aladin keys berhasil')
                           res.send(result)
                         })
                         .catch(error =>res.status(400).send(error));
