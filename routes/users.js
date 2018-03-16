@@ -10,6 +10,7 @@ const ctrl = require('../controller/userCtrl')
 // });
 
 router.get('/info', ctrl.getUser)
+router.get('/token', ctrl.refreshToken)
 router.get('/:username', auth.authUser, ctrl.getUserData)
 
 router.put('/coin', ctrl.decreaseCoin)

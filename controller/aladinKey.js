@@ -10,6 +10,13 @@ let banksStr = ""
 
 module.exports = {
   topUpKeys(req, res) {
+
+    var decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
+    console.log('ini decoded:', decoded)
+    if (decoded.emailVerified == false) {
+      return res.send({ msg: 'not verified user' })
+    }
+
     db.key.findById(req.body.keyId)
     .then(data => {
       if (!data) {
@@ -24,7 +31,6 @@ module.exports = {
         availableBanks: "null",
       })
       .then((dataPayment) => {
-        let decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
         db.topup.create({
         paymentId: dataPayment.id,
         userId: decoded.id,
@@ -36,7 +42,7 @@ module.exports = {
             method: 'POST',
             url: `https://api.xendit.co/v2/invoices`,
             headers: {
-              authorization: "Basic eG5kX2RldmVsb3BtZW50X09ZcUFmTDBsMDdldmxjNXJkK0FhRW1URGI5TDM4Tko4bFhiZytSeGkvR2JlOExHb0NBUitndz09Og=="
+              authorization: process.env.XENDIT_DEVELOPMENT_AUTHORIZATION
             },
             data: {
               external_id: dataStrPaymentID,
