@@ -45,7 +45,7 @@ module.exports = {
     return transaction
       .findAll({
         where: {
-          userId: req.body.id
+          userId: decoded.id
         },
         include: [
           { all: true }
