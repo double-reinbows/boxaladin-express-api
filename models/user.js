@@ -4,7 +4,7 @@ module.exports = function(sequelize, DataTypes) {
   var user = sequelize.define('user', {
     username: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: true
     },
     firstName: {
       type: DataTypes.STRING,

@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken')
 const AWS = require('aws-sdk')
 const db = require('../models')
 const hash = require('../helpers/aladin_hash')
+const { genRandomString } = require('../helpers/string')
 
 const SECRET = 'aradin'
 
@@ -61,6 +62,7 @@ exports.signin = (req, res) => {
           id: user.id,
           username: user.username || user.email,
           email: user.email,
+          emailVerified: user.emailVerified,
           firstName: user.firstName,
           familyName: user.familyName,
           sex: user.sex,
@@ -95,23 +97,25 @@ exports.signup = (req, res) => {
    */
   db.user
     .findOne({
-      attributes: ['username', 'email'],
+      // attributes: ['username', 'email'],
       where: {
-        $or: [
-          {
-            username: req.body.username
-          },
-          {
-            email: req.body.email,
-            // emailVerified: true
-          }
-        ]
+        // $or: [
+        //   {
+        //     username: req.body.username
+        //   },
+        //   {
+        //     email: req.body.email,
+        //     // emailVerified: true
+        //   }
+        // ]
+        email: req.body.email,
+        emailVerified: true
       }
     })
     .then(found => {
       if (found) {
         let isUsed = {}
-        if (found.username === req.body.username) isUsed.username = true
+        // if (found.username === req.body.username) isUsed.username = true
         if (found.email === req.body.email) isUsed.email = true
         /**
          * Di sini res.send()-nya pakai return. Jadi klo conditional ini
@@ -134,30 +138,39 @@ exports.signup = (req, res) => {
       req.body.emailVerified = false
       req.body.aladinKeys = 0
       req.body.coin = 0
+      req.body.emailToken = genRandomString(128)
 
-      req.body.emailToken = jwt.sign(
-        {
-          email: req.body.email,
-          username: req.body.username
-        },
-        process.env.JWT_SECRET
-      )
-
+      // CREATE USER
       db.user.create(req.body)
       .then(data => {
-        sendEmailVerification(data.email, data.emailToken)
-        var token = jwt.sign(
-          {
-            id: data.id,
-            username: data.username,
-            email: data.email,
-            firstName: data.firstName,
-            familyName: data.familyName,
-            sex: data.sex,
-          },
-          process.env.JWT_SECRET
-        )
-        db.phonenumber.create({
+
+        console.log('USER CREATED:', data)
+
+        var token = jwt.sign({
+          id: data.id,
+          username: data.username,
+          email: data.email,
+          emailVerified: data.emailVerified,
+          firstName: data.firstName,
+          familyName: data.familyName,
+          sex: data.sex,
+        },process.env.JWT_SECRET)
+
+        // UPDATE EMAIL TOKEN
+        // db.user.update({
+        //   emailToken: emailToken
+        // }, {
+        //   where: {
+        //     id: data.id
+        //   },
+        //   returning: true
+        // })
+        // .then(userUpdateResult => {
+          
+          sendEmailVerification(data.email, data.emailToken)
+
+          // CREATE PHONE
+          db.phonenumber.create({
             userId: data.id,
             number: req.body.phonenumber,
             verified: false,
@@ -165,14 +178,34 @@ exports.signup = (req, res) => {
             primary: true
           })
           .then(dataPhone => {
-            res.status(200).send({
+  
+            return res.status(200).send({
               message: "Signup Berhasil",
               token
             })
+            
           })
-          .catch(error => res.status(400).send('gagal', error));
+          .catch(error => {
+            console.log('error create phone:', error)
+            return res.status(400).send(error)
+          });
+
+        // })
+        // .catch(err => {
+        //   console.log(err)
+        //   return res.send(err)
+        // })
+
       })
-      .catch(error => res.status(400).send('faileddddd', error));
+      .catch(error => {
+        console.log('error create user:', error)
+        return res.status(400).send(error)
+      });
+
+    })
+    .catch(err => {
+      console.log('error find user:', err)
+      return res.send(err)
     })
 }
 
@@ -202,13 +235,13 @@ const sendEmailVerification = (email_address, emailToken) => {
           Charset: 'UTF-8',
           Data: `Click this link to verify your email address: ${
             process.env.BA_WEB_HOST
-          }/emailVerification?encoded=${emailToken}`
+          }/emailVerification?email=${email_address}&encoded=${emailToken}`
         },
         Text: {
           Charset: 'UTF-8',
           Data: `Click this link to verify your email address: ${
             process.env.BA_WEB_HOST
-          }/emailVerification?encoded=${emailToken}`
+          }/emailVerification?email=${email_address}&encoded=${emailToken}`
         }
       },
       Subject: {
@@ -226,7 +259,7 @@ const sendEmailVerification = (email_address, emailToken) => {
 }
 
 exports.verifyEmail = (req, res) => {
-  const decoded = jwt.verify(req.query.encoded, process.env.JWT_SECRET)
+  // const decoded = jwt.verify(req.query.encoded, process.env.JWT_SECRET)
   db.user
     .update(
       {
@@ -234,14 +267,8 @@ exports.verifyEmail = (req, res) => {
       },
       {
         where: {
-          $or: [
-            {
-              username: decoded.username
-            },
-            {
-              email: decoded.email
-            }
-          ]
+          email: req.query.email,
+          emailToken: req.query.encoded
         }
       }
     )

@@ -3,10 +3,13 @@ const jwt = require('jsonwebtoken')
 const db = require('../models')
 const awsHelper = require('../helpers/aws')
 const hash = require('../helpers/aladin_hash')
+const { genRandomString } = require('../helpers/string')
 
 module.exports = {
 
   requestViaEmail: (req, res) => {
+
+    const emailToken = genRandomString(128)
   
     db.user.findOne({
       where: {
@@ -19,42 +22,54 @@ module.exports = {
         return res.send({ msg: 'email tidak ada' })
       }
 
-      awsHelper.sendEmail({
-        email_destinations: [userResult.email],
-        email_subject: `Box Aladin RESET PASSWORD`,
-        email_text: `Click here to RESET Your password: ${process.env.BA_WEB_HOST}/resetpassword?encoded=${userResult.emailToken}`,
-        email_source: `teza.harsony230394@gmail.com`
+      db.user.update({
+        emailToken: emailToken
+      }, {
+        where: {
+          email: req.body.email
+        }
       })
+      .then(() => {
 
-      return res.send({
-        msg: 'email sent'
+        awsHelper.sendEmail({
+          email_destinations: [req.body.email],
+          email_subject: `Box Aladin RESET PASSWORD`,
+          email_text: `Click here to RESET Your password: ${process.env.BA_WEB_HOST}/resetpassword?email=${req.body.email}&encoded=${emailToken}`,
+          email_source: `teza.harsony230394@gmail.com`,
+          email_return_path: `teza.harsony230394@gmail.com`,
+        })
+  
+        return res.send({
+          msg: 'email sent'
+        })
+
+      })
+      .catch(err => {
+        console.log('error update emailToken:', err)
+        return res.send(err)
       })
 
     })
-    .catch(err => res.send(err))
+    .catch(err => {
+      console.log('error find user:', err)
+      return res.send(err)
+    })
 
   },
 
   reset: (req, res) => {
 
-    const decoded = jwt.verify(req.query.encoded, process.env.JWT_SECRET)
     const newPassword = hash(req.body.password)
-    const newEmailToken = jwt.sign({
-      email: decoded.email,
-      username: decoded.username
-    }, process.env.JWT_SECRET)
+    const newEmailToken = genRandomString(128)
 
     db.user.findOne({
       where: {
-        $and: [{
-          username: decoded.username
-        }, {
-          email: decoded.email
-        }]
+        email: req.query.email,
+        emailToken: req.query.encoded
       }
     })
     .then(userResult => {
-      if (userResult.emailToken != req.query.encoded) {
+      if (userResult == null) {
         return res.send({ msg: 'link expired' })
       }
 
@@ -63,11 +78,8 @@ module.exports = {
         emailToken: newEmailToken
       }, {
         where: {
-          $and: [{
-            username: decoded.username
-          }, {
-            email: decoded.email
-          }]
+          email: req.query.email,
+          emailToken: req.query.encoded
         }
       })
       .then(result => res.send({ msg: 'password updated' }))

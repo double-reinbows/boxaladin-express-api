@@ -4,6 +4,39 @@ const db = require('../models')
 const sequelize = require('sequelize')
 const jwt = require('jsonwebtoken')
 
+exports.refreshToken = (req, res) => {
+  const decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
+  db.user.findOne({
+    where: {
+      id: decoded.id
+    }
+  })
+  .then(data => {
+
+    let token = jwt.sign({
+      id: data.id,
+      username: data.username,
+      email: data.email,
+      emailVerified: data.emailVerified,
+      firstName: data.firstName,
+      familyName: data.familyName,
+      sex: data.sex,
+    }, process.env.JWT_SECRET)
+
+    return res.send({
+      msg: 'refresh token success',
+      token
+    })
+
+  })
+  .catch(err => {
+    
+    console.log('error find user', err)
+    return res.send(err)
+
+  })
+}
+
 exports.getUserData = (req, res) => {
   db.user.findOne({
     where: {

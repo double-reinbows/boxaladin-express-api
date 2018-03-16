@@ -70,8 +70,16 @@ exports.sendSmsVerification = (req, res) => {
       
       db.phonenumber.findById(findResult.id)
       .then(data => {
-        awsHelper.sendSMS(data.number, data.otp)
+        
+        let message = `Box Aladin OTP: ${data.otp}`
+
+        awsHelper.sendSMS({
+          phone: data.number,
+          message
+        })
+        
         return res.send({ message: 'OTP sent' })
+      
       })
       .catch(err => res.send(err))
 
