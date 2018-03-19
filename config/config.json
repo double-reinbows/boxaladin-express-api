@@ -1,17 +1,18 @@
 {
   "development": {
-    "username": "postgres",
-    "password": "anak223",
+    "username": "root",
+    "password": "kolorijo",
     "database": "boxaladin",
-    "host": "localhost",
+    "host": "boxaladin-develop.cbo164jcsisu.ap-southeast-1.rds.amazonaws.com",
     "port": "5432",
     "dialect": "postgres"
   },
   "test": {
-    "username": "postgres",
-    "password": "anak223",
-    "database": "testboxaladin",
-    "host": "localhost",
+    "username": "boxaladin",
+    "password": "kolorijo",
+    "database": "devboxaladin",
+    "host": "baexpress-test.cbo164jcsisu.ap-southeast-1.rds.amazonaws.com",
+    "port": "5432",
     "dialect": "postgres"
   },
   "production": {
@@ -19,14 +20,6 @@
     "password": "anak223",
     "database": "boxaladin",
     "host": "localhost",
-    "port": "5432",
-    "dialect": "postgres"
-  },
-  "development-cloud": {
-    "username": "boxaladin",
-    "password": "kolorijo",
-    "database": "devboxaladin",
-    "host": "baexpress-test.cbo164jcsisu.ap-southeast-1.rds.amazonaws.com",
     "port": "5432",
     "dialect": "postgres"
   }
