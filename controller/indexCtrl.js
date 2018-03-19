@@ -28,6 +28,24 @@ let gmailDotCheck = obj => {
 }
 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
+const handleDotGmail = (obj) => {
+  var email = obj.email
+  var user = email.split('@')[0]
+  var provider = email.split('@')[1]
+  
+  if (provider == 'gmail.com') {
+    let userWithoutDot = user.split('.').join('')
+    let result = userWithoutDot + '@gmail.com'
+    
+    obj.typed_email = obj.email
+    obj.email = result
+
+    return console.log(result)
+  } else {
+    return console.log(email)
+  } 
+}
+
 exports.getAll = (req, res) => {
   db.user
     .findAll({
@@ -129,7 +147,8 @@ exports.signup = (req, res) => {
        * Lanjut ke registrasi (signup)
        */
 
-      gmailDotCheck(req.body)
+      // gmailDotCheck(req.body)
+      handleDotGmail(req.body)
 
       req.body.password = hash(req.body.password)
       var salt = Math.floor(Math.random() * 90000) + 10000
