@@ -34,7 +34,8 @@ module.exports = {
         validate: {
           isEmail: true
         },
-        allowNull: false
+        allowNull: false,
+        unique: true
       },
       emailVerified: {
         type: Sequelize.BOOLEAN,

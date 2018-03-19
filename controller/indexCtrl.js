@@ -198,8 +198,8 @@ exports.signup = (req, res) => {
 
       })
       .catch(error => {
-        console.log('error create user:', error)
-        return res.status(400).send(error)
+        console.log('error create user:', error.message)
+        return res.send(error)
       });
 
     })

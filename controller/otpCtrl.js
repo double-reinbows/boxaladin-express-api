@@ -36,12 +36,10 @@ exports.postPhoneNumber = (req, res) => {
       primary: primaryStatus
     })
     .then(data => {
-      res.send(
-        // message: 'data added',
-        // data: data,
-        data.dataValues
-        
-      )
+      res.send({
+        message: 'data added',
+        data: data.dataValues
+      })
     })
     .catch(err => console.log(err))
   })
