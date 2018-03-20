@@ -294,3 +294,30 @@ exports.verifyEmail = (req, res) => {
     .then(result => res.send({message: 'verification success'}))
     .catch(err => console.log(err))
 }
+
+exports.resendEmailVerification = (req, res) => {
+  const decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
+  const newEmailToken = genRandomString(128)
+
+  db.user.update({
+    emailToken: newEmailToken
+  }, {
+    where: {
+      email: decoded.email
+    }
+  })
+  .then(() => {
+    sendEmailVerification(decoded.email, newEmailToken)
+
+    return res.status(200).send({
+      message: 'email sent',
+      data: decoded
+    })
+    
+  })
+  .catch(err => {
+    console.log('ERROR:', err)
+    return res.send(err)
+  })
+
+}

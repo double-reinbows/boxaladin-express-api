@@ -34,6 +34,7 @@ router.post("/signup", ctrl.signup);
 
 
 router.get("/emailVerification", ctrl.verifyEmail);
+router.post('/resendemailverification', ctrl.resendEmailVerification)
 
 //-------------------phone routes-------------------------
 router.get('/allPhone', phoneCtrl.all);
