@@ -21,7 +21,7 @@ const SECRET = 'aradin'
 let gmailDotCheck = obj => {
   let pattern = /(\w+)\.(\w+)@gmail.com/
   if (pattern.test(obj.email)) {
-    obj.typed_email = obj.email
+    obj.typedEmail = obj.email
     obj.email = obj.email.replace(pattern, `$1$2@gmail.com`)
   }
   return obj
@@ -35,9 +35,9 @@ const handleDotGmail = (obj) => {
   
   if (provider == 'gmail.com') {
     let userWithoutDot = user.split('.').join('')
-    let result = userWithoutDot + '@gmail.com'
+    var result = userWithoutDot + '@gmail.com'
     
-    obj.typed_email = obj.email
+    obj.typedEmail = obj.email
     obj.email = result
 
     return console.log(result)
@@ -56,23 +56,32 @@ exports.getAll = (req, res) => {
     })
 }
 
+
 exports.signin = (req, res) => {
+
+    // var email1 = req.body.email
+    // var user = email1.split('@')[0]
+    // var provider = email1.split('@')[1]
+  
+    // if (provider == 'gmail.com') {
+    //   let userWithoutDot = user.split('.').join('')
+    //   var result = userWithoutDot + '@gmail.com'
+    // } else {
+    //   return console.log(email1)
+    // } 
+
   let hashedPass = hash(req.body.password)
+  
   db.user.findOne({
     where: {
-      $or: [{
-        username: req.body.username
-      }, {
-        email:req.body.username,
+        typedEmail: req.body.email
         // emailVerified: true
-      }]
       }
     })
     .then(user => {
     if (user == null) {
       res.send({
         message: 'username or email not found'
-
       })
     } else if (user.password.substr(6) === hashedPass.substr(6)) {
       let token = jwt.sign(
@@ -91,7 +100,8 @@ exports.signin = (req, res) => {
       res.send(
       {
         message: 'login success',
-        token: token
+        token: token,
+        
       }
     )
     } else if (user.password.substr(6) !== hashedPass.substr(6)) {
