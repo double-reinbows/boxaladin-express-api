@@ -59,22 +59,23 @@ exports.getAll = (req, res) => {
 
 exports.signin = (req, res) => {
 
-    // var email1 = req.body.email
-    // var user = email1.split('@')[0]
-    // var provider = email1.split('@')[1]
+    var email1 = req.body.email
+    var user = email1.split('@')[0]
+    var provider = email1.split('@')[1]
   
-    // if (provider == 'gmail.com') {
-    //   let userWithoutDot = user.split('.').join('')
-    //   var result = userWithoutDot + '@gmail.com'
-    // } else {
-    //   return console.log(email1)
-    // } 
+    if (provider == 'gmail.com') {
+      let userWithoutDot = user.split('.').join('')
+      var result = userWithoutDot + '@gmail.com'
+      var emailFilter = result
+    } else {
+      var emailFilter = email1
+    } 
 
   let hashedPass = hash(req.body.password)
   
   db.user.findOne({
     where: {
-        typedEmail: req.body.email
+        email: emailFilter
         // emailVerified: true
       }
     })
