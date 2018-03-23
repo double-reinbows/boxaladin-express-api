@@ -11,8 +11,11 @@ module.exports = {
       userId: {
         type: Sequelize.INTEGER
       },
-      freeKeyId: {
+      gameRuleId: {
         type: Sequelize.INTEGER
+      },
+      winToken: {
+        type: Sequelize.STRING
       },
       createdAt: {
         allowNull: false,

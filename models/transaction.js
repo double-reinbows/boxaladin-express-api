@@ -6,7 +6,8 @@ module.exports = (sequelize, DataTypes) => {
     userId: DataTypes.INTEGER,
     aladinPrice: DataTypes.INTEGER,
     number: DataTypes.STRING,
-    status: DataTypes.STRING
+    status: DataTypes.STRING,
+    description: DataTypes.STRING
   });
 
   transaction.associate = (models) => {

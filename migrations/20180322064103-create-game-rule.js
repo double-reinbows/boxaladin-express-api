@@ -1,7 +1,7 @@
 'use strict';
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('freekeys', {
+    return queryInterface.createTable('gamerules', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -11,7 +11,7 @@ module.exports = {
       star: {
         type: Sequelize.INTEGER
       },
-      amount: {
+      pulsaAmount: {
         type: Sequelize.INTEGER
       },
       description: {
@@ -28,6 +28,6 @@ module.exports = {
     });
   },
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('freekeys');
+    return queryInterface.dropTable('gamerules');
   }
 };

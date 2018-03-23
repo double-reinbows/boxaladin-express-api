@@ -12,7 +12,8 @@ module.exports = {
 			}
 
 			user.update({
-				aladinKeys: user.aladinKeys - 1
+				aladinKeys: user.aladinKeys - 1,
+				coin: user.coin + 1
 			})
 			.then(result => {
 

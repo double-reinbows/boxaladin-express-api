@@ -2,12 +2,13 @@
 module.exports = (sequelize, DataTypes) => {
   var win = sequelize.define('win', {
     userId: DataTypes.INTEGER,
-    freeKeyId: DataTypes.INTEGER,
+    gameRuleId: DataTypes.INTEGER,
+    winToken: DataTypes.STRING
   });
 
   win.associate = (models) => {
-    win.belongsTo(models.freekey, {
-      foreignKey: 'freeKeyId',
+    win.belongsTo(models.gamerule, {
+      foreignKey: 'gameRuleId',
     });
 
     win.belongsTo(models.user, {

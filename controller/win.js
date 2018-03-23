@@ -1,11 +1,31 @@
 const jwt = require('jsonwebtoken')
-
+const https = require ('https')
+const CircularJSON = require('circular-json')
+const axios = require ('axios')
+const convert = require('xml-js')
+const db = require('../models')
+const md5 = require('md5')
 const Model = require('../models')
+const { genRandomString } = require('../helpers/string')
 
 module.exports = {
 
   all: (req, res) => {
     Model.win.findAll({
+      include: [
+        { all: true }
+      ]
+    })
+    .then(result => res.send(result))
+    .catch(err => res.send(err))
+  },
+
+  byId: (req, res) => {
+    Model.win.findOne({
+      where: {
+        id: req.params.id
+      }
+    }, {
       include: [
         { all: true }
       ]
@@ -34,12 +54,12 @@ module.exports = {
 
     // const reward = req.body.star == 5 ? 'active1' : ( req.body.star == 4 ? 'active2' : ( req.body.star == 3 ? 'active3' : ( req.body.star == 2 ? 'active4' : ( req.body.star == 1 ? 'active5' : '' ) ) ) )
     
-    Model.freekey.findOne({
+    Model.gamerule.findOne({
       where: { star: parseInt(req.body.star) }
     })
-    .then(freekeyResult => {
+    .then(gameruleResult => {
 
-      if (freekeyResult == null) {
+      if (gameruleResult == null) {
         return res.send({ errmsg: 'tidak ada hadiah buat jumlah star ini' })
       }
 
@@ -50,65 +70,135 @@ module.exports = {
 
         Model.win.create({
           userId: decoded.id,
-          freeKeyId: freekeyResult.id
+          gameRuleId: gameruleResult.id,
+          winToken: genRandomString(128)
         })
         .then(winResult => {
 
-          Model.user.update({
-            aladinKeys: userResult.aladinKeys + freekeyResult.amount
-          }, {
+          Model.win.findOne({
             where: {
-              id: decoded.id
-            }
+              id: winResult.id
+            },
+            include: [
+              { all: true }
+            ]
           })
           .then(result => {
-
+            
             return res.send({
-              freekey: freekeyResult,
-              msg: 'user free keys updated'
+              message: 'data win created',
+              data: result
             })
 
+          })
+          .catch(err => res.send(err))
+        })
+        .catch(err => res.send(err))
+      })
+      .catch(err => res.send(err))
+    })
+    .catch(err => res.send(err))
+
+  },
+
+  claimFreePulsa: (req, res) => {
+    const decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
+    
+    Model.transaction.create({
+      paymentId: 0,
+      productId: parseInt(req.body.productId),
+      userId: decoded.id,
+      aladinPrice: 0,
+      number: req.body.phone,
+      status: 'PENDING',
+      description: 'FREE',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    })
+    .then(transactionResult => {
+      // return res.send(transactionResult)
+
+      Model.product.findOne({
+        where: {
+          id: transactionResult.productId
+        }
+      })
+      .then(dataProduct => {
+
+        var sign = md5(process.env.PULSA_USERNAME + process.env.PULSA_DEVELOPMENT_KEY + transactionResult.id)        
+        var pulsa = `<?xml version="1.0" ?>
+                    <mp>
+                      <commands>topup</commands>
+                      <username>${process.env.PULSA_USERNAME}</username>
+                      <ref_id>${transactionResult.id}</ref_id>
+                      <hp>${transactionResult.number}</hp>
+                      <pulsa_code>${dataProduct.pulsaCode}</pulsa_code>
+                      <sign>${sign}</sign>
+                    </mp>`
+
+        console.log('PULSA:', pulsa)
+        console.log('DATA PRODUCT:', dataProduct)
+
+        axios.post('https://testprepaid.mobilepulsa.net/v1/legacy/index', pulsa, {
+          headers: {
+            'Content-Type': 'text/xml',
+          },
+          httpsAgent: new https.Agent({ rejectUnauthorized: false })
+        })
+        .then((data) => {
+          let json = CircularJSON.stringify(data.data);
+          let dataJson = JSON.parse(json)
+          let convertJson = convert.xml2json(dataJson, { compact: true})
+          let object = JSON.parse(convertJson)
+
+          db.transaction.update({
+            status: object.mp.message._text,
+          }, {
+            where: {
+              id: object.mp.ref_id._text
+            }
+          })
+          .then((data)=>{
+            console.log('RESULT UPDATE TRANSACTION:', data)
+            return res.send(object.mp)
           })
           .catch(err => res.send(err))
 
         })
         .catch(err => res.send(err))
-
+        
       })
-      .catch(err => res.send(err))
-
-      // return res.send({
-      //   msg: 'dapat free keys',
-      //   data: req.body,
-      //   data2: decoded,
-      //   data3: result
-      // })
-
-      // req.body.userId = decoded.id
-      // req.body.rewardId = result.id
-      // req.body.status = 'PENDING'
-      // req.body.star = parseInt(req.body.star)
-
-      // Model.win.create(req.body)
-      // .then(result => {
-
-      //   Model.win.findOne({
-      //     where: {
-      //       id: result.id
-      //     },
-      //     include: [
-      //       { all: true }
-      //     ]
-      //   })
-      //   .then(result => res.send(result))
-      //   .catch(err => res.send(err))
-
-      // })
-      // .catch(err => res.send(err))
+      .catch(err => {
+        console.log('ERROR FIND PRODUCT:', err)
+        return res.send(err)
+      })
 
     })
-    .catch(err => res.send(err))
-
+    .catch(err => {
+      console.log('ERROR CREATE TRANSACTION:', err)
+      return res.send(err)
+    })
   },
+
+  resetToken: (req, res) => {
+    Model.win.update({
+      winToken: genRandomString(128)
+    }, {
+      where: {
+        id: req.params.id
+      }
+    })
+    .then(updateResult => {
+      console.log('WIN TOKEN UPDATED')
+      return res.send({
+        msg: 'win token updated',
+        data: updateResult
+      })
+    })
+    .catch(err => {
+      console.log('ERROR UPDATE WIN:', err)
+      return res.send(err)
+    })
+  }
 
 }
