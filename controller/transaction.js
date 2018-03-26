@@ -32,7 +32,9 @@ module.exports = {
       })
       .then((data) => {
         data.map(transaction => {
-          transaction.payment.availableBanks = JSON.parse(transaction.payment.availableBanks);
+          if (transaction.payment) {
+            transaction.payment.availableBanks = JSON.parse(transaction.payment.availableBanks)
+          }
         });
         res.send(data);
       })
@@ -53,12 +55,17 @@ module.exports = {
       })
       .then(data => {
         data.map(transaction => {
-          transaction.payment.availableBanks = JSON.parse(transaction.payment.availableBanks)
+          if (transaction.payment) {
+            transaction.payment.availableBanks = JSON.parse(transaction.payment.availableBanks)
+          }
         })
         res.send(data)
       })
 
-      .catch(err => res.status(400).send(err))
+      .catch(err => {
+        console.log('ERROR FIND TRANSACTION:', err)
+        return res.status(400).send(err)
+      })
   },
 
   byId(req, res) {
