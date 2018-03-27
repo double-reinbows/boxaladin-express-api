@@ -29,6 +29,7 @@ router.post('/unlockPrice', aladinController.decreaseAladinPrice)
 router.get('/firebase', firebaseHelper.syncToFirebase)
 
 router.get("/", ctrl.getAll);
+// router.get('/userwithphone', ctrl.getAllWithPhone)
 router.post("/signin", ctrl.signin);
 router.post("/signup", ctrl.signup);
 
@@ -39,6 +40,7 @@ router.post('/resendemailverification', ctrl.resendEmailVerification)
 //-------------------phone routes-------------------------
 router.get('/allPhone', phoneCtrl.all);
 router.get("/phoneNumbers", phoneCtrl.getPhoneByUser);
+router.get("/userwithphone/:id", phoneCtrl.getAllPhone);
 router.post('/phonenumber', phoneHelper.checkDuplicate, phoneHelper.checkAlready, phoneCtrl.postPhoneNumber)
 router.put('/phone/:id', phoneHelper.checkDuplicate, phoneHelper.checkAlready, phoneCtrl.changePhone)
 router.delete('/phone/:id', phoneCtrl.removePhone)

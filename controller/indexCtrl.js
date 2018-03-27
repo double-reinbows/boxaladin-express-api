@@ -49,7 +49,12 @@ const handleDotGmail = (obj) => {
 exports.getAll = (req, res) => {
   db.user
     .findAll({
-      order: [['username', 'ASC']]
+      order: [['id', 'ASC']],
+      include: [
+        {
+          all: true
+        }
+      ]
     })
     .then(data => {
       res.send(data)

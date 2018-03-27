@@ -1,7 +1,7 @@
 {
   "development": {
     "username": "postgres",
-    "password": "anak223",
+    "password": null,
     "database": "boxaladin",
     "host": "localhost",
     "port": "5432",
@@ -11,7 +11,7 @@
     "username": "boxaladin",
     "password": "kolorijo",
     "database": "devboxaladin",
-    "host": "baexpress-test.cbo164jcsisu.ap-southeast-1.rds.amazonaws.com",
+    "host": "localhost",
     "port": "5432",
     "dialect": "postgres"
   },
@@ -20,14 +20,6 @@
     "password": "anak223",
     "database": "boxaladin",
     "host": "localhost",
-    "port": "5432",
-    "dialect": "postgres"
-  },
-  "development-public": {
-    "username": "root",
-    "password": "kolorijo",
-    "database": "boxaladin",
-    "host": "boxaladin-develop.cbo164jcsisu.ap-southeast-1.rds.amazonaws.com",
     "port": "5432",
     "dialect": "postgres"
   }

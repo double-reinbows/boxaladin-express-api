@@ -234,3 +234,16 @@ exports.changePrimary = (req, res) => {
   })
   
 }
+
+exports.getAllPhone = (req, res) => {
+  db.phonenumber.findOne({
+    where: {
+      userId: req.params.id,
+      primary: 'TRUE'
+    },    
+  })
+  .then(result => {
+    res.send(result)
+  })
+  .catch(err => res.send(err))
+}
