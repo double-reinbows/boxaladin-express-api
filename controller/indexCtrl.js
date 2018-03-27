@@ -80,6 +80,7 @@ exports.signin = (req, res) => {
   
   db.user.findOne({
     where: {
+        role: null,
         email: emailFilter
         // emailVerified: true
       }

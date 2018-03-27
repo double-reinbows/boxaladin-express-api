@@ -116,7 +116,8 @@ module.exports = {
       updatedAt: new Date(),
     })
     .then(transactionResult => {
-      // return res.send(transactionResult)
+
+      console.log('--- CREATE TRANSACTION RESULT --- :', transactionResult.dataValues)
 
       Model.product.findOne({
         where: {
@@ -137,7 +138,7 @@ module.exports = {
                     </mp>`
 
         console.log('PULSA:', pulsa)
-        console.log('DATA PRODUCT:', dataProduct)
+        console.log('DATA PRODUCT:', dataProduct.dataValues)
 
         axios.post('https://testprepaid.mobilepulsa.net/v1/legacy/index', pulsa, {
           headers: {
@@ -150,6 +151,8 @@ module.exports = {
           let dataJson = JSON.parse(json)
           let convertJson = convert.xml2json(dataJson, { compact: true})
           let object = JSON.parse(convertJson)
+
+          console.log('--- OBJECT RESPONSE PULSA --- :', object)
 
           db.transaction.update({
             status: object.mp.message._text,
