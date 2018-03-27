@@ -13,3 +13,33 @@ exports.authUser = (req, res, next) => {
     res.send('not logged')
   }
 }
+
+exports.isSuperadmin = (req, res, next) => {
+  let decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
+  
+  if (decoded.role.toUpperCase() == 'SUPERADMIN') {
+
+    next()
+
+  } else {
+
+    return res.send({
+      message: 'not superadmin'
+    })
+
+  }
+}
+
+exports.isLogin = (req, res, next) => {
+  if (req.headers.token != null) {
+
+    next()
+    
+  } else {
+
+    return res.send({
+      message: 'not login'
+    })
+
+  }
+}

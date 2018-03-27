@@ -67,6 +67,10 @@ module.exports = {
       coin: {
         type: Sequelize.INTEGER,
       },
+      role: {
+        type: Sequelize.STRING,
+        allowNull: true
+      },
       createdAt: {
         allowNull: true,
         type: Sequelize.DATE
