@@ -17,9 +17,9 @@
   },
   "production": {
     "username": "postgres",
-    "password": "anak223",
+    "password": "boxaladin",
     "database": "boxaladin",
-    "host": "localhost",
+    "host": "boxaladin-prod.cbo164jcsisu.ap-southeast-1.rds.amazonaws.com",
     "port": "5432",
     "dialect": "postgres"
   }

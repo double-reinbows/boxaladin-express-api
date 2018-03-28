@@ -126,7 +126,7 @@ module.exports = {
       })
       .then(dataProduct => {
 
-        var sign = md5(process.env.PULSA_USERNAME + process.env.PULSA_DEVELOPMENT_KEY + transactionResult.id)        
+        var sign = md5(process.env.PULSA_USERNAME + process.env.PULSA_PRODCUTION_KEY + transactionResult.id)        
         var pulsa = `<?xml version="1.0" ?>
                     <mp>
                       <commands>topup</commands>
@@ -140,7 +140,7 @@ module.exports = {
         console.log('PULSA:', pulsa)
         console.log('DATA PRODUCT:', dataProduct.dataValues)
 
-        axios.post('https://testprepaid.mobilepulsa.net/v1/legacy/index', pulsa, {
+        axios.post('https://api.mobilepulsa.net/v1/legacy/index', pulsa, {
           headers: {
             'Content-Type': 'text/xml',
           },
