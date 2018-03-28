@@ -14,6 +14,20 @@ exports.authUser = (req, res, next) => {
   }
 }
 
+exports.isLogin = (req, res, next) => {
+  if (req.headers.token != null) {
+
+    next()
+    
+  } else {
+
+    return res.send({
+      message: 'not login'
+    })
+
+  }
+}
+
 exports.isSuperadmin = (req, res, next) => {
   let decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
   
@@ -30,15 +44,17 @@ exports.isSuperadmin = (req, res, next) => {
   }
 }
 
-exports.isLogin = (req, res, next) => {
-  if (req.headers.token != null) {
+exports.isAdmin = (req, res, next) => {
+  let decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
+  
+  if (decoded.role.toUpperCase() == 'ADMIN' || decoded.role.toUpperCase() == 'SUPERADMIN') {
 
     next()
-    
+
   } else {
 
     return res.send({
-      message: 'not login'
+      message: 'not admin'
     })
 
   }
