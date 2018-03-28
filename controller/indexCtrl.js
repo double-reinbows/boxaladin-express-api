@@ -50,11 +50,6 @@ exports.getAll = (req, res) => {
   db.user
     .findAll({
       order: [['id', 'ASC']],
-      include: [
-        {
-          all: true
-        }
-      ]
     })
     .then(data => {
       res.send(data)

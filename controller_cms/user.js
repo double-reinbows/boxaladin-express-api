@@ -95,4 +95,33 @@ module.exports = {
     })
   },
 
+  getAll: (req, res) => {
+    model.user
+      .findAll({
+        order: [['id', 'ASC']],
+        include: 
+          {
+            all: true
+          }
+        
+      })
+
+      .then(data => {
+        console.log('data', data)
+        res.send(data)
+      })
+      .catch(err => res.send(err))
+  },
+
+  getPhone(req, res){
+    model.phonenumber.findOne({
+      where: {
+        userId: 3
+      }
+    })
+    .then(data => {res.send(data)
+    })
+    .catch(err => res.send(err))
+  }
+
 }
