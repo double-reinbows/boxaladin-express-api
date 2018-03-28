@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 
+const jwt = require('jsonwebtoken')
+
 const xenditController = require('../controller/balance')
 const paymentController = require('../controller/payment')
 const callbackController = require('../controller/callback')
@@ -21,6 +23,15 @@ const firebaseHelper = require('../helpers/firebase')
 const aladinController = require('../controller/aladin')
 
 const forgotPassword = require('../controller/forgotPassword')
+
+router.get('/sandbox', (req, res) => {
+  let decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
+  console.log(' --- ', decoded)
+  return res.send({
+    message: 'sandbox endpoint',
+    data: decoded
+  })
+})
 
 router.post('/forgotpassword', forgotPassword.requestViaEmail)
 router.post('/resetpassword', forgotPassword.reset)
