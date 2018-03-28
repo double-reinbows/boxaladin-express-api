@@ -5,6 +5,8 @@ module.exports = {
 
   all: (req, res) => {
 
+    // function ini terima query; page, limit, orderBy, orderDirection (ASC/DESC), filterBy, filterValue
+
     let where = {
       paymentId: {
         $ne: 0
@@ -12,6 +14,8 @@ module.exports = {
     }
 
     let order = []
+    let limit = req.query.limit || 50
+    let offset = 0
 
     if (req.query.filterBy) {
       where[req.query.filterBy] = req.query.filterValue
@@ -21,9 +25,19 @@ module.exports = {
       order.push([ req.query.orderBy, req.query.orderDirection ])
     }
 
+    if (req.query.page === null) {
+      req.query.page = 1
+    }
+
+    if (req.query.page > 1) {
+      offset = (req.query.page - 1) * limit
+    }
+
     model.transaction.findAll({
       where: where,
       order: order,
+      limit: limit,
+      offset: offset,
       include: [{
         all: true
       }]
