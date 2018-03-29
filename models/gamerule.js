@@ -1,7 +1,11 @@
 'use strict';
 module.exports = (sequelize, DataTypes) => {
   var gamerule = sequelize.define('gamerule', {
-    star: DataTypes.INTEGER,
+    star: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      unique: true
+    },
     pulsaAmount: DataTypes.INTEGER,
     description: DataTypes.STRING
   });

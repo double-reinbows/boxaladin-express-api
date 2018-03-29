@@ -9,7 +9,9 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       star: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        unique: true
       },
       pulsaAmount: {
         type: Sequelize.INTEGER
