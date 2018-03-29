@@ -103,11 +103,8 @@ module.exports = {
           {
             all: true
           }
-        
       })
-
       .then(data => {
-        console.log('data', data)
         res.send(data)
       })
       .catch(err => res.send(err))
