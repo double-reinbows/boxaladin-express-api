@@ -14,12 +14,7 @@ module.exports = {
 
     console.log('--- QUERY --- :', req.query)
 
-    let where = {
-      paymentId: {
-        $ne: 0
-      },
-    }
-
+    let where = {}
     let order = []
     let limit = req.query.limit || 50
     let offset = 0
@@ -47,7 +42,7 @@ module.exports = {
       }
     }
 
-    model.transaction.findAll({
+    model.win.findAll({
       where: where,
       order: order,
       limit: limit,
@@ -60,7 +55,7 @@ module.exports = {
       return res.send(result)
     })
     .catch(err => {
-      console.log('ERROR FIND TRANSACTION:', err)
+      console.log('ERROR FIND WIN:', err)
       return res.send(err)
     })
   },
