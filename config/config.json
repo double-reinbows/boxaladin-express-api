@@ -17,7 +17,7 @@
   },
   "production": {
     "username": "postgres",
-    "password": "anak223",
+    "password": "dengermusiksambilngopi",
     "database": "boxaladin",
     "host": "localhost",
     "port": "5432",
