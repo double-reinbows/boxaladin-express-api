@@ -95,30 +95,21 @@ module.exports = {
     })
   },
 
-  getAll: (req, res) => {
-    model.user
-      .findAll({
-        order: [['id', 'ASC']],
-        include: 
-          {
-            all: true
-          }
-      })
+  getUserWithPhone: (req, res) => {
+    model.sequelize.query(`SELECT p.number, u.id, u.email FROM users AS u join phonenumbers AS p on p."userId" = u.id WHERE p.primary = true ORDER BY u.id ASC`, {
+      model: model.user,
+    })
       .then(data => {
         res.send(data)
       })
       .catch(err => res.send(err))
   },
 
-  getPhone(req, res){
-    model.phonenumber.findOne({
-      where: {
-        userId: 3
-      }
-    })
-    .then(data => {res.send(data)
-    })
-    .catch(err => res.send(err))
+    getAll: (req, res) => {
+    model.sequelize.query(`SELECT * FROM users `)
+      .then(data => {
+        res.send(data)
+      })
+      .catch(err => res.send(err))
   }
-
 }
