@@ -34,6 +34,7 @@ module.exports = {
           })
           .then((resultProduct) => {
             let dataStrPaymentID = dataTransaction.dataValues.paymentId.toString()
+            var productDescription = resultProduct.dataValues.productName
             axios({
               method: 'POST',
               url: `https://api.xendit.co/v2/invoices`,
@@ -44,7 +45,7 @@ module.exports = {
                 external_id: dataStrPaymentID,
                 amount: req.body.amount,
                 payer_email: decoded.email,
-                description: resultProduct.dataValues.productName
+                description: productDescription
               },
             })
             .then(({data}) => {
@@ -59,20 +60,30 @@ module.exports = {
                   id: dataPayment.id
                 }
               })
-              .then((dataAxios)=>{
-                db.transaction.findOne({
+              .then((dataAxios) => {
+                db.transaction.update({
+                  description: productDescription
+                }, {
                   where: {
                     paymentId: dataPayment.id
                   }
                 })
-                .then(dataTransaksi => {
-                  if (!dataTransaksi) {
-                    return res.status(404).send({
-                      message: 'Data Not Found',
-                    });
-                  }
-                  return res.status(200).send(dataTransaksi);
-                })
+                .then((dataTransaksi => {
+                  db.transaction.findOne({
+                    where: {
+                      paymentId: dataPayment.id
+                    }
+                  })
+                  .then(dataFinal => {
+                    if (!dataFinal) {
+                      return res.status(404).send({
+                        message: 'Data Not Found'
+                      });
+                    }
+                    return res.status(200).send(dataFinal);
+                  })
+                  .catch(error => res.status(400).send(error));
+                }))
                 .catch(error => res.status(400).send(error));
               })
               .catch(error => res.status(400).send(error));
