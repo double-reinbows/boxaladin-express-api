@@ -7,17 +7,18 @@ const xml = require("xml-parse");
 module.exports = {
     createCallbackXendit(req, res) {
       if(req.headers['x-callback-token']!==undefined && req.headers['x-callback-token']===process.env.XENDIT_PRODUCTION_TOKEN)
-      {      
+      {
         const paymentId = req.body.external_id;
-        db.payment    
+        db.payment
         .findById(paymentId)
         .then(data => {
           if (!data) {
             return res.status(404).send({
               message: 'Id Not Found',
             });
-          }else{              
+          }else{
             if(data.status === 'PENDING'&& req.body.status === 'PAID'){
+              console.log('update payment');
               db.payment.update({
                 status: req.body.status
               },{
@@ -26,8 +27,9 @@ module.exports = {
                 }
               })
               .then(() => {
-                db.transaction.findOne({    
-                  where:{    
+                console.log('cari transaction sesuai paymentId', paymentId);
+                db.transaction.findOne({
+                  where:{
                     paymentId: paymentId
                   }
                 })
@@ -65,6 +67,7 @@ module.exports = {
                     })
                     .catch(error => res.status(400).send(error));
                   } else {
+                    console.log('panggil function pulsa');
                     pulsa.pulsa(req,res)
                   }
                 })
@@ -75,21 +78,21 @@ module.exports = {
               return res.send("Callback Xendit Failed")
             }
           }})
-          .catch(error => res.status(400).send(error)); 
+          .catch(error => res.status(400).send(error));
         } else {
             return res.status(500).send('Invalid Credentials')
         }
-  }, 
+  },
 
   createCallbackPulsa(req, res) {
-
+    console.log('callback pulsa');
     let parsedXML = xml.parse(req.body);
 
     let convertJson = convert.xml2json(parsedXML[2].childNodes[0].text, { compact: true})
     let object = JSON.parse(convertJson)
     let idTransaction = object.ref_id._text
     let response =  parsedXML[2].childNodes[9].childNodes[0].text
-
+    console.log('data', response);
     if(response === '00'){
       db.transaction.update({
         status: "SUCCESS"

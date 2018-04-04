@@ -7,21 +7,25 @@ const md5 = require('md5')
 
 module.exports = {
   pulsa(req, res) {
+    console.log('function pulsa jalan');
+    console.log(req.body.external_id);
     db.transaction.findOne({
       where: {
         paymentId: req.body.external_id
       }
     })
     .then(dataTransaction => {
-
+      console.log('cek data product sesuai productId', productId);
       db.product.findOne({
         where: {
           id: dataTransaction.productId
         }
       })
       .then(dataProduct => {
-
-        var sign = md5('081380572721' + process.env.PULSA_PRODUCTION_KEY + dataTransaction.dataValues.id)        
+        console.log('data mobile pulsa');
+        console.log(dataTransaction.dataValues.id);
+        console.log(dataTransaction.dataValues.number);
+        var sign = md5('081380572721' + process.env.PULSA_PRODUCTION_KEY + dataTransaction.dataValues.id)
         var pulsa = `<?xml version="1.0" ?>
                     <mp>
                       <commands>topup</commands>
@@ -38,10 +42,13 @@ module.exports = {
             httpsAgent: new https.Agent({ rejectUnauthorized: false })
         })
         .then((data) => {
+          console.log('balikan mobile pulsa')
           let json = CircularJSON.stringify(data.data);
           let dataJson = JSON.parse(json)
           let convertJson = convert.xml2json(dataJson, { compact: true})
           let object = JSON.parse(convertJson)
+          console.log(object.mp)
+          console.log(object.mp.message._text);
           db.transaction.update({
             status: object.mp.message._text,
             },{
