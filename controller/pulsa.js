@@ -15,7 +15,8 @@ module.exports = {
       }
     })
     .then(dataTransaction => {
-      console.log('cek data product sesuai productId', productId);
+      console.log('tralalalala');
+      console.log('cek data product sesuai productId', dataTransaction);
       db.product.findOne({
         where: {
           id: dataTransaction.productId
