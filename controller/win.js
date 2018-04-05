@@ -126,11 +126,11 @@ module.exports = {
       })
       .then(dataProduct => {
 
-        var sign = md5(process.env.PULSA_USERNAME + process.env.PULSA_PRODCUTION_KEY + transactionResult.dataValues.id)
+        var sign = md5('081380572721' + process.env.PULSA_PRODCUTION_KEY + transactionResult.dataValues.id)
         var pulsa = `<?xml version="1.0" ?>
                     <mp>
                       <commands>topup</commands>
-                      <username>${process.env.PULSA_USERNAME}</username>
+                      <username>081380572721</username>
                       <ref_id>${transactionResult.dataValues.id}</ref_id>
                       <hp>${transactionResult.dataValues.number}</hp>
                       <pulsa_code>${dataProduct.dataValues.pulsaCode}</pulsa_code>
