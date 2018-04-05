@@ -53,7 +53,7 @@ module.exports = {
     const decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
 
     // const reward = req.body.star == 5 ? 'active1' : ( req.body.star == 4 ? 'active2' : ( req.body.star == 3 ? 'active3' : ( req.body.star == 2 ? 'active4' : ( req.body.star == 1 ? 'active5' : '' ) ) ) )
-    
+
     Model.gamerule.findOne({
       where: { star: parseInt(req.body.star) }
     })
@@ -84,7 +84,7 @@ module.exports = {
             ]
           })
           .then(result => {
-            
+
             return res.send({
               message: 'data win created',
               data: result
@@ -103,7 +103,7 @@ module.exports = {
 
   claimFreePulsa: (req, res) => {
     const decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
-    
+
     Model.transaction.create({
       paymentId: 0,
       productId: parseInt(req.body.productId),
@@ -121,24 +121,25 @@ module.exports = {
 
       Model.product.findOne({
         where: {
-          id: transactionResult.productId
+          id: transactionResult.dataValues.productId
         }
       })
       .then(dataProduct => {
 
-        var sign = md5(process.env.PULSA_USERNAME + process.env.PULSA_PRODCUTION_KEY + transactionResult.id)        
+        var sign = md5(process.env.PULSA_USERNAME + process.env.PULSA_PRODCUTION_KEY + transactionResult.dataValues.id)
         var pulsa = `<?xml version="1.0" ?>
                     <mp>
                       <commands>topup</commands>
                       <username>${process.env.PULSA_USERNAME}</username>
-                      <ref_id>${transactionResult.id}</ref_id>
-                      <hp>${transactionResult.number}</hp>
-                      <pulsa_code>${dataProduct.pulsaCode}</pulsa_code>
+                      <ref_id>${transactionResult.dataValues.id}</ref_id>
+                      <hp>${transactionResult.dataValues.number}</hp>
+                      <pulsa_code>${dataProduct.dataValues.pulsaCode}</pulsa_code>
                       <sign>${sign}</sign>
                     </mp>`
 
         console.log('PULSA:', pulsa)
         console.log('DATA PRODUCT:', dataProduct.dataValues)
+        console.log('SIGN:', sign)
 
         axios.post('https://api.mobilepulsa.net/v1/legacy/index', pulsa, {
           headers: {
@@ -169,7 +170,7 @@ module.exports = {
 
         })
         .catch(err => res.send(err))
-        
+
       })
       .catch(err => {
         console.log('ERROR FIND PRODUCT:', err)
