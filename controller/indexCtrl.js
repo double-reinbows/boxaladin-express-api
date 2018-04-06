@@ -32,18 +32,18 @@ const handleDotGmail = (obj) => {
   var email = obj.email
   var user = email.split('@')[0]
   var provider = email.split('@')[1]
-  
+
   if (provider == 'gmail.com') {
     let userWithoutDot = user.split('.').join('')
     var result = userWithoutDot + '@gmail.com'
-    
+
     obj.typedEmail = obj.email
     obj.email = result
 
     return console.log(result)
   } else {
     return console.log(email)
-  } 
+  }
 }
 
 exports.getAll = (req, res) => {
@@ -62,17 +62,17 @@ exports.signin = (req, res) => {
     var email1 = req.body.email
     var user = email1.split('@')[0]
     var provider = email1.split('@')[1]
-  
+
     if (provider == 'gmail.com') {
       let userWithoutDot = user.split('.').join('')
       var result = userWithoutDot + '@gmail.com'
       var emailFilter = result
     } else {
       var emailFilter = email1
-    } 
+    }
 
   let hashedPass = hash(req.body.password)
-  
+
   db.user.findOne({
     where: {
         role: null,
@@ -103,7 +103,7 @@ exports.signin = (req, res) => {
       {
         message: 'login success',
         token: token,
-        
+
       }
     )
     } else if (user.password.substr(6) !== hashedPass.substr(6)) {
@@ -197,7 +197,7 @@ exports.signup = (req, res) => {
         //   returning: true
         // })
         // .then(userUpdateResult => {
-          
+
           sendEmailVerification(data.email, data.emailToken)
 
           // CREATE PHONE
@@ -209,12 +209,12 @@ exports.signup = (req, res) => {
             primary: true
           })
           .then(dataPhone => {
-  
+
             return res.status(200).send({
               message: "Signup Berhasil",
               token
             })
-            
+
           })
           .catch(error => {
             console.log('error create phone:', error)
@@ -280,8 +280,8 @@ const sendEmailVerification = (email_address, emailToken) => {
         Data: 'boxAladin email verification'
       }
     },
-    ReturnPath: 'teza.harsony230394@gmail.com',
-    Source: 'teza.harsony230394@gmail.com'
+    ReturnPath: 'no-reply@boxaladin.com',
+    Source: 'no-reply@boxaladin.com'
   }
   ses.sendEmail(params, (err, data) => {
     if (err) console.log(err, err.stack)
@@ -325,7 +325,7 @@ exports.resendEmailVerification = (req, res) => {
       message: 'email sent',
       data: decoded
     })
-    
+
   })
   .catch(err => {
     console.log('ERROR:', err)
