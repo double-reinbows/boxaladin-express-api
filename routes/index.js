@@ -3,7 +3,6 @@ const router = express.Router();
 
 const jwt = require('jsonwebtoken')
 
-const xenditController = require('../controller/balance')
 const paymentController = require('../controller/payment')
 const callbackController = require('../controller/callback')
 const pulsaController = require('../controller/pulsa')
@@ -62,7 +61,6 @@ router.post("/phoneVerification", phoneCtrl.verifyPhoneNumber);
 
 
 //-------------------xendit routes-------------------------
-router.get('/balance', xenditController.balance)
 router.post('/payment', paymentController.createInvoice)
 router.get('/payment/:id', paymentController.retrieveInvoice)
 // router.get('/status/:id/:invoice', paymentController.updateStatus)

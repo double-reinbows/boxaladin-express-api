@@ -6,7 +6,7 @@ module.exports = {
         method: 'GET',
         url: `https://api.xendit.co/balance`,
         headers: {
-          authorization: "Basic eG5kX2RldmVsb3BtZW50X09ZcUFmTDBsMDdldmxjNXJkK0FhRW1URGI5TDM4Tko4bFhiZytSeGkvR2JlOExHb0NBUitndz09Og=="        
+          authorization: process.env.XENDIT_PRODUCTION_AUTHORIZATION        
         }
       })
       .then(({data}) => {
