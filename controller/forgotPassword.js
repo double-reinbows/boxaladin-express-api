@@ -37,15 +37,15 @@ module.exports = {
         emailToken: emailToken
       }, {
         where: {
-          email: req.body.email
+          email: emailFilter
         }
       })
       .then(() => {
 
         awsHelper.sendEmail({
-          email_destinations: [req.body.email],
+          email_destinations: [emailFilter],
           email_subject: `Box Aladin RESET PASSWORD`,
-          email_text: `Click here to RESET Your password: ${process.env.BA_WEB_HOST}/resetpassword?email=${req.body.email}&encoded=${emailToken}`,
+          email_text: `Click here to RESET Your password: ${process.env.BA_WEB_HOST}/resetpassword?email=${emailFilter}&encoded=${emailToken}`,
           email_source: `no-reply@boxaladin.com`,
           email_return_path: `no-reply@boxaladin.com`,
         })
