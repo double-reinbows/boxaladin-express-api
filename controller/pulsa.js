@@ -27,7 +27,7 @@ module.exports = {
       .then(dataProduct => {
         console.log('kirim data')
         console.log(dataTransaction.dataValues.id)
-        var sign = md5('081380572721' + process.env.PULSA_PRODUCTION_KEY + dataTransaction.dataValues.id)        
+        var sign = md5('081380572721' + process.env.PULSA_KEY + dataTransaction.dataValues.id)        
         var pulsa = `<?xml version="1.0" ?>
                     <mp>
                       <commands>topup</commands>
@@ -37,7 +37,7 @@ module.exports = {
                       <pulsa_code>${dataProduct.dataValues.pulsaCode}</pulsa_code>
                       <sign>${sign}</sign>
                     </mp>`
-        axios.post('https://api.mobilepulsa.net/v1/legacy/index', pulsa, {
+        axios.post(process.env.MOBILE_PULSA, pulsa, {
             headers: {
                 'Content-Type': 'text/xml',
             },
