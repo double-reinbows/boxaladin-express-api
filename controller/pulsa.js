@@ -4,9 +4,10 @@ const axios = require ('axios')
 var convert = require('xml-js')
 const db = require('../models')
 const md5 = require('md5')
-
+const jwt = require ('jsonwebtoken')
 module.exports = {
   pulsa(req, res) {
+    var decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
     console.log('function pulsa')
     console.log(req.body.external_id)
     db.transaction.findOne({
@@ -19,6 +20,7 @@ module.exports = {
       console.log(dataTransaction.paymentId)
       console.log(dataTransaction.userId)
       console.log(dataTransaction.dataValues)
+      var refId = decoded.id + dataTransaction.dataValues.productId
       db.product.findOne({
         where: {
           id: dataTransaction.productId
@@ -27,12 +29,12 @@ module.exports = {
       .then(dataProduct => {
         console.log('kirim data')
         console.log(dataTransaction.dataValues.id)
-        var sign = md5('081380572721' + process.env.PULSA_KEY + dataTransaction.dataValues.id)        
+        var sign = md5('081380572721' + process.env.PULSA_KEY + refId)        
         var pulsa = `<?xml version="1.0" ?>
                     <mp>
                       <commands>topup</commands>
                       <username>081380572721</username>
-                      <ref_id>${dataTransaction.dataValues.id}</ref_id>
+                      <ref_id>${refId}</ref_id>
                       <hp>${dataTransaction.dataValues.number}</hp>
                       <pulsa_code>${dataProduct.dataValues.pulsaCode}</pulsa_code>
                       <sign>${sign}</sign>

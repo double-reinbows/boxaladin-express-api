@@ -48,7 +48,7 @@ module.exports = {
               external_id: dataStrPaymentID,
               amount: dataPayment.amount,
               payer_email: decoded.email,
-              description: "asd"
+              description: "TopUp Aladin Key"
             },
           })
           .then(({data}) => {
