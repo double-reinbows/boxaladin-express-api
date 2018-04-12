@@ -15,7 +15,7 @@ exports.sendSMS = (payload) => {
       'DefaultSMSType': 'Transactional',
     }
   };
-  
+
   sns.setSMSAttributes(MessageType, function(err, data) {
     if (err) {
       console.log(err, err.stack); // an error occurred
@@ -39,7 +39,7 @@ exports.sendSMS = (payload) => {
     }
   });
 
-  console.log('SEND SMS FROM AWS TO:', payload.phone, payload.messsage);
+  console.log('SEND SMS FROM AWS TO:', payload.phone, payload.message);
 
 }
 
