@@ -12,6 +12,7 @@ module.exports = {
     return payment
     .create({
       invoiceId: "null",
+      xenditId: 'null',
       status: "PENDING",
       amount: req.body.amount,
       availableBanks: "null",
@@ -22,6 +23,7 @@ module.exports = {
         paymentId: dataPayment.id,
         productId: req.body.productId,
         userId: decoded.id,
+        pulsaId: 'null',
         number: req.body.phoneNumber,
         status: "PENDING",
         aladinPrice: req.body.amount
@@ -33,7 +35,8 @@ module.exports = {
             }
           })
           .then((resultProduct) => {
-            let dataStrPaymentID = dataTransaction.dataValues.paymentId.toString()
+            let newId = decoded.id + '-' + dataTransaction.dataValues.paymentId
+            console.log('id baru', newId)
             var productDescription = resultProduct.dataValues.productName
             axios({
               method: 'POST',
@@ -42,7 +45,7 @@ module.exports = {
                 authorization: process.env.XENDIT_AUTHORIZATION
               },
               data: {
-                external_id: dataStrPaymentID,
+                external_id: newId,
                 amount: req.body.amount,
                 payer_email: decoded.email,
                 description: productDescription
@@ -54,6 +57,7 @@ module.exports = {
               banksStr = JSON.stringify(banksArr_Obj)
               db.payment.update({
                 invoiceId: invoice,
+                xenditId: newId,
                 availableBanks: banksStr
               },{
                 where:{
@@ -62,7 +66,8 @@ module.exports = {
               })
               .then((dataAxios) => {
                 db.transaction.update({
-                  description: productDescription
+                  description: productDescription,
+                  pulsaId: newId
                 }, {
                   where: {
                     paymentId: dataPayment.id

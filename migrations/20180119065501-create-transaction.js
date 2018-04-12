@@ -20,6 +20,10 @@ module.exports = {
         allowNull: false,
         type: Sequelize.INTEGER
       },
+      pulsaId: {
+        allowNull: false,
+        type: Sequelize.STRING
+      },
       aladinPrice: {
         allowNull: true,
         type: Sequelize.INTEGER

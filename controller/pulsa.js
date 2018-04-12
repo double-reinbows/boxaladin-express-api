@@ -7,14 +7,14 @@ const md5 = require('md5')
 const jwt = require ('jsonwebtoken')
 module.exports = {
   pulsa(req, res) {
-    var decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
     db.transaction.findOne({
       where: {
-        paymentId: req.body.external_id
+        pulsaId: req.body.external_id
       }
     })
     .then(dataTransaction => {
-      var refId = decoded.id + dataTransaction.dataValues.productId
+      console.log('daat transaksi', dataTransaction)
+      var refId = req.body.external_id
       db.product.findOne({
         where: {
           id: dataTransaction.productId
@@ -42,15 +42,17 @@ module.exports = {
           let dataJson = JSON.parse(json)
           let convertJson = convert.xml2json(dataJson, { compact: true})
           let object = JSON.parse(convertJson)
+          console.log(object)
           db.transaction.update({
             status: object.mp.message._text,
             },{
               where:{
-                id: object.mp.ref_id._text
+                id: dataTransaction.dataValues.id
               }
             })
             .then((data)=>{
               console.log('sukses')
+              console.log(object.mp)
               res.send(object.mp);
             })
             .catch(err => res.send(err))

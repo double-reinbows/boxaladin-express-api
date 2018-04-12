@@ -4,6 +4,7 @@ module.exports = (sequelize, DataTypes) => {
     userId: DataTypes.INTEGER,
     keyId: DataTypes.INTEGER,
     paymentId: DataTypes.INTEGER,
+    xenditId: DataTypes.STRING
   }); 
 
   topup.associate = (models) => {

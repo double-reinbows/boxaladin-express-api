@@ -2,7 +2,7 @@
   "development": {
     "username": "postgres",
     "password": null,
-    "database": "testing",
+    "database": "boxaladin",
     "host": "localhost",
     "port": "5432",
     "dialect": "postgres"
