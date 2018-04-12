@@ -1,25 +1,23 @@
 {
   "development": {
-    "username": "postgres",
-    "password": null,
-    "database": "testing",
-    "host": "localhost",
+    "username": "boxaladin",
+    "password": "kolorijo",
+    "database": "devboxaladin",
+    "host": "baexpress-test.cbo164jcsisu.ap-southeast-1.rds.amazonaws.com",
     "port": "5432",
-    "dialect": "postgres"
+    "dialect": "postgres",
+    "pool": {
+      "max": 5,
+      "min": 0,
+      "idle": 20000,
+      "acquire": 20000
+    }
   },
   "test": {
     "username": "boxaladin",
     "password": "kolorijo",
     "database": "devboxaladin",
-    "host": "localhost",
-    "port": "5432",
-    "dialect": "postgres"
-  },
-  "production": {
-    "username": "postgres",
-    "password": "dengermusiksambilngopi",
-    "database": "boxaladin",
-    "host": "boxaladin-prod.cbo164jcsisu.ap-southeast-1.rds.amazonaws.com",
+    "host": "baexpress-test.cbo164jcsisu.ap-southeast-1.rds.amazonaws.com",
     "port": "5432",
     "dialect": "postgres"
   }

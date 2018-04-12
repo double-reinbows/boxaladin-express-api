@@ -6,8 +6,8 @@ const xml = require("xml-parse");
 
 module.exports = {
     createCallbackXendit(req, res) {
-      if(req.headers['x-callback-token']!==undefined && req.headers['x-callback-token']===process.env.XENDIT_PRODUCTION_TOKEN)
-      {
+      if(req.headers['x-callback-token']!==undefined && req.headers['x-callback-token']===process.env.XENDIT_TOKEN)
+      {      
         const paymentId = req.body.external_id;
         db.payment
         .findById(paymentId)

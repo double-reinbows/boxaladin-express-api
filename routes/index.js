@@ -3,7 +3,6 @@ const router = express.Router();
 
 const jwt = require('jsonwebtoken')
 
-const xenditController = require('../controller/balance')
 const paymentController = require('../controller/payment')
 const callbackController = require('../controller/callback')
 const pulsaController = require('../controller/pulsa')
@@ -14,6 +13,7 @@ const topUpController = require('../controller/aladinKey')
 const ctrl = require('../controller/indexCtrl')
 const phoneCtrl = require('../controller/otpCtrl')
 const phoneHelper = require('../helpers/phone')
+const service = require('../controller/layanan')
 
 const categoryController = require('../controller/category')
 const brandController = require('../controller/brand')
@@ -47,7 +47,7 @@ router.post("/signup", ctrl.signup);
 
 router.get("/emailVerification", ctrl.verifyEmail);
 router.post('/resendemailverification', ctrl.resendEmailVerification)
-
+router.post('/serviceemail', service.sendEmailService)
 //-------------------phone routes-------------------------
 router.get('/allPhone', phoneCtrl.all);
 router.get("/phoneNumbers", phoneCtrl.getPhoneByUser);
@@ -62,7 +62,6 @@ router.post("/phoneVerification", phoneCtrl.verifyPhoneNumber);
 
 
 //-------------------xendit routes-------------------------
-router.get('/balance', xenditController.balance)
 router.post('/payment', paymentController.createInvoice)
 router.get('/payment/:id', paymentController.retrieveInvoice)
 // router.get('/status/:id/:invoice', paymentController.updateStatus)

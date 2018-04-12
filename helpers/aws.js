@@ -23,11 +23,28 @@ exports.sendSMS = (payload) => {
       console.log(data);           // successful response
     }
   });
-
+    console.log('asdasdas', payload.phone)
+    var x = payload.phone
+    var splitNumber = x.split('')
+    console.log('asd', splitNumber)
+    if (splitNumber[0] === '0') {
+      splitNumber.splice(0, 1, '62')
+      var newNumber = splitNumber.join('')
+    } else if (splitNumber[0] + splitNumber[1] + splitNumber[2] === '+62') {
+      splitNumber.splice(0, 3, '62')
+      var newNumber = splitNumber.join('')
+    } else if (splitNumber[0] === '8') {
+      splitNumber.splice(0, 0, '62')
+      var newNumber = splitNumber.join('')
+    } else if (splitNumber.length === 0) {
+      var newNumber = splitNumber.join('')
+    } else {
+      var newNumber = x
+    }
   var Message = {
     Message: payload.message,
     MessageStructure: 'string',
-    PhoneNumber: payload.phone,
+    PhoneNumber: newNumber,
     Subject: 'your subject',
   }
 
@@ -39,7 +56,7 @@ exports.sendSMS = (payload) => {
     }
   });
 
-  console.log('SEND SMS FROM AWS TO:', payload.phone, payload.message);
+  console.log('SEND SMS FROM AWS TO:', newNumber, Message.Message);
 
 }
 

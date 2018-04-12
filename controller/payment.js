@@ -39,7 +39,7 @@ module.exports = {
               method: 'POST',
               url: `https://api.xendit.co/v2/invoices`,
               headers: {
-                authorization: process.env.XENDIT_PRODUCTION_AUTHORIZATION
+                authorization: process.env.XENDIT_AUTHORIZATION
               },
               data: {
                 external_id: dataStrPaymentID,

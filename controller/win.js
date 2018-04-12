@@ -141,7 +141,7 @@ module.exports = {
         console.log('DATA PRODUCT:', dataProduct.dataValues)
         console.log('SIGN:', sign)
 
-        axios.post('https://api.mobilepulsa.net/v1/legacy/index', pulsa, {
+        axios.post(process.env.MOBILE_PULSA, pulsa, {
           headers: {
             'Content-Type': 'text/xml',
           },
