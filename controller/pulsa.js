@@ -8,18 +8,12 @@ const jwt = require ('jsonwebtoken')
 module.exports = {
   pulsa(req, res) {
     var decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
-    console.log('function pulsa')
-    console.log(req.body.external_id)
     db.transaction.findOne({
       where: {
         paymentId: req.body.external_id
       }
     })
     .then(dataTransaction => {
-      console.log('product findoneee', dataTransaction.dataValues.productId)
-      console.log(dataTransaction.paymentId)
-      console.log(dataTransaction.userId)
-      console.log(dataTransaction.dataValues)
       var refId = decoded.id + dataTransaction.dataValues.productId
       db.product.findOne({
         where: {
@@ -27,8 +21,6 @@ module.exports = {
         }
       })
       .then(dataProduct => {
-        console.log('kirim data')
-        console.log(dataTransaction.dataValues.id)
         var sign = md5('081380572721' + process.env.PULSA_KEY + refId)        
         var pulsa = `<?xml version="1.0" ?>
                     <mp>
@@ -46,12 +38,10 @@ module.exports = {
             httpsAgent: new https.Agent({ rejectUnauthorized: false })
         })
         .then((data) => {
-          console.log('data pulsa')
           let json = CircularJSON.stringify(data.data);
           let dataJson = JSON.parse(json)
           let convertJson = convert.xml2json(dataJson, { compact: true})
           let object = JSON.parse(convertJson)
-          console.log(object.mp.message._text)
           db.transaction.update({
             status: object.mp.message._text,
             },{

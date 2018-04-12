@@ -2,7 +2,7 @@
   "development": {
     "username": "postgres",
     "password": null,
-    "database": "boxaladin",
+    "database": "testing",
     "host": "localhost",
     "port": "5432",
     "dialect": "postgres"
@@ -19,7 +19,7 @@
     "username": "postgres",
     "password": "dengermusiksambilngopi",
     "database": "boxaladin",
-    "host": "localhost",
+    "host": "boxaladin-prod.cbo164jcsisu.ap-southeast-1.rds.amazonaws.com",
     "port": "5432",
     "dialect": "postgres"
   }

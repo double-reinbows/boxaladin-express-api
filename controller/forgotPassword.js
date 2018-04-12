@@ -11,17 +11,17 @@ module.exports = {
     var email1 = req.body.email
     var user = email1.split('@')[0]
     var provider = email1.split('@')[1]
-  
+
     if (provider == 'gmail.com') {
       let userWithoutDot = user.split('.').join('')
       var result = userWithoutDot + '@gmail.com'
       var emailFilter = result
     } else {
       var emailFilter = email1
-    } 
+    }
 
     const emailToken = genRandomString(128)
-  
+
     db.user.findOne({
       where: {
         email: emailFilter
@@ -37,19 +37,19 @@ module.exports = {
         emailToken: emailToken
       }, {
         where: {
-          email: req.body.email
+          email: emailFilter
         }
       })
       .then(() => {
 
         awsHelper.sendEmail({
-          email_destinations: [req.body.email],
+          email_destinations: [emailFilter],
           email_subject: `Box Aladin RESET PASSWORD`,
-          email_text: `Click here to RESET Your password: ${process.env.BA_WEB_HOST}/resetpassword?email=${req.body.email}&encoded=${emailToken}`,
-          email_source: `teza.harsony230394@gmail.com`,
-          email_return_path: `teza.harsony230394@gmail.com`,
+          email_text: `Click here to RESET Your password: ${process.env.BA_WEB_HOST}/resetpassword?email=${emailFilter}&encoded=${emailToken}`,
+          email_source: `no-reply@boxaladin.com`,
+          email_return_path: `no-reply@boxaladin.com`,
         })
-  
+
         return res.send({
           msg: 'email sent'
         })
