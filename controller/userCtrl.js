@@ -30,7 +30,7 @@ exports.refreshToken = (req, res) => {
 
   })
   .catch(err => {
-    
+
     console.log('error find user', err)
     return res.send(err)
 
@@ -92,7 +92,29 @@ exports.decreaseCoin = (req, res) => {
       coin: req.body.coin > 0 ? req.body.coin - 1 : 0
     })
     .then(() => {
-      return res.send({ message: 'coin updated' })
+
+      // INCREASE JUMLAH MAIN
+      db.gamecount.findAll()
+      .then(loseResult => {
+
+        if (loseResult.length == 0) {
+          db.gamecount.create({
+            count: 1
+          })
+          .then(createResult => res.send(createResult))
+          .catch(err => res.send(err))
+        } else {
+          loseResult[0].update({
+            count: loseResult[0].count + 1
+          })
+          .then(createResult => res.send({ message: 'coin & game count updated' }))
+          .catch(err => res.send(err))
+        }
+
+      })
+      .catch(err => res.send(err))
+
+      // return res.send({ message: 'coin updated' })
     })
     .catch(err => {
       return res.send(err)
@@ -100,12 +122,12 @@ exports.decreaseCoin = (req, res) => {
 
   })
   .catch(err => {
-    return res.send(err)    
+    return res.send(err)
   })
 }
 
 exports.buyCoinWithAladinKey = (req, res) => {
-  
+
   const decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
 
   db.user.findOne({
@@ -114,16 +136,16 @@ exports.buyCoinWithAladinKey = (req, res) => {
     }
   })
   .then(result => {
-    
+
     result.update({
       aladinKeys: result.aladinKeys - req.body.key,
       coin: result.coin + (req.body.key * 10),
     })
     .then(updateResult => {
-      
+
       console.log(updateResult)
       return res.send({ message: 'coin updated' })
-      
+
     })
     .catch(err => {
       console.log(err)
@@ -135,5 +157,5 @@ exports.buyCoinWithAladinKey = (req, res) => {
     console.log(err)
     return res.send(err)
   })
-  
+
 }
