@@ -38,6 +38,7 @@ var win = require('./routes/win');
 var reward = require('./routes/reward');
 var claim = require('./routes/claim');
 var admin = require('./routes/admin');
+var lose = require('./routes/gamecount');
 
 var app = express();
 app.use(cors())
@@ -63,6 +64,7 @@ app.use('/win', win);
 app.use('/reward', reward);
 app.use('/claim', claim);
 app.use('/admin', admin);
+app.use('/lose', lose);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
