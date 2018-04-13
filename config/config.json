@@ -20,5 +20,13 @@
     "host": "baexpress-test.cbo164jcsisu.ap-southeast-1.rds.amazonaws.com",
     "port": "5432",
     "dialect": "postgres"
+  },
+  "production": {
+    "username": "postgres",
+    "password": "dengermusiksambilngopi",
+    "database": "boxaladin",
+    "host": "boxaladin-prod.cbo164jcsisu.ap-southeast-1.rds.amazonaws.com",
+    "port": "5432",
+    "dialect": "postgres"
   }
 }
