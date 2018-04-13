@@ -8,7 +8,8 @@ module.exports = {
     createCallbackXendit(req, res) {
       if(req.headers['x-callback-token']!==undefined && req.headers['x-callback-token']===process.env.XENDIT_TOKEN)
       {      
-        const paymentId = req.body.external_id;
+        const xenditExternalid = req.body.external_id;
+        const paymentId = xenditExternalid.split('-')[1]
         db.payment
         .findById(paymentId)
         .then(data => {
@@ -23,14 +24,14 @@ module.exports = {
                 status: req.body.status
               },{
                 where:{
-                  id: paymentId
+                  xenditId: xenditExternalid
                 }
               })
               .then(() => {
-                console.log('cari transaction sesuai paymentId', paymentId);
+                console.log('cari transaction sesuai xenditId', xenditExternalid);
                 db.transaction.findOne({
                   where:{
-                    paymentId: paymentId
+                    pulsaId: xenditExternalid
                   }
                 })
                 .then((resultTransaction) => {
@@ -98,7 +99,7 @@ module.exports = {
         status: "SUCCESS"
       },{
         where:{
-          id: idTransaction
+          pulsaId: idTransaction
         }
       })
       .then((data) => {
@@ -110,7 +111,7 @@ module.exports = {
         status: response
       },{
         where:{
-          id: idTransaction
+          pulsaId: idTransaction
         }
       })
       .then((data) => {

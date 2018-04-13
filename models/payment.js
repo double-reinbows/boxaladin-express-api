@@ -2,6 +2,7 @@
 module.exports = (sequelize, DataTypes) => {
   var payment = sequelize.define('payment', {
     invoiceId: DataTypes.STRING,
+    xenditId: DataTypes.STRING,
     status: DataTypes.STRING,
     amount: DataTypes.INTEGER,
     availableBanks: DataTypes.TEXT

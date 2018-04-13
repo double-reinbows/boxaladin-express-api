@@ -26,18 +26,20 @@ module.exports = {
       }
       db.payment.create ({
         invoiceId: "null",
+        xenditId: 'null',
         status: "PENDING",
         amount: data.price,
         availableBanks: "null",
       })
       .then((dataPayment) => {
+        let newId = decoded.id + ('-') + dataPayment.id
         db.topup.create({
         paymentId: dataPayment.id,
         userId: decoded.id,
-        keyId: req.body.keyId
+        keyId: req.body.keyId,
+        xenditId: newId
         })
         .then((dataTopUp) => {
-          let dataStrPaymentID = dataTopUp.paymentId.toString()
           axios({
             method: 'POST',
             url: `https://api.xendit.co/v2/invoices`,
@@ -45,7 +47,7 @@ module.exports = {
               authorization: process.env.XENDIT_AUTHORIZATION
             },
             data: {
-              external_id: dataStrPaymentID,
+              external_id: newId,
               amount: dataPayment.amount,
               payer_email: decoded.email,
               description: "TopUp Aladin Key"
@@ -57,6 +59,7 @@ module.exports = {
             banksStr = JSON.stringify(banksArr_Obj)
             db.payment.update({
               invoiceId: invoice,
+              xenditId: newId,
               availableBanks: banksStr
             },{
               where:{
