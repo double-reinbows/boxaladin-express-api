@@ -9,7 +9,6 @@ module.exports = {
       if(req.headers['x-callback-token']!==undefined && req.headers['x-callback-token']===process.env.XENDIT_TOKEN)
       {      
         const xenditExternalid = req.body.external_id;
-        const paymentId = xenditExternalid.split('-')[1]
         db.payment
         .findById(paymentId)
         .then(data => {
@@ -38,7 +37,7 @@ module.exports = {
                   if(resultTransaction === null){
                     db.topup.findOne({
                       where:{
-                        paymentId: paymentId
+                        xenditId: xenditExternalid
                       },
                       include:[
                         {all:true}
