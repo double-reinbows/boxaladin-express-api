@@ -108,6 +108,7 @@ module.exports = {
       paymentId: 0,
       productId: parseInt(req.body.productId),
       userId: decoded.id,
+      pulsaId: 'null',
       aladinPrice: 0,
       number: req.body.phone,
       status: 'PENDING',
@@ -125,13 +126,13 @@ module.exports = {
         }
       })
       .then(dataProduct => {
-
-        var sign = md5('081380572721' + 'e106e106e517d3a2160d' + transactionResult.dataValues.id)
+        var newId = decoded.id + ('-free-') + transactionResult.dataValues.id
+        var sign = md5('081380572721' + process.env.PULSA_KEY + newId)
         var pulsa = `<?xml version="1.0" ?>
                     <mp>
                       <commands>topup</commands>
                       <username>081380572721</username>
-                      <ref_id>${transactionResult.dataValues.id}</ref_id>
+                      <ref_id>${newId}</ref_id>
                       <hp>${transactionResult.dataValues.number}</hp>
                       <pulsa_code>${dataProduct.dataValues.pulsaCode}</pulsa_code>
                       <sign>${sign}</sign>
@@ -157,9 +158,10 @@ module.exports = {
 
           db.transaction.update({
             status: object.mp.message._text,
+            pulsaId : newId
           }, {
             where: {
-              id: object.mp.ref_id._text
+              id: transactionResult.dataValues.id
             }
           })
           .then((data)=>{
