@@ -118,7 +118,7 @@ module.exports = {
     })
     .then(transactionResult => {
 
-      console.log('--- CREATE TRANSACTION RESULT --- :', transactionResult.dataValues)
+      // console.log('--- CREATE TRANSACTION RESULT --- :', transactionResult.dataValues)
 
       Model.product.findOne({
         where: {
