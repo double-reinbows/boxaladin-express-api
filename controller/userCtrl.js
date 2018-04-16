@@ -139,7 +139,7 @@ exports.buyCoinWithAladinKey = (req, res) => {
 
     result.update({
       aladinKeys: result.aladinKeys - req.body.key,
-      coin: result.coin + (req.body.key * 10),
+      coin: result.coin + (req.body.key * 5),
     })
     .then(updateResult => {
 
