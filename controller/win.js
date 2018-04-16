@@ -106,7 +106,7 @@ module.exports = {
 
     Model.transaction.create({
       paymentId: 0,
-      productId: parseInt(req.body.productId),
+      productId: 0,
       userId: decoded.id,
       pulsaId: 'null',
       aladinPrice: 0,
@@ -120,12 +120,12 @@ module.exports = {
 
       // console.log('--- CREATE TRANSACTION RESULT --- :', transactionResult.dataValues)
 
-      Model.product.findOne({
-        where: {
-          id: transactionResult.dataValues.productId
-        }
-      })
-      .then(dataProduct => {
+      // Model.product.findOne({
+      //   where: {
+      //     id: transactionResult.dataValues.productId
+      //   }
+      // })
+      // .then(dataProduct => {
         var newId = decoded.id + ('-free-') + transactionResult.dataValues.id
         var sign = md5('081380572721' + process.env.PULSA_KEY + newId)
         var pulsa = `<?xml version="1.0" ?>
@@ -134,12 +134,11 @@ module.exports = {
                       <username>081380572721</username>
                       <ref_id>${newId}</ref_id>
                       <hp>${transactionResult.dataValues.number}</hp>
-                      <pulsa_code>${dataProduct.dataValues.pulsaCode}</pulsa_code>
+                      <pulsa_code>${req.body.pulsaCode}</pulsa_code>
                       <sign>${sign}</sign>
                     </mp>`
 
         console.log('PULSA:', pulsa)
-        console.log('DATA PRODUCT:', dataProduct.dataValues)
         console.log('SIGN:', sign)
 
         axios.post(process.env.MOBILE_PULSA, pulsa, {
@@ -173,11 +172,11 @@ module.exports = {
         })
         .catch(err => res.send(err))
 
-      })
-      .catch(err => {
-        console.log('ERROR FIND PRODUCT:', err)
-        return res.send(err)
-      })
+      // })
+      // .catch(err => {
+      //   console.log('ERROR FIND PRODUCT:', err)
+      //   return res.send(err)
+      // })
 
     })
     .catch(err => {
