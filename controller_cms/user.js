@@ -96,7 +96,7 @@ module.exports = {
   },
 
   getUserWithPhone: (req, res) => {
-    model.sequelize.query(`SELECT p.number, u.id, u.email, u."aladinKeys" FROM users AS u join phonenumbers AS p on p."userId" = u.id WHERE p.primary = true ORDER BY u.id ASC`, {
+    model.sequelize.query(`SELECT u.id, u.email, u."aladinKeys" FROM users AS u ORDER BY u.id ASC`, {
       model: model.user,
     })
       .then(data => {
@@ -105,12 +105,24 @@ module.exports = {
       .catch(err => res.send(err))
   },
 
+  // getUserWithPhone: (req, res) => {
+  //   model.user.findAll({
+  //   include: [{
+  //     all: true
+  //   }]
+  // })
+  //   .then(dataUser => {
+  //     res.send(dataUser)
+  //   })
+  //   .catch(err => res.send(err))
+  // },
+
     getAll: (req, res) => {
 
       console.log('--- QUERY --- :', req.query)
 
       let where = {
-        userId: {
+        id: {
           $ne: 0
         },
       }
@@ -145,12 +157,11 @@ module.exports = {
       model.user.count()
       .then(countResult => {
   
-        model.phonenumber.findAll({
+        model.user.findAll({
           where: where,
           order: order,
           limit: limit,
           offset: offset,
-          order: ['userId'],
           include: [{
             all: true
           }],
@@ -174,5 +185,38 @@ module.exports = {
         console.log('ERROR COUNT USER:', err)
         return res.send(err)
       })
+  },
+
+  findUser: (req, res) => {
+    model.user.findOne({
+      where:[{
+        email : req.body.email
+      }]
+    })
+    .then(dataUser => {
+      if (dataUser === null) {
+        res.send({message : 'email not found'})
+      } else {
+        model.phonenumber.findOne({
+          where:[{
+            userId : dataUser.id 
+          }]
+        })
+        .then(phoneUser => {
+          if (phoneUser === null ){
+            res.send({ 
+              message: 'null',
+              user: dataUser
+            })
+          } else {
+            res.send({
+              user: dataUser,
+              phone: phoneUser
+            })
+          }
+        })
+      }
+    })
+    .catch(err => res.send(err)) 
   }
 }

@@ -11,6 +11,7 @@ const xendit = require('../controller_cms/xendit')
 router.get('/', auth.isLogin, auth.isAdmin, user.getAll)
 router.get('/phone', auth.isLogin, auth.isAdmin, user.getUserWithPhone)
 router.get('/balance', auth.isLogin, auth.isAdmin, xendit.balance)
+router.post('/finduser', auth.isLogin, auth.isAdmin, user.findUser)
 
 router.post('/addkey', auth.isLogin, auth.isAdmin, key.addKey )
 router.post('/removekey', auth.isLogin, auth.isAdmin, key.removeKey)
