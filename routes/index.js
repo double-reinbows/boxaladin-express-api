@@ -59,7 +59,8 @@ router.delete('/phone/:id', phoneCtrl.removePhone)
 router.post("/changePrimary", phoneCtrl.changePrimary);
 router.post("/smsVerification", phoneCtrl.sendSmsVerification);
 router.post("/phoneVerification", phoneCtrl.verifyPhoneNumber);
-
+router.post('/otp', phoneCtrl.otp)
+router.post('/signupverification', phoneCtrl.signUpVerify)
 
 //-------------------xendit routes-------------------------
 router.post('/payment', paymentController.createInvoice)

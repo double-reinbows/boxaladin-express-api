@@ -1,6 +1,8 @@
 const db = require('../models')
 const jwt = require('jsonwebtoken')
 const awsHelper = require('../helpers/aws')
+const otp = require('./otp')
+const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;  /* need to INSTALL the package XMLHttpRequest */
 
 exports.all = (req, res) => {
   db.phonenumber.findAll({
@@ -268,3 +270,84 @@ exports.getAllPhone = (req, res) => {
   })
   .catch(err => res.send(err))
 }
+
+exports.otp = (req, res) => {
+  var data = JSON.stringify({
+    "userid": `${process.env.CITCALL_USER}`,
+    "password": `${process.env.CITCALL_PASSWORD}`,
+    "msisdn": `${req.body.phonenumber}`,
+    "gateway": "0"
+  });
+  var xhr = new XMLHttpRequest();
+  xhr.withCredentials = false;
+  xhr.addEventListener("readystatechange",function(){
+    if(this.readyState === this.DONE) {
+      var json = JSON.parse(this.responseText)
+      otp.sentOtp(req, res, json)
+    }
+  });
+  xhr.open("POST", "https://gateway.citcall.com/v1/call");
+  xhr.setRequestHeader("content-type", "application/json");
+  xhr.setRequestHeader("accept", "application/json");
+  xhr.send(data)
+
+}
+
+exports.signUpVerify = (req, res) => {
+  db.phonenumber.findOne({
+    where: {
+      number: req.body.phonenumber,
+      verified: false
+    }
+  })
+  .then(result => {
+    if (result === null){
+      res.send({
+        message: 'Phone Terverifikasi'
+      })
+    } else{
+      if (result.otp == req.body.otp) {
+        db.phonenumber.update({
+          verified: true,
+          primary: true
+        }, {
+          where: {
+            id: result.id
+          }
+        })
+        .then(updateResult => {
+          db.user.findOne({
+            where:{
+              id: result.userId
+            }
+          })
+          .then((resultUser) => {
+            var key = parseInt(resultUser.dataValues.aladinKeys) + 5
+            db.user.update({
+              aladinKeys: key
+            },{
+              where:{
+                id: resultUser.dataValues.id
+              }
+            })
+            .then((finalResult) => {
+              res.send({
+                message: 'phone verified',
+                data: finalResult
+              })
+            })
+            .catch(error =>res.status(400).send(error));
+          })
+          .catch(error => res.status(400).send(error));
+        })
+        .catch(err => res.send(err))
+      } else {
+        res.send({
+          message: 'incorrect otp'
+        })
+      }
+    }
+  })
+  .catch(err => res.send(err))
+}
+

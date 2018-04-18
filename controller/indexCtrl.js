@@ -3,6 +3,7 @@ const AWS = require('aws-sdk')
 const db = require('../models')
 const hash = require('../helpers/aladin_hash')
 const { genRandomString } = require('../helpers/string')
+const otpCitCall = require('./otpCtrl')
 
 const SECRET = 'aradin'
 
@@ -114,132 +115,6 @@ exports.signin = (req, res) => {
   })
 }
 
-exports.signup = (req, res) => {
-  /**
-   * Query pertama tujuannya untuk cek
-   * apakah username dan/atau email
-   * sudah ada yang pakai.
-   * Saya belum cek balikan dari
-   * sequelize seandainya user coba input suatu
-   * value yang sama ke kolom yang di-set isUnique.
-   * Kalau balikannya gampang, bisa dipakai buat simplifikasi
-   * kodingan di bawah.
-   */
-  db.user
-    .findOne({
-      // attributes: ['username', 'email'],
-      where: {
-        // $or: [
-        //   {
-        //     username: req.body.username
-        //   },
-        //   {
-        //     email: req.body.email,
-        //     // emailVerified: true
-        //   }
-        // ]
-        email: req.body.email,
-        emailVerified: true
-      }
-    })
-    .then(found => {
-      if (found) {
-        let isUsed = {}
-        // if (found.username === req.body.username) isUsed.username = true
-        if (found.email === req.body.email) isUsed.email = true
-        /**
-         * Di sini res.send()-nya pakai return. Jadi klo conditional ini
-         * dieksekusi, ga akan lanjut ke query signup
-         */
-        return res.send({isUsed})
-      }
-
-      /**
-       * username dan/atau email belum terdaftar.
-       * Lanjut ke registrasi (signup)
-       */
-
-      // gmailDotCheck(req.body)
-      handleDotGmail(req.body)
-
-      req.body.password = hash(req.body.password)
-      var salt = Math.floor(Math.random() * 90000) + 10000
-      var randomOtp = Math.floor(Math.random() * 900000) + 100000
-      req.body.salt = salt
-      req.body.emailVerified = false
-      req.body.aladinKeys = 0
-      req.body.coin = 0
-      req.body.emailToken = genRandomString(128)
-
-      // CREATE USER
-      db.user.create(req.body)
-      .then(data => {
-
-        console.log('USER CREATED:', data)
-
-        var token = jwt.sign({
-          id: data.id,
-          username: data.username,
-          email: data.email,
-          emailVerified: data.emailVerified,
-          firstName: data.firstName,
-          familyName: data.familyName,
-          sex: data.sex,
-        },process.env.JWT_SECRET)
-
-        // UPDATE EMAIL TOKEN
-        // db.user.update({
-        //   emailToken: emailToken
-        // }, {
-        //   where: {
-        //     id: data.id
-        //   },
-        //   returning: true
-        // })
-        // .then(userUpdateResult => {
-
-          sendEmailVerification(data.email, data.emailToken)
-
-          // CREATE PHONE
-          db.phonenumber.create({
-            userId: data.id,
-            number: req.body.phonenumber,
-            verified: false,
-            otp: randomOtp,
-            primary: true
-          })
-          .then(dataPhone => {
-
-            return res.status(200).send({
-              message: "Signup Berhasil",
-              token
-            })
-
-          })
-          .catch(error => {
-            console.log('error create phone:', error)
-            return res.status(400).send(error)
-          });
-
-        // })
-        // .catch(err => {
-        //   console.log(err)
-        //   return res.send(err)
-        // })
-
-      })
-      .catch(error => {
-        console.log('error create user:', error.message)
-        return res.send(error)
-      });
-
-    })
-    .catch(err => {
-      console.log('error find user:', err)
-      return res.send(err)
-    })
-}
-
 const sendEmailVerification = (email_address, emailToken) => {
   // const decoded = jwt.verify(req.body.token, process.env.JWT_SECRET)
 
@@ -333,3 +208,96 @@ exports.resendEmailVerification = (req, res) => {
   })
 
 }
+
+
+exports.signup = (req, res) => {
+  db.user
+    .findOne({
+      where: {
+        email: req.body.email,
+        emailVerified: true
+      }
+    })
+    .then(found => {
+      if (found) {
+        let isUsed = {}
+        if (found.email === req.body.email) isUsed.email = true
+        return res.send({isUsed})
+      } else {
+        db.phonenumber.findOne({
+          where: {
+            number: req.body.phonenumber,
+          }
+        })
+        .then(result => {
+          let phoneIsUsed = {}
+          if (result !== null) {
+            res.send({
+              phoneIsUsed
+            })
+          } else {
+            handleDotGmail(req.body)
+
+            req.body.password = hash(req.body.password)
+            var salt = Math.floor(Math.random() * 90000) + 10000
+            // var randomOtp = Math.floor(Math.random() * 900000) + 100000
+            req.body.salt = salt
+            req.body.emailVerified = false
+            req.body.aladinKeys = 0
+            req.body.coin = 0
+            req.body.emailToken = genRandomString(128)
+      
+            // CREATE USER
+            db.user.create(req.body)
+            .then(data => {
+      
+              console.log('USER CREATED:', data)
+      
+              var token = jwt.sign({
+                id: data.id,
+                username: data.username,
+                email: data.email,
+                emailVerified: data.emailVerified,
+                firstName: data.firstName,
+                familyName: data.familyName,
+                sex: data.sex,
+              },process.env.JWT_SECRET)      
+                sendEmailVerification(data.email, data.emailToken)
+      
+                // CREATE PHONE
+                db.phonenumber.create({
+                  userId: data.id,
+                  number: req.body.phonenumber,
+                  verified: false,
+                  otp: 0,
+                  primary: false
+                })
+                .then(dataPhone => {
+                  otpCitCall.otp(req, res)
+                  return res.status(200).send({
+                    message: "Signup Berhasil",
+                    token
+                  })
+                })
+                .catch(error => {
+                  console.log('error create phone:', error)
+                  return res.status(400).send(error)
+                });
+              })
+              .catch(error => {
+                console.log('error create user:', error.message)
+                return res.send(error)
+              });
+            }
+          })
+          .catch(err => {
+            console.log('error find phone', err)
+            res.send(err)
+          })
+        }
+      })
+      .catch(err => {
+        console.log('error find user:', err)
+        return res.send(err)
+      })
+    }
