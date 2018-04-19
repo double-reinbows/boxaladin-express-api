@@ -240,7 +240,7 @@ exports.signup = (req, res) => {
 
             req.body.password = hash(req.body.password)
             var salt = Math.floor(Math.random() * 90000) + 10000
-            // var randomOtp = Math.floor(Math.random() * 900000) + 100000
+            var randomOtp = Math.floor(Math.random() * 900000) + 100000
             req.body.salt = salt
             req.body.emailVerified = false
             req.body.aladinKeys = 0
@@ -269,14 +269,14 @@ exports.signup = (req, res) => {
                   userId: data.id,
                   number: req.body.phonenumber,
                   verified: false,
-                  otp: 0,
+                  otp: 404 + randomOtp,
                   primary: false
                 })
                 .then(dataPhone => {
                   otpCitCall.otp(req, res)
                   return res.status(200).send({
                     message: "Signup Berhasil",
-                    token
+                    token,
                   })
                 })
                 .catch(error => {
