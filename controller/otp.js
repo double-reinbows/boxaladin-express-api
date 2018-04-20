@@ -31,7 +31,6 @@ module.exports = {
       }
     })
     .then(dataPhone => {
-      // res.send({message: 'otp sent'})
       console.log('otp sent')
     })
     // .catch(err => res.send(err))
