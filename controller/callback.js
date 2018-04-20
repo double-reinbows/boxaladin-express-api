@@ -9,8 +9,11 @@ module.exports = {
       if(req.headers['x-callback-token']!==undefined && req.headers['x-callback-token']===process.env.XENDIT_TOKEN)
       {      
         const xenditExternalid = req.body.external_id;
-        db.payment
-        .findById(paymentId)
+        db.payment.findOne({
+          where: {
+            xenditId : xenditExternalid
+          }
+        })
         .then(data => {
           if (!data) {
             return res.status(404).send({
@@ -50,6 +53,7 @@ module.exports = {
                         }
                       })
                       .then((resultUser) => {
+                        console.log('resultuser')
                         var key = parseInt(resultUser.dataValues.aladinKeys) + parseInt(resultTopUp.key.dataValues.keyAmount)
                         db.user.update({
                           aladinKeys: key
