@@ -23,6 +23,7 @@ const firebaseHelper = require('../helpers/firebase')
 const aladinController = require('../controller/aladin')
 
 const forgotPassword = require('../controller/forgotPassword')
+const auth = require('../helpers/auth')
 
 router.get('/sandbox', (req, res) => {
   let decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
@@ -39,7 +40,7 @@ router.post('/resetpassword', forgotPassword.reset)
 router.post('/unlockPrice', aladinController.decreaseAladinPrice)
 router.get('/firebase', firebaseHelper.syncToFirebase)
 
-router.get("/", ctrl.getAll);
+router.get("/", auth.isLogin, auth.isSuperadmin, ctrl.getAll);
 // router.get('/userwithphone', ctrl.getAllWithPhone)
 router.post("/signin", ctrl.signin);
 router.post("/signup", ctrl.signup);
