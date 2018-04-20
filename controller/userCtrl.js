@@ -136,22 +136,29 @@ exports.buyCoinWithAladinKey = (req, res) => {
     }
   })
   .then(result => {
-
-    result.update({
-      aladinKeys: result.aladinKeys - req.body.key,
-      coin: result.coin + (req.body.key * 5),
-    })
-    .then(updateResult => {
-
-      console.log(updateResult)
-      return res.send({ message: 'coin updated' })
-
-    })
-    .catch(err => {
-      console.log(err)
-      return res.send(err)
-    })
-
+    console.log(result)
+    if (result.aladinKeys < req.body.key) {
+      res.send({
+        message: 'aladinkey tidak cukup'
+      })
+    } else if (result.aladinKeys <= 0) {
+      res.send({
+        message: 'aladinkey 0'
+      })
+    }else {
+      result.update({
+        aladinKeys: result.aladinKeys - req.body.key,
+        coin: result.coin + (req.body.key * 5),
+      })
+      .then(updateResult => {
+        console.log(updateResult)
+        return res.send({ message: 'coin updated' })
+      })
+      .catch(err => {
+        console.log(err)
+        return res.send(err)
+      })
+    }
   })
   .catch(err => {
     console.log(err)

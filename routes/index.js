@@ -50,7 +50,6 @@ router.get("/emailVerification", ctrl.verifyEmail);
 router.post('/resendemailverification', ctrl.resendEmailVerification)
 router.post('/serviceemail', service.sendEmailService)
 //-------------------phone routes-------------------------
-router.get('/allPhone', phoneCtrl.all);
 router.get("/phoneNumbers", phoneCtrl.getPhoneByUser);
 router.get("/userwithphone/:id", phoneCtrl.getAllPhone);
 router.post('/phonenumber', phoneHelper.checkDuplicate, phoneHelper.checkAlready, phoneCtrl.postPhoneNumber)
