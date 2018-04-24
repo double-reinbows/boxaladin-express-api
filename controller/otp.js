@@ -11,6 +11,7 @@ module.exports = {
       }
     })
     .then( user => {
+      console.log(user.id)
       if (json.rc === '00'){
         var phone = json.token
         var splitNumber = phone.split('')
@@ -42,6 +43,20 @@ module.exports = {
           console.log('otp sent')
         })
         .catch(err => console.log(err))
+        } else if (json.rc == '34' || json.rc == '06'){
+          db.phonenumber.update({
+            otp: json.rc
+          },{
+            where: {
+              number: req.body.phonenumber,
+              userId: user.id
+            }
+          })
+          .then(updatePhone => {
+            console.log('retry')
+            res.send('retry')
+          })
+          .catch(err => console.log(err))
         } else {
           db.phonenumber.update({
             otp: json.rc

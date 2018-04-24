@@ -74,6 +74,7 @@ exports.postPhoneNumber = (req, res) => {
         })
         .catch(err => console.log(err))
       } else if ( checkNumber !== null) {
+        console.log('duplicate')
         res.send('duplicate number')
       } else {
         res.send('err')
@@ -317,21 +318,34 @@ exports.otp = (req, res) => {
     var emailFilter = email1
   } 
 
-  axios({
-    method: 'POST',
-    url: `https://gateway.citcall.com/v1/call`,
-    data: dataCitCall,
-  })
-  .then(databalikan => {
-    if ( databalikan.code === 'ETIMEDOUT'){
-      console.log('err')
-      res.send('err')
-    }
-    console.log('sukses', databalikan.data)
-    var json = databalikan.data
+  // axios({
+  //   method: 'POST',
+  //   url: `https://gateway.citcall.com/v1/call`,
+  //   data: dataCitCall,
+  // })
+  // .then(databalikan => {
+  //   if ( databalikan.code === 'ETIMEDOUT'){
+  //     console.log('err')
+  //     res.send('err')
+  //   }
+  //   console.log('sukses', databalikan.data)
+  //   var json = databalikan.data
+
+  var json = {
+    "rc": "06",
+    "trx_id": "20170709083044690027711524",
+    "msisdn": "+6281234567890",
+    "via": "voice",
+    "token": "622130401234",
+    "dial_code": "200",
+    "dial_status": "OK",
+    "call_status": "ANSWERED",
+    "result": "Success"
+  }
+
     otp.sentOtp(req, res, json, emailFilter)
-  })
-  .catch(err => console.log(err))
+  // })
+  // .catch(err => console.log(err))
 }
 
 exports.signUpVerify = (req, res) => {

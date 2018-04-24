@@ -271,6 +271,10 @@ exports.signup = (req, res) => {
                 })
                 .then(dataPhone => {
                   otpCitCall.otp(req, res, data)
+                  res.send({
+                    message: 'Signup Berhasil',
+                    token: token
+                  })
                 })
                 .catch(error => {
                   console.log('error create phone:', error)
