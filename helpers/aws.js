@@ -23,10 +23,8 @@ exports.sendSMS = (payload) => {
       console.log(data);           // successful response
     }
   });
-    console.log('asdasdas', payload.phone)
     var x = payload.phone
     var splitNumber = x.split('')
-    console.log('asd', splitNumber)
     if (splitNumber[0] === '0') {
       splitNumber.splice(0, 1, '62')
       var newNumber = splitNumber.join('')

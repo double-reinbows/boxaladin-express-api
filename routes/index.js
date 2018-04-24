@@ -11,7 +11,8 @@ const creditCardController = require('../controller/creditCard')
 const topUpController = require('../controller/aladinKey')
 
 const ctrl = require('../controller/indexCtrl')
-const phoneCtrl = require('../controller/otpCtrl')
+const phoneCtrl = require('../controller/phoneCtrl')
+const otpCtrl = require('../controller/otp')
 const phoneHelper = require('../helpers/phone')
 const service = require('../controller/layanan')
 
@@ -52,7 +53,7 @@ router.post('/serviceemail', service.sendEmailService)
 //-------------------phone routes-------------------------
 router.get("/phoneNumbers", phoneCtrl.getPhoneByUser);
 router.get("/userwithphone/:id", phoneCtrl.getAllPhone);
-router.post('/phonenumber', phoneHelper.checkDuplicate, phoneHelper.checkAlready, phoneCtrl.postPhoneNumber)
+router.post('/phonenumber' , phoneCtrl.postPhoneNumber)
 router.put('/phone/:id', phoneHelper.checkDuplicate, phoneHelper.checkAlready, phoneCtrl.changePhone)
 router.delete('/phone/:id', phoneCtrl.removePhone)
 
@@ -61,6 +62,7 @@ router.post("/smsVerification", phoneCtrl.sendSmsVerification);
 router.post("/phoneVerification", phoneCtrl.verifyPhoneNumber);
 router.post('/otp', phoneCtrl.otp)
 router.post('/signupverification', phoneCtrl.signUpVerify)
+router.post('/olduserotp', otpCtrl.oldUserVerification)
 
 //-------------------xendit routes-------------------------
 router.post('/payment', paymentController.createInvoice)

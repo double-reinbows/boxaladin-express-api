@@ -21,6 +21,7 @@ module.exports = {
 			}
 		})
 	},
+
 	checkAlready: (req, res, next) => {
 		db.phonenumber.findOne({
 			where: {
@@ -37,5 +38,40 @@ module.exports = {
 				next()
 			}
 		})
+	},
+
+	checkNumber: (req, res, newNumber, next) => {
+
+		var phone = req.body.phonenumber
+		var splitNumber = phone.split('')
+	
+		if (splitNumber[0] === '0') {
+			splitNumber.splice(0, 1, '0')
+			var newNumber = splitNumber.join('')
+			next()
+		} else if (splitNumber[0] + splitNumber[1] + splitNumber[2] === '+62') {
+			splitNumber.splice(0, 3, '0')
+			var newNumber = splitNumber.join('')
+			next()
+
+		} else if (splitNumber[0] + splitNumber[1] === '62') {
+			splitNumber.splice(0, 2, '0')
+			var newNumber = splitNumber.join('')
+			next()
+
+		} else if (splitNumber[0] === '8') {
+			splitNumber.splice(0, 0, '0')
+			var newNumber = splitNumber.join('')
+			next()
+
+		} else if (splitNumber.length === 0) {
+			var newNumber = splitNumber.join('')
+			next()
+
+		} else {
+			var newNumber = phone
+			next()
+
+		}
 	}
 }

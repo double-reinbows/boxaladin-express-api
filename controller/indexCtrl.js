@@ -3,7 +3,7 @@ const AWS = require('aws-sdk')
 const db = require('../models')
 const hash = require('../helpers/aladin_hash')
 const { genRandomString } = require('../helpers/string')
-const otpCitCall = require('./otpCtrl')
+const otpCitCall = require('./phoneCtrl')
 
 const SECRET = 'aradin'
 
@@ -209,7 +209,6 @@ exports.resendEmailVerification = (req, res) => {
 
 }
 
-
 exports.signup = (req, res) => {
   db.user
     .findOne({
@@ -227,6 +226,7 @@ exports.signup = (req, res) => {
         db.phonenumber.findOne({
           where: {
             number: req.body.phonenumber,
+            primary : true
           }
         })
         .then(result => {
@@ -249,10 +249,7 @@ exports.signup = (req, res) => {
       
             // CREATE USER
             db.user.create(req.body)
-            .then(data => {
-      
-              console.log('USER CREATED:', data)
-      
+            .then(data => {      
               var token = jwt.sign({
                 id: data.id,
                 username: data.username,
@@ -269,15 +266,11 @@ exports.signup = (req, res) => {
                   userId: data.id,
                   number: req.body.phonenumber,
                   verified: false,
-                  otp: 404 + randomOtp,
+                  otp:randomOtp,
                   primary: false
                 })
                 .then(dataPhone => {
-                  otpCitCall.otp(req, res)
-                  return res.status(200).send({
-                    message: "Signup Berhasil",
-                    token,
-                  })
+                  otpCitCall.otp(req, res, data)
                 })
                 .catch(error => {
                   console.log('error create phone:', error)

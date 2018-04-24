@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken')
 const awsHelper = require('../helpers/aws')
 const otp = require('./otp')
 const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;  /* need to INSTALL the package XMLHttpRequest */
+const axios = require('axios')
 
 exports.all = (req, res) => {
   db.phonenumber.findAll({
@@ -20,51 +21,64 @@ exports.postPhoneNumber = (req, res) => {
   var randomOtp = Math.floor(Math.random()*900000) + 100000;
   var decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
 
+  var phone = req.body.phonenumber
+  var splitNumber = phone.split('')
+
+  if (splitNumber[0] === '0') {
+    splitNumber.splice(0, 1, '0')
+    var newNumber = splitNumber.join('')
+  } else if (splitNumber[0] + splitNumber[1] + splitNumber[2] === '+62') {
+    splitNumber.splice(0, 3, '0')
+    var newNumber = splitNumber.join('')
+  } else if (splitNumber[0] + splitNumber[1] === '62') {
+    splitNumber.splice(0, 2, '0')
+    var newNumber = splitNumber.join('')
+  } else if (splitNumber[0] === '8') {
+    splitNumber.splice(0, 0, '0')
+    var newNumber = splitNumber.join('')
+  } else if (splitNumber.length === 0) {
+    var newNumber = splitNumber.join('')
+  } else {
+    var newNumber = phone
+  }
+
   db.phonenumber.findAll({
     where: {
       userId: decoded.id,
-      primary: true
     }
   })
   .then(result => {
-    var primaryStatus = null
-    result.length == 0 ? primaryStatus = true : primaryStatus = false
+    // var primaryStatus = null
+    // result.length == 0 ? primaryStatus = true : primaryStatus = false
 
-    var phone = req.body.phonenumber
-    var splitNumber = phone.split('')
-
-    if (splitNumber[0] === '0') {
-      splitNumber.splice(0, 1, '0')
-      var newNumber = splitNumber.join('')
-    } else if (splitNumber[0] + splitNumber[1] + splitNumber[2] === '+62') {
-      splitNumber.splice(0, 3, '0')
-      var newNumber = splitNumber.join('')
-    } else if (splitNumber[0] + splitNumber[1] === '62') {
-      splitNumber.splice(0, 2, '0')
-      var newNumber = splitNumber.join('')
-    } else if (splitNumber[0] === '8') {
-      splitNumber.splice(0, 0, '0')
-      var newNumber = splitNumber.join('')
-    } else if (splitNumber.length === 0) {
-      var newNumber = splitNumber.join('')
-    } else {
-      var newNumber = phone
-    }
-
-    db.phonenumber.create({
-      userId: decoded.id,
-      number: newNumber,
-      verified: false,
-      otp: randomOtp,
-      primary: primaryStatus
+    db.phonenumber.findOne({
+      where: {
+        userId : decoded.id,
+        number : newNumber
+      }
     })
-    .then(data => {
-      res.send({
-        message: 'data added',
-        data: data.dataValues
-      })
+    .then(checkNumber => {
+      if (checkNumber === null){
+        db.phonenumber.create({
+          userId: decoded.id,
+          number: newNumber,
+          verified: false,
+          otp: randomOtp,
+          primary: false
+        })
+        .then(data => {
+          res.send({
+            message: 'data added',
+            data: data.dataValues
+          })
+        })
+        .catch(err => console.log(err))
+      } else if ( checkNumber !== null) {
+        res.send('duplicate number')
+      } else {
+        res.send('err')
+      }
     })
-    .catch(err => console.log(err))
   })
   .catch(errCreate => console.log(errCreate))
 }
@@ -272,82 +286,122 @@ exports.getAllPhone = (req, res) => {
 }
 
 exports.otp = (req, res) => {
-  var data = JSON.stringify({
+    // var xhr = new XMLHttpRequest();
+  // xhr.withCredentials = false;
+  // xhr.addEventListener("readystatechange",function(){
+  //   if(this.readyState === this.DONE) {
+  //     var json = JSON.parse(this.responseText)
+  //   }
+  // });
+  // xhr.open("POST", "https://gateway.citcall.com/v1/call");
+  // xhr.setRequestHeader("content-type", "application/json");
+  // xhr.setRequestHeader("accept", "application/json");
+  // xhr.send(data)
+
+  var dataCitCall = JSON.stringify({
     "userid": `${process.env.CITCALL_USER}`,
     "password": `${process.env.CITCALL_PASSWORD}`,
     "msisdn": `${req.body.phonenumber}`,
     "gateway": "0"
   });
-  var xhr = new XMLHttpRequest();
-  xhr.withCredentials = false;
-  xhr.addEventListener("readystatechange",function(){
-    if(this.readyState === this.DONE) {
-      var json = JSON.parse(this.responseText)
-      otp.sentOtp(req, res, json)
-    }
-  });
-  xhr.open("POST", "https://gateway.citcall.com/v1/call");
-  xhr.setRequestHeader("content-type", "application/json");
-  xhr.setRequestHeader("accept", "application/json");
-  xhr.send(data)
 
+  var email1 = req.body.email
+  var user = email1.split('@')[0]
+  var provider = email1.split('@')[1]
+
+  if (provider == 'gmail.com') {
+    let userWithoutDot = user.split('.').join('')
+    var result = userWithoutDot + '@gmail.com'
+    var emailFilter = result
+  } else {
+    var emailFilter = email1
+  } 
+
+  axios({
+    method: 'POST',
+    url: `https://gateway.citcall.com/v1/call`,
+    data: dataCitCall,
+  })
+  .then(databalikan => {
+    if ( databalikan.code === 'ETIMEDOUT'){
+      console.log('err')
+      res.send('err')
+    }
+    console.log('sukses', databalikan.data)
+    var json = databalikan.data
+    otp.sentOtp(req, res, json, emailFilter)
+  })
+  .catch(err => console.log(err))
 }
 
 exports.signUpVerify = (req, res) => {
-  db.phonenumber.findOne({
+  console.log('email verify', req.body.email)
+  db.user.findOne({
     where: {
-      number: req.body.phonenumber,
-      verified: false
+      email: req.body.email
     }
   })
-  .then(result => {
-    if (result === null){
-      res.send({
-        message: 'Phone Terverifikasi'
-      })
-    } else{
-      if (result.otp == req.body.otp) {
-        db.phonenumber.update({
-          verified: true,
-          primary: true
-        }, {
-          where: {
-            id: result.id
-          }
+  .then(dataUser => {
+    db.phonenumber.findOne({
+      where: {
+        number: req.body.phonenumber,
+        verified: false,
+        userId: dataUser.id
+      }
+    })
+    .then(result => {
+      if (result === null){
+        res.send({
+          message: 'Phone Terverifikasi'
         })
-        .then(updateResult => {
-          db.user.findOne({
-            where:{
-              id: result.userId
+      } else{
+        console.log(result)
+        if (result.otp == req.body.otp) {
+          db.phonenumber.update({
+            verified: true,
+            primary: true
+          }, {
+            where: {
+              id: result.id
             }
           })
-          .then((resultUser) => {
-            var key = parseInt(resultUser.dataValues.aladinKeys) + 5
-            db.user.update({
-              aladinKeys: key
-            },{
+          .then(updateResult => {
+            db.user.findOne({
               where:{
-                id: resultUser.dataValues.id
+                id: result.userId
               }
             })
-            .then((finalResult) => {
-              res.send({
-                message: 'phone verified',
-                data: finalResult
+            .then((resultUser) => {
+              var key = parseInt(resultUser.dataValues.aladinKeys) + 5
+              db.user.update({
+                aladinKeys: key
+              },{
+                where:{
+                  id: resultUser.dataValues.id
+                }
               })
+              .then((finalResult) => {
+                res.send({
+                  message: 'phone verified',
+                  data: finalResult
+                })
+              })
+              .catch(error =>res.status(400).send(error));
             })
-            .catch(error =>res.status(400).send(error));
+            .catch(error => res.status(400).send(error));
           })
-          .catch(error => res.status(400).send(error));
-        })
-        .catch(err => res.send(err))
-      } else {
-        res.send({
-          message: 'incorrect otp'
-        })
+          .catch(err => res.send(err))
+        } else {
+          res.send({
+            message: 'incorrect otp'
+          })
+          .catch(err => console.log(err))
+        }
       }
-    }
+    })
+    .catch(err => console.log(err))
   })
-  .catch(err => res.send(err))
+  .catch(err => console.log(err))
 }
+
 

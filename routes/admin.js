@@ -7,7 +7,7 @@ const win = require('../controller_cms/win')
 const gamerule = require('../controller_cms/gamerule')
 const key = require('../controller_cms/key')
 const xendit = require('../controller_cms/xendit')
-const phoneCtrl = require('../controller/otpCtrl')
+const phoneCtrl = require('../controller/phoneCtrl')
 
 router.get('/', auth.isLogin, auth.isAdmin, user.getAll)
 router.get('/phone', auth.isLogin, auth.isAdmin, user.getUserWithPhone)
