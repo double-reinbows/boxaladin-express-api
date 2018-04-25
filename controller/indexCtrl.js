@@ -273,7 +273,7 @@ exports.signup = (req, res) => {
                   otpCitCall.otp(req, res, data)
                   res.send({
                     message: 'Signup Berhasil',
-                    token: token
+                    token: token,
                   })
                 })
                 .catch(error => {

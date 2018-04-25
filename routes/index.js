@@ -54,7 +54,7 @@ router.post('/serviceemail', service.sendEmailService)
 router.get("/phoneNumbers", phoneCtrl.getPhoneByUser);
 router.get("/userwithphone/:id", phoneCtrl.getAllPhone);
 router.post('/phonenumber' , phoneCtrl.postPhoneNumber)
-router.put('/phone/:id', phoneHelper.checkDuplicate, phoneHelper.checkAlready, phoneCtrl.changePhone)
+router.put('/phone/:id', phoneHelper.checkDuplicate, phoneCtrl.changePhone)
 router.delete('/phone/:id', phoneCtrl.removePhone)
 
 router.post("/changePrimary", phoneCtrl.changePrimary);
@@ -62,7 +62,8 @@ router.post("/smsVerification", phoneCtrl.sendSmsVerification);
 router.post("/phoneVerification", phoneCtrl.verifyPhoneNumber);
 router.post('/otp', phoneCtrl.otp)
 router.post('/signupverification', phoneCtrl.signUpVerify)
-router.post('/olduserotp', otpCtrl.oldUserVerification)
+router.post('/olduserotp', otpCtrl.oldUserSentotp)
+router.post('/olduserverification', phoneCtrl.oldUserVerify)
 
 //-------------------xendit routes-------------------------
 router.post('/payment', paymentController.createInvoice)

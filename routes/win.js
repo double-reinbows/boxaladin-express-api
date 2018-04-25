@@ -1,14 +1,15 @@
 const router = require('express').Router()
+const auth = require('../helpers/auth')
 
 const win = require('../controller/win')
 
-router.get('/', win.all)
-router.get('/user', win.byUser)
-router.get('/:id', win.byId)
+router.get('/', auth.isLogin, auth.isSuperadmin, win.all)
+router.get('/user', auth.isLogin, win.byUser)
+router.get('/:id', auth.isLogin, win.byId)
 
-router.put('/resettoken/:id', win.resetToken)
+// router.put('/resettoken/:id', win.resetToken)
 
-router.post('/', win.create)
-router.post('/claimfreepulsa', win.claimFreePulsa)
+router.post('/', auth.isLogin, win.create)
+router.post('/claimfreepulsa', auth.isLogin, win.claimFreePulsa)
 
 module.exports = router

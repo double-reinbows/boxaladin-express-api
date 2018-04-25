@@ -286,7 +286,7 @@ exports.getAllPhone = (req, res) => {
   .catch(err => res.send(err))
 }
 
-exports.otp = (req, res) => {
+exports.otp = (req, res, data) => {
     // var xhr = new XMLHttpRequest();
   // xhr.withCredentials = false;
   // xhr.addEventListener("readystatechange",function(){
@@ -306,17 +306,7 @@ exports.otp = (req, res) => {
     "gateway": "0"
   });
 
-  var email1 = req.body.email
-  var user = email1.split('@')[0]
-  var provider = email1.split('@')[1]
-
-  if (provider == 'gmail.com') {
-    let userWithoutDot = user.split('.').join('')
-    var result = userWithoutDot + '@gmail.com'
-    var emailFilter = result
-  } else {
-    var emailFilter = email1
-  } 
+  var idUser = data.id
 
   // axios({
   //   method: 'POST',
@@ -332,7 +322,7 @@ exports.otp = (req, res) => {
   //   var json = databalikan.data
 
   var json = {
-    "rc": "06",
+    "rc": "00",
     "trx_id": "20170709083044690027711524",
     "msisdn": "+6281234567890",
     "via": "voice",
@@ -343,7 +333,7 @@ exports.otp = (req, res) => {
     "result": "Success"
   }
 
-    otp.sentOtp(req, res, json, emailFilter)
+    otp.updateOtp(req, res, json, idUser)
   // })
   // .catch(err => console.log(err))
 }
@@ -418,4 +408,92 @@ exports.signUpVerify = (req, res) => {
   .catch(err => console.log(err))
 }
 
+exports.oldUserOtp = (req, res, oldUserId) => {
 
+var dataCitCall = JSON.stringify({
+  "userid": `${process.env.CITCALL_USER}`,
+  "password": `${process.env.CITCALL_PASSWORD}`,
+  "msisdn": `${req.body.phonenumber}`,
+  "gateway": "0"
+});
+
+var idUser = oldUserId
+
+// axios({
+//   method: 'POST',
+//   url: `https://gateway.citcall.com/v1/call`,
+//   data: dataCitCall,
+// })
+// .then(databalikan => {
+//   if ( databalikan.code === 'ETIMEDOUT'){
+//     console.log('err')
+//     res.send('err')
+//   }
+//   console.log('sukses', databalikan.data)
+//   var json = databalikan.data
+
+var json = {
+  "rc": "00",
+  "trx_id": "20170709083044690027711524",
+  "msisdn": "+6281234567890",
+  "via": "voice",
+  "token": "622130401234",
+  "dial_code": "200",
+  "dial_status": "OK",
+  "call_status": "ANSWERED",
+  "result": "Success"
+}
+
+  otp.updateOtp(req, res, json, idUser)
+// })
+// .catch(err => console.log(err))
+}
+
+exports.oldUserVerify = (req, res) => {
+  console.log('email verify', req.body.email)
+  db.user.findOne({
+    where: {
+      email: req.body.email
+    }
+  })
+  .then(dataUser => {
+    db.phonenumber.findOne({
+      where: {
+        number: req.body.phonenumber,
+        verified: false,
+        userId: dataUser.id
+      }
+    })
+    .then(result => {
+      if (result === null){
+        res.send({
+          message: 'Phone Terverifikasi'
+        })
+      } else{
+        if (result.otp == req.body.otp) {
+          db.phonenumber.update({
+            verified: true,
+            primary: true
+          }, {
+            where: {
+              id: result.id
+            }
+          })
+          .then((finalResult) => {
+            res.send({
+              message: 'phone verified',
+            })
+          })
+          .catch(error =>res.status(400).send(error));
+        } else {
+          res.send({
+            message: 'incorrect otp'
+          })
+          .catch(err => console.log(err))
+        }
+      }
+    })
+    .catch(err => console.log(err))
+  })
+  .catch(err => console.log(err))
+}

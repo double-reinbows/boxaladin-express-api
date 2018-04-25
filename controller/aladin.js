@@ -16,7 +16,6 @@ module.exports = {
 				coin: user.coin + 1
 			})
 			.then(result => {
-
 				db.product.findById(req.body.productId, {
 					include: [
 						{ all: true}
@@ -31,38 +30,46 @@ module.exports = {
 							data: product
 					})
 					}
-
-					product.update({
-						aladinPrice: product.aladinPrice - 500
-					}, {
+					db.aladinKey.findOne({
 						where: {
-							id: req.body.productId
+							id: 1
 						}
 					})
-					.then(result => {
-
-            // update di firebase
-
-						const productsRef = firebase.database().ref().child('products')
-						productsRef.child(result.id).update({
-							id: result.id,
-							productName: result.productName,
-							price: result.price,
-							aladinPrice: result.aladinPrice,
-							brand: result.brand.brandName,
-							category: result.category.categoryName,
-							brandId: result.brand.id,
-							categoryId: result.category.id
-						}, function() {
-
-							return res.send({
-								message: 'success',
-								data: result
-							})
-
+					.then( dataDecreasePrice => {
+						console.log(dataDecreasePrice)
+						product.update({
+							aladinPrice: product.aladinPrice - dataDecreasePrice.decreasePrice
+						}, {
+							where: {
+								id: req.body.productId
+							}
 						})
+						.then(result => {
+	
+							// update di firebase
+	
+							const productsRef = firebase.database().ref().child('products')
+							productsRef.child(result.id).update({
+								id: result.id,
+								productName: result.productName,
+								price: result.price,
+								aladinPrice: result.aladinPrice,
+								brand: result.brand.brandName,
+								category: result.category.categoryName,
+								brandId: result.brand.id,
+								categoryId: result.category.id
+							}, function() {
+	
+								return res.send({
+									message: 'success',
+									data: result
+								})
+	
+							})
+						})
+						.catch(err => res.send(err))
 					})
-					.catch(err => res.send(err))
+
 
 				})
 				.catch(err => res.send(err))
