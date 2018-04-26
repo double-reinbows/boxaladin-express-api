@@ -6,14 +6,13 @@ var cors = require('cors')
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var isDevelop = process.env.NODE_ENV || 'development';
-var envPath = isDevelop ? path.resolve('.env.dev') : path.resolve('.env');
+var envPath = isDevelop = 3000 ? path.resolve('.env.dev') : path.resolve('.env.prod');
 console.log('author: ',process.env.AUTHOR);
 console.log('envPath: ',envPath);
 require('dotenv').config({path: envPath})
 var firebase = require('firebase')
 var admin = require("firebase-admin")
 var xmlparser = require('express-xml-bodyparser')
-
 // Initialize Firebase Admin
 var serviceAccount = require("./boxaladin-auction-firebase-adminsdk-kr4x0-a14e997d4b.json")
 admin.initializeApp({
