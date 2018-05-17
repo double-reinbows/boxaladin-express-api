@@ -287,18 +287,6 @@ exports.getAllPhone = (req, res) => {
 }
 
 exports.otp = (req, res, data) => {
-    // var xhr = new XMLHttpRequest();
-  // xhr.withCredentials = false;
-  // xhr.addEventListener("readystatechange",function(){
-  //   if(this.readyState === this.DONE) {
-  //     var json = JSON.parse(this.responseText)
-  //   }
-  // });
-  // xhr.open("POST", "https://gateway.citcall.com/v1/call");
-  // xhr.setRequestHeader("content-type", "application/json");
-  // xhr.setRequestHeader("accept", "application/json");
-  // xhr.send(data)
-
   var dataCitCall = JSON.stringify({
     "userid": `${process.env.CITCALL_USER}`,
     "password": `${process.env.CITCALL_PASSWORD}`,
@@ -306,36 +294,17 @@ exports.otp = (req, res, data) => {
     "gateway": "0"
   });
 
-  var idUser = data.id
+  axios({
+    method: 'POST',
+    url: `https://gateway.citcall.com/v1/call`,
+    data: dataCitCall,
+  })
+  .then(databalikan => {
+    var json = databalikan.data
 
-  // axios({
-  //   method: 'POST',
-  //   url: `https://gateway.citcall.com/v1/call`,
-  //   data: dataCitCall,
-  // })
-  // .then(databalikan => {
-  //   if ( databalikan.code === 'ETIMEDOUT'){
-  //     console.log('err')
-  //     res.send('err')
-  //   }
-  //   console.log('sukses', databalikan.data)
-  //   var json = databalikan.data
-
-  var json = {
-    "rc": "00",
-    "trx_id": "20170709083044690027711524",
-    "msisdn": "+6281234567890",
-    "via": "voice",
-    "token": "622130401234",
-    "dial_code": "200",
-    "dial_status": "OK",
-    "call_status": "ANSWERED",
-    "result": "Success"
-  }
-
-    otp.updateOtp(req, res, json, idUser)
-  // })
-  // .catch(err => console.log(err))
+    otp.updateOtp(req, res, json)
+  })
+  .catch(err => console.log(err))
 }
 
 exports.signUpVerify = (req, res) => {
@@ -406,47 +375,6 @@ exports.signUpVerify = (req, res) => {
     .catch(err => console.log(err))
   })
   .catch(err => console.log(err))
-}
-
-exports.oldUserOtp = (req, res, oldUserId) => {
-
-var dataCitCall = JSON.stringify({
-  "userid": `${process.env.CITCALL_USER}`,
-  "password": `${process.env.CITCALL_PASSWORD}`,
-  "msisdn": `${req.body.phonenumber}`,
-  "gateway": "0"
-});
-
-var idUser = oldUserId
-
-// axios({
-//   method: 'POST',
-//   url: `https://gateway.citcall.com/v1/call`,
-//   data: dataCitCall,
-// })
-// .then(databalikan => {
-//   if ( databalikan.code === 'ETIMEDOUT'){
-//     console.log('err')
-//     res.send('err')
-//   }
-//   console.log('sukses', databalikan.data)
-//   var json = databalikan.data
-
-var json = {
-  "rc": "00",
-  "trx_id": "20170709083044690027711524",
-  "msisdn": "+6281234567890",
-  "via": "voice",
-  "token": "622130401234",
-  "dial_code": "200",
-  "dial_status": "OK",
-  "call_status": "ANSWERED",
-  "result": "Success"
-}
-
-  otp.updateOtp(req, res, json, idUser)
-// })
-// .catch(err => console.log(err))
 }
 
 exports.oldUserVerify = (req, res) => {

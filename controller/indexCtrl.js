@@ -57,7 +57,6 @@ exports.getAll = (req, res) => {
     })
 }
 
-
 exports.signin = (req, res) => {
 
     var email1 = req.body.email

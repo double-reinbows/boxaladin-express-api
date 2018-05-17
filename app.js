@@ -6,23 +6,21 @@ var cors = require('cors')
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var isDevelop = process.env.NODE_ENV || 'development';
-var envPath = isDevelop = 3000 ? path.resolve('.env.dev') : path.resolve('.env.prod');
+var envPath = isDevelop ? path.resolve('.env.dev') : path.resolve('.env');
 console.log('author: ',process.env.AUTHOR);
 console.log('envPath: ',envPath);
 require('dotenv').config({path: envPath})
 var firebase = require('firebase')
 var admin = require("firebase-admin")
 var xmlparser = require('express-xml-bodyparser')
+
+var auth = require("./helpers/auth")
+
 // Initialize Firebase Admin
-var serviceAccount = require("./boxaladin-auction-firebase-adminsdk-kr4x0-a14e997d4b.json")
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://boxaladin-auction.firebaseio.com"
-})
 
 // Initialize Firebase
 var config = {
-  apiKey: "AIzaSyDjiWTez3r_lZreCZUvIUhaSj8-rIWfhgw",
+  apiKey: process.env.FIREBASE_KEY,
   authDomain: "boxaladin-auction.firebaseapp.com",
   databaseURL: "https://boxaladin-auction.firebaseio.com",
   projectId: "boxaladin-auction",
@@ -38,6 +36,7 @@ var reward = require('./routes/reward');
 var claim = require('./routes/claim');
 var admin = require('./routes/admin');
 var lose = require('./routes/gamecount');
+var cms = require('./routes/cms')
 
 var app = express();
 app.use(cors())
@@ -61,9 +60,10 @@ app.use('/', index);
 app.use('/users', users);
 app.use('/win', win);
 app.use('/reward', reward);
-app.use('/claim', claim);
-app.use('/admin', admin);
-app.use('/lose', lose);
+app.use('/claim',  claim);
+app.use('/admin',  admin);
+app.use('/lose',  lose);
+app.use('/cms',  cms)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

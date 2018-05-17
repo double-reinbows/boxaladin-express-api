@@ -4,14 +4,13 @@ const jwt = require('jsonwebtoken')
 const citcall = require('./phoneCtrl')
 
 module.exports = {
-  updateOtp(req, res, json, idUser){
+  updateOtp(req, res, json){
     db.user.findOne({
       where: {
-        id: idUser
+        email: req.body.email
       }
     })
     .then( user => {
-      console.log('AAAAAAAAAAAAAAAAAAAAAAAAAAAA', idUser)
       if (json.rc === '00'){
         var phone = json.token
         var splitNumber = phone.split('')
@@ -36,7 +35,7 @@ module.exports = {
         },{
           where: {
             number: req.body.phonenumber,
-            userId: idUser
+            userId: user.id
           }
         })
         .then(dataHpUser => {
@@ -49,7 +48,7 @@ module.exports = {
           },{
             where: {
               number: req.body.phonenumber,
-              userId: idUser
+              userId: user.id
             }
           })
           .then(updatePhone => {
@@ -63,7 +62,7 @@ module.exports = {
           },{
             where: {
               number: req.body.phonenumber,
-              userId: idUser
+              userId: user.id
             }
           })
           .then(updatePhone => {
@@ -116,8 +115,8 @@ module.exports = {
           primary: false
         })
         .then(data => {
-          var oldUserId = data.userId
-          citcall.oldUserOtp(req, res, oldUserId)
+          citcall.otp(req, res)
+          res.send('phone created')
         })
         .catch(err => res.send(err))
       } else if (checkNumber.length !== 0) {

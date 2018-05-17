@@ -42,7 +42,6 @@ router.post('/unlockPrice', aladinController.decreaseAladinPrice)
 router.get('/firebase', firebaseHelper.syncToFirebase)
 
 router.get("/", auth.isLogin, auth.isSuperadmin, ctrl.getAll);
-// router.get('/userwithphone', ctrl.getAllWithPhone)
 router.post("/signin", ctrl.signin);
 router.post("/signup", ctrl.signup);
 

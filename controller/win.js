@@ -25,12 +25,51 @@ module.exports = {
 
     Model.win.findOne({
       where: {
-        // id: req.params.id,
+        id: req.params.id,
         userId: decoded.id
       },
       order: [['createdAt', 'DESC']]
     })
     .then(result => res.send(result))
+    .catch(err => res.send(err))
+  },
+
+  checkCoinById: (req, res) => {
+    const decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
+    Model.user.findOne({
+      where: {
+        id: decoded.id
+      }
+    })
+    .then(dataUser => {
+      Model.win.count({
+        where: {
+          createdAt: {
+            $between: [new Date(new Date() - 24 * 60 * 60 * 1000), new Date()]
+          },
+          userId: decoded.id
+        }
+      })
+      .then(result => {
+        if (result <= 3) {
+          res.send({
+            result,
+            coin : dataUser.coin
+          })
+        } else if (result < 0) {
+          res.send({
+            message : 'limit habis',
+            coin : dataUser.coin
+          })
+        } else if ( result > 3){
+          res.send ({
+            message : 'limit habis',
+            coin : dataUser.coin
+          })
+        }
+      })
+      .catch(err => console.log('err', err))
+    })
     .catch(err => res.send(err))
   },
 
@@ -98,118 +137,121 @@ module.exports = {
       .catch(err => res.send(err))
     })
     .catch(err => res.send(err))
-
   },
 
   claimFreePulsa: (req, res) => {
     const decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
-    if ( req.body.winToken === null ){
-      res.send('error')
-    } else {
-      Model.win.findOne({
-        where: {
-          winToken: req.body.winToken,
-          userId: decoded.id
-        }
-      })
-      .then(dataWin => {
-        if (dataWin === null){
-          res.send('tidak ketemu')
-        } else if ( dataWin.winToken === req.body.winToken ){
-            db.win.update({
-              winToken: null
-            }, {
-              where: {
-                id : dataWin.id
-              }
-            })
-            .then(dataWin => {
-              Model.transaction.create({
-                paymentId: 0,
-                productId: 0,
-                userId: decoded.id,
-                pulsaId: 'null',
-                aladinPrice: 0,
-                number: req.body.phone,
-                status: 'PENDING',
-                description: 'FREE',
-                createdAt: new Date(),
-                updatedAt: new Date(),
+    if ( req.body.authentication === process.env.HASHED_PASSWORD){
+      if ( req.body.winToken === null ){
+        res.send('error')
+      } else {
+        console.log('sukses')
+        Model.win.findOne({
+          where: {
+            winToken: req.body.winToken,
+            userId: decoded.id
+          }
+        })
+        .then(dataWin => {
+          if (dataWin === null){
+            res.send('tidak ketemu')
+          } else if ( dataWin.winToken === req.body.winToken ){
+              db.win.update({
+                winToken: null
+              }, {
+                where: {
+                  id : dataWin.id
+                }
               })
-              .then(transactionResult => {
-          
-                // console.log('--- CREATE TRANSACTION RESULT --- :', transactionResult.dataValues)
-          
-                // Model.product.findOne({
-                //   where: {
-                //     id: transactionResult.dataValues.productId
-                //   }
-                // })
-                // .then(dataProduct => {
-                  var newId = decoded.id + ('-free-') + transactionResult.dataValues.id
-                  var sign = md5('081380572721' + process.env.PULSA_KEY + newId)
-                  var pulsa = `<?xml version="1.0" ?>
-                              <mp>
-                                <commands>topup</commands>
-                                <username>081380572721</username>
-                                <ref_id>${newId}</ref_id>
-                                <hp>${transactionResult.dataValues.number}</hp>
-                                <pulsa_code>${req.body.pulsaCode}</pulsa_code>
-                                <sign>${sign}</sign>
-                              </mp>`
-          
-                  console.log('PULSA:', pulsa)
-                  console.log('SIGN:', sign)
-          
-                  axios.post(process.env.MOBILE_PULSA, pulsa, {
-                    headers: {
-                      'Content-Type': 'text/xml',
-                    },
-                    httpsAgent: new https.Agent({ rejectUnauthorized: false })
-                  })
-                  .then((data) => {
-                    let json = CircularJSON.stringify(data.data);
-                    let dataJson = JSON.parse(json)
-                    let convertJson = convert.xml2json(dataJson, { compact: true})
-                    let object = JSON.parse(convertJson)
-          
-                    console.log('--- OBJECT RESPONSE PULSA --- :', object)
-          
-                    db.transaction.update({
-                      status: object.mp.message._text,
-                      pulsaId : newId
-                    }, {
-                      where: {
-                        id: transactionResult.dataValues.id
-                      }
+              .then(dataWin => {
+                Model.transaction.create({
+                  paymentId: 0,
+                  productId: 0,
+                  userId: decoded.id,
+                  pulsaId: 'null',
+                  aladinPrice: 0,
+                  number: req.body.phone,
+                  status: 'PENDING',
+                  description: 'FREE',
+                  createdAt: new Date(),
+                  updatedAt: new Date(),
+                })
+                .then(transactionResult => {
+
+                  // console.log('--- CREATE TRANSACTION RESULT --- :', transactionResult.dataValues)
+
+                  // Model.product.findOne({
+                  //   where: {
+                  //     id: transactionResult.dataValues.productId
+                  //   }
+                  // })
+                  // .then(dataProduct => {
+                    var newId = decoded.id + ('-free-') + transactionResult.dataValues.id
+                    var sign = md5('081380572721' + process.env.PULSA_KEY + newId)
+                    var pulsa = `<?xml version="1.0" ?>
+                                <mp>
+                                  <commands>topup</commands>
+                                  <username>081380572721</username>
+                                  <ref_id>${newId}</ref_id>
+                                  <hp>${transactionResult.dataValues.number}</hp>
+                                  <pulsa_code>${req.body.pulsaCode}</pulsa_code>
+                                  <sign>${sign}</sign>
+                                </mp>`
+
+                    console.log('PULSA:', pulsa)
+                    console.log('SIGN:', sign)
+
+                    axios.post(process.env.MOBILE_PULSA, pulsa, {
+                      headers: {
+                        'Content-Type': 'text/xml',
+                      },
+                      httpsAgent: new https.Agent({ rejectUnauthorized: false })
                     })
-                    .then((data)=>{
-                      console.log('RESULT UPDATE TRANSACTION:', data)
-                      return res.send(object.mp)
+                    .then((data) => {
+                      let json = CircularJSON.stringify(data.data);
+                      let dataJson = JSON.parse(json)
+                      let convertJson = convert.xml2json(dataJson, { compact: true})
+                      let object = JSON.parse(convertJson)
+
+                      console.log('--- OBJECT RESPONSE PULSA --- :', object)
+
+                      db.transaction.update({
+                        status: object.mp.message._text,
+                        pulsaId : newId
+                      }, {
+                        where: {
+                          id: transactionResult.dataValues.id
+                        }
+                      })
+                      .then((data)=>{
+                        console.log('RESULT UPDATE TRANSACTION:', data)
+                        return res.send(object.mp)
+                      })
+                      .catch(err => res.send(err))
+
                     })
                     .catch(err => res.send(err))
-          
-                  })
-                  .catch(err => res.send(err))
-          
-                // })
-                // .catch(err => {
-                //   console.log('ERROR FIND PRODUCT:', err)
-                //   return res.send(err)
-                // })
-          
+
+                  // })
+                  // .catch(err => {
+                  //   console.log('ERROR FIND PRODUCT:', err)
+                  //   return res.send(err)
+                  // })
+
+                })
+                .catch(err => {
+                  console.log('ERROR CREATE TRANSACTION:', err)
+                  return res.send(err)
+                })
               })
-              .catch(err => {
-                console.log('ERROR CREATE TRANSACTION:', err)
-                return res.send(err)
-              })
-            })
-          .catch(err => res.send(err))
-        }
-      })
-      .catch(err => res.send(err))
+            .catch(err => res.send(err))
+          }
+        })
+        .catch(err => res.send(err))
+      }
+    } else {
+      res.send(console.log('error wrong auth'))
     }
-    
   },
 
   resetToken: (req, res) => {
