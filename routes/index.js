@@ -27,6 +27,7 @@ const forgotPassword = require('../controller/forgotPassword')
 const auth = require('../helpers/auth')
 
 const gameRuleController = require('../controller/gamerule');
+const gameController = require('../controller/gameController');
 
 router.get('/sandbox', (req, res) => {
   let decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
@@ -115,5 +116,6 @@ router.put('/api/product/:id', productController.update);
 router.delete('/api/product/:id', productController.destroy);
 
 router.get('/gamerules', gameRuleController.all);
+router.get('/game', gameController.play);
 
 module.exports = router;
