@@ -16,17 +16,24 @@ module.exports = {
 	syncToFirebase: (req, res) => {
 		db.product.findAll({
 			include: [
-				{ all: true }
-			]
+        {
+        model: db.brand,
+      },
+      {
+        model: db.category
+      }
+    ]
 		})
 		.then(result => {
-			const productsRef = firebase.database().ref().child('products')
+			const productsRef = firebase.database().ref().child('productsdummy')
 			result.map((data, idx) => {
 				productsRef.child(data.id).set({
 					id: data.id,
 					productName: data.productName,
 					price: data.price,
 					aladinPrice: data.aladinPrice,
+					displayPrice: data.displayPrice,
+					decreasePrice: data.decreasePrice,
 					brand: data.brand.brandName,
 					category: data.category.categoryName,
 					brandId: data.brand.id,

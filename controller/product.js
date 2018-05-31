@@ -1,5 +1,6 @@
 const product = require('../models').product;
 const firebase = require('firebase')
+const db = require('../models')
 
 module.exports = {
   filter(req, res) {
@@ -47,11 +48,18 @@ module.exports = {
         .catch(err => res.status(400).send(err));
     }
   },
+
   list(req, res) {
-    return product.findAll({
+    db.product.findAll({
+      order: [['id', 'ASC']],
       include: [
-        { all: true }
-      ]
+        {
+        model: db.brand,
+      },
+      {
+        model: db.category
+      }
+    ]
     })
       .then(data => res.send(data))
       .catch(err => res.status(400).send(err));
@@ -91,7 +99,7 @@ module.exports = {
           ]
         })
         .then(result => {
-          const productsRef = firebase.database().ref().child('products')
+          const productsRef = firebase.database().ref().child('productsdummy')
   				productsRef.child(result.id).set({
   					id: result.id,
   					productName: result.productName,
@@ -135,7 +143,7 @@ module.exports = {
           })
           .then(result => {
             // tulis hasil uppdate ke firebase di sini
-            const productsRef = firebase.database().ref().child('products')
+            const productsRef = firebase.database().ref().child('productsdummy')
     				productsRef.child(result.id).update({
     					id: result.id,
     					productName: result.productName,
@@ -166,7 +174,7 @@ module.exports = {
         .destroy()
         .then(result => {
           // hapus data di firebase sesuai id dari result
-          const productsRef = firebase.database().ref().child('products')
+          const productsRef = firebase.database().ref().child('productsdummy')
   				productsRef.child(req.params.id).remove()
           res.status(200).send({ message: 'product deleted successfully.' })
         })

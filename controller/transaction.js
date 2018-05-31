@@ -1,24 +1,8 @@
 const transaction = require('../models').transaction;
 const jwt = require('jsonwebtoken')
+const db = require('../models')
 
 module.exports = {
-
-  create(req, res) {
-    var decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
-    return transaction
-      .create({
-        userId: decoded.id,
-        paymentId: req.body.paymentId,
-        productId: req.body.productId,
-        aladinPrice: req.body.aladinPrice,
-        number: req.body.phoneNumber,
-        status: "PENDING",
-      })
-      .then((data) => {
-        res.status(200).send(data)
-      })
-      .catch(err => res.send(err))
-  },
 
   allPendingByUser(req, res) {
     var decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
@@ -69,15 +53,15 @@ module.exports = {
   },
 
   byId(req, res) {
-    return transaction
-      .findOne({
-        where: {
-          id: parseInt(req.params.id)
-        },
-        include: [
-          { all: true }
-        ]
-      })
+    // return transaction
+    console.log('id', req.params.id)
+    db.transaction.findById(req.params.id, {
+      include: [
+        { model: db.payment },
+        { model: db.product },
+        { model: db.virtualAccount }
+      ]
+    })
       .then(data => {
         data.payment.availableBanks = JSON.parse(data.payment.availableBanks)
         res.send(data)
@@ -85,5 +69,33 @@ module.exports = {
 
       .catch(err => res.status(400).send(err))
   },
+
+  // byId(req, res) {
+  //   console.log('id', req.params.id)
+  //   db.transaction.findById(req.params.id, {
+  //   })
+  //     .then(dataTransaction => {
+  //       db.payment.findOne({
+  //         where: {
+  //           id: dataTransaction.paymentId
+  //         }
+  //       })
+  //       .then(dataPayment => {
+  //         db.virtualAccount.findOne({
+  //           where:{
+  //             id: dataTransaction.virtualId
+  //           }
+  //         })
+  //         .then(dataFinal => {
+  //           res.send({
+  //             dataTransaction,
+  //             dataPayment,
+  //             dataFinal
+  //           })
+  //         })
+  //       })
+  //     })
+  //     .catch(err => res.status(400).send(err))
+  // },
 
 };

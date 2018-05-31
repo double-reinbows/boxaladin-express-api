@@ -5,8 +5,15 @@ var logger = require('morgan');
 var cors = require('cors')
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-var isDevelop = process.env.NODE_ENV || 'development';
-var envPath = isDevelop ? path.resolve('.env.dev') : path.resolve('.env');
+var nodeEnv = process.env.NODE_ENV;
+if (nodeEnv === 'development') {
+  var envPath = path.resolve('.env.dev');
+} else if (nodeEnv === 'test') {
+  var envPath = path.resolve('.env.test');
+} else if (nodeEnv === 'production') {
+  var envPath = path.resolve('.env.prod');
+}
+// var envPath = nodeEnv === 'development' ? path.resolve('.env.dev') : path.resolve('.env.prod');
 console.log('author: ',process.env.AUTHOR);
 console.log('envPath: ',envPath);
 require('dotenv').config({path: envPath})
@@ -36,7 +43,12 @@ var reward = require('./routes/reward');
 var claim = require('./routes/claim');
 var admin = require('./routes/admin');
 var lose = require('./routes/gamecount');
+<<<<<<< HEAD
 var cms = require('./routes/cms')
+=======
+var cms = require('./routes/cms');
+var history = require('./routes/history');
+>>>>>>> testing
 
 var app = express();
 app.use(cors())
@@ -60,10 +72,18 @@ app.use('/', index);
 app.use('/users', users);
 app.use('/win', win);
 app.use('/reward', reward);
+<<<<<<< HEAD
 app.use('/claim',  claim);
 app.use('/admin',  admin);
 app.use('/lose',  lose);
 app.use('/cms',  cms)
+=======
+app.use('/claim', claim);
+app.use('/admin', admin);
+app.use('/lose', lose);
+app.use('/cms', cms);
+app.use('/history', history);
+>>>>>>> testing
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

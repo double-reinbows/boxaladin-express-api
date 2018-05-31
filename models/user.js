@@ -97,6 +97,11 @@ module.exports = function(sequelize, DataTypes) {
       as: 'claims',
     });
 
+    user.hasMany(models.aladinkeyLog, {
+      foreignKey: 'userId',
+      as: 'aladinkeyLogs',
+    })
+
   };
 
   return user;

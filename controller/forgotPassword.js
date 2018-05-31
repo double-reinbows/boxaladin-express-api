@@ -45,7 +45,82 @@ module.exports = {
         awsHelper.sendEmail({
           email_destinations: [emailFilter],
           email_subject: `Box Aladin RESET PASSWORD`,
-          email_text: `Click here to RESET Your password: ${process.env.BA_WEB_HOST}/resetpassword?email=${emailFilter}&encoded=${emailToken}`,
+          email_text: `
+          <!DOCTYPE html>
+                  <html>
+                    <head>
+                      <meta charset="utf-8">
+                      <link rel="stylesheet" href="email.css">
+                      <title></title>
+                    </head>
+                    <body style="
+                      width: 50%;
+                      margin: auto;
+                    ">
+                      <header style="
+                        padding-top: 5%;
+                        padding-bottom: 2%;
+                        border-bottom: 5px #FCCD06 solid;
+                        text-align: center;
+                      ">
+                        <img src="https://s3-ap-southeast-1.amazonaws.com/boxaladin.com/BoxAladin.png" style="
+                          height: 100px;
+                        "/>
+                      </header>
+                      <p style="
+                        text-align: center;
+                        padding: 2%;
+                        font-size: 34px;
+                      ">Halo !
+                      </p>
+                      <p style="
+                        text-align: center;
+                        font-size: 30px;
+                      ">
+                      Seseorang baru saja mengajukan permintaan untuk mengganti
+                      password pada email ${userResult.typedEmail}. Untuk mengganti
+                      password, klik link dibawah ini:
+                      </p>
+                      <a href="${process.env.BA_WEB_HOST}/resetpassword?email=${emailFilter}&encoded=${emailToken}">
+                      <p style="
+                        text-align: center;
+                        font-size: 30px;
+                        padding: 5%;
+                      ">
+                        UBAH PASSWORD
+                      </p>
+                      </a>
+                      <div style="
+                        width: 100%;
+                        padding-bottom: 5%;
+                        border-bottom: 5px #FCCD06 solid;
+                        text-align: center;
+                      ">
+                      <p style="
+                        text-align: center;
+                        font-size: 30px;
+                      ">
+                      Jika kamu tidak mengajukan permintaan ini, abaikan email ini.
+Password tidak akan terganti jika kamu tidak meng-klik link di
+atas dan membuat password yang baru.
+                      </p>
+                      </div>
+
+                      <p style="
+                        text-align:center;
+                        font-size:25px;
+                      ">
+                        <b>Semakin Dilihat, Semakin Murah!</b>
+                      </p>
+
+                      <p style="
+                        text-align:center;
+                      ">
+                        Terima Kasih, Box Aladin
+                      </p>
+                    </body>
+                  </html>
+          `,
           email_source: `no-reply@boxaladin.com`,
           email_return_path: `no-reply@boxaladin.com`,
         })

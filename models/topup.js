@@ -4,7 +4,9 @@ module.exports = (sequelize, DataTypes) => {
     userId: DataTypes.INTEGER,
     keyId: DataTypes.INTEGER,
     paymentId: DataTypes.INTEGER,
-    xenditId: DataTypes.STRING
+    xenditId: DataTypes.STRING,
+    virtualId: DataTypes.INTEGER,
+    status:  DataTypes.STRING
   }); 
 
   topup.associate = (models) => {
@@ -17,7 +19,9 @@ module.exports = (sequelize, DataTypes) => {
     topup.belongsTo(models.payment, {
       foreignKey: 'paymentId',
     });   
-
+    topup.belongsTo(models.virtualAccount, {
+      foreignKey: 'virtualId',
+    });   
   };
   return topup;
 };

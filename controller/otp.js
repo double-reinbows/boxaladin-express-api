@@ -10,8 +10,9 @@ module.exports = {
         email: req.body.email
       }
     })
-    .then( user => {
-      if (json.rc === '00'){
+    .then(dataUser => {
+      console.log('user', dataUser)
+      if (json.rc === '00' || json.rc == '06'){
         var phone = json.token
         var splitNumber = phone.split('')
         if (splitNumber[0] === '0') {
@@ -35,20 +36,20 @@ module.exports = {
         },{
           where: {
             number: req.body.phonenumber,
-            userId: user.id
+            userId: dataUser.id
           }
         })
         .then(dataHpUser => {
           console.log('otp sent')
         })
         .catch(err => console.log(err))
-        } else if (json.rc == '34' || json.rc == '06'){
+        } else if (json.rc == '34'){
           db.phonenumber.update({
             otp: json.rc
           },{
             where: {
               number: req.body.phonenumber,
-              userId: user.id
+              userId: dataUser.id
             }
           })
           .then(updatePhone => {
@@ -62,7 +63,7 @@ module.exports = {
           },{
             where: {
               number: req.body.phonenumber,
-              userId: user.id
+              userId: dataUser.id
             }
           })
           .then(updatePhone => {
@@ -80,7 +81,7 @@ module.exports = {
 
     var phone = req.body.phonenumber
     var splitNumber = phone.split('')
-  
+
     if (splitNumber[0] === '0') {
       splitNumber.splice(0, 1, '0')
       var newNumber = splitNumber.join('')

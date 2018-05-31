@@ -47,25 +47,34 @@ module.exports = {
                       ]
                     })
                     .then((resultTopUp)=>{
-                      db.user.findOne({
-                        where:{
-                          id: resultTopUp.dataValues.userId
+                      db.topup.update({
+                        status: "PAID"
+                      }, {
+                        where: {
+                          xenditId: xenditExternalid
                         }
                       })
-                      .then((resultUser) => {
-                        console.log('resultuser')
-                        var key = parseInt(resultUser.dataValues.aladinKeys) + parseInt(resultTopUp.key.dataValues.keyAmount)
-                        db.user.update({
-                          aladinKeys: key
-                        },{
+                      .then(dataUpdate =>{
+                        db.user.findOne({
                           where:{
-                            id: resultUser.dataValues.id
+                            id: resultTopUp.dataValues.userId
                           }
                         })
-                        .then((result) => {
-                          res.send(result)
+                        .then((resultUser) => {
+                          var key = parseInt(resultUser.dataValues.aladinKeys) + parseInt(resultTopUp.key.dataValues.keyAmount)
+                          db.user.update({
+                            aladinKeys: key
+                          },{
+                            where:{
+                              id: resultUser.dataValues.id
+                            }
+                          })
+                          .then((result) => {
+                            res.send(result)
+                          })
+                          .catch(error =>res.status(400).send(error));
                         })
-                        .catch(error =>res.status(400).send(error));
+                        .catch(error => res.status(400).send(error));
                       })
                       .catch(error => res.status(400).send(error));
                     })
@@ -124,8 +133,6 @@ module.exports = {
     }
   },
 
-}
-
     // Contoh payload yang dikirim dari xendit:
     // {
     //   id: "579c8d61f23fa4ca35e52da4",
@@ -144,3 +151,115 @@ module.exports = {
     //   adjusted_received_amount: 47500,
     //   updated: "2016-10-10T08:15:03.404Z",
     //   created: "2016-10-10T08:15:03.404Z"
+
+    //payload fixed VA
+  //   {
+  //     id: "58a435201b6ce2a355f46070",
+  //     owner_id: "5824128aa6f9f9b648be9d76",
+  //     external_id: "fixed-va-1487156410",
+  //     merchant_code: "88608",
+  //     account_number: "886081000123456",
+  //     bank_code: "MANDIRI",
+  //     name: "John Doe",
+  //     is_closed: false,
+  //     expiration_date: "2048-02-15T11:01:52.722Z",
+  //     is_single_use: false,
+  //     status: "ACTIVE",
+  //     created: "2017-02-15T11:01:52.896Z",
+  //     updated: "2017-02-15T11:01:52.896Z"
+  // }
+
+    callBackFixedXendit(req, res) {
+      console.log('xendit req body', req.body)
+      if(req.headers['x-callback-token']!==undefined && req.headers['x-callback-token']===process.env.XENDIT_TOKEN)
+      {      
+        const xenditExternalid = req.body.external_id;
+        db.payment.findOne({
+          where: {
+            xenditId : xenditExternalid
+          }
+        })
+        .then(data => {
+          if (!data) {
+            return res.status(404).send({
+              message: 'Id Not Found',
+            });
+          }else{
+            if(data.status === 'PENDING'){
+              console.log('update payment');
+              db.payment.update({
+                status: 'PAID'
+              },{
+                where:{
+                  xenditId: xenditExternalid
+                }
+              })
+              .then(() => {
+                console.log('cari transaction sesuai xenditId', xenditExternalid);
+                db.transaction.findOne({
+                  where:{
+                    pulsaId: xenditExternalid
+                  }
+                })
+                .then((resultTransaction) => {
+                  if(resultTransaction === null){
+                    db.topup.findOne({
+                      where:{
+                        xenditId: xenditExternalid
+                      },
+                      include:[
+                        {all:true}
+                      ]
+                    })
+                    .then( resultTopUp => {
+                      console.log('update topup')
+                      db.topup.update({
+                        status: "PAID"
+                      }, {
+                        where: {
+                          xenditId: xenditExternalid
+                        }
+                      })
+                      .then(dataUpdate =>{
+                        db.user.findOne({
+                          where:{
+                            id: resultTopUp.dataValues.userId
+                          }
+                        })
+                        .then((resultUser) => {
+                          var key = parseInt(resultUser.dataValues.aladinKeys) + parseInt(resultTopUp.key.dataValues.keyAmount)
+                          db.user.update({
+                            aladinKeys: key
+                          },{
+                            where:{
+                              id: resultUser.dataValues.id
+                            }
+                          })
+                          .then((result) => {
+                            res.send(result)
+                          })
+                          .catch(error =>res.status(400).send(error));
+                        })
+                        .catch(error => res.status(400).send(error));
+                      })
+                      .catch(error => res.status(400).send(error));
+                    })
+                    .catch(error => res.status(400).send(error));
+                  } else {
+                    console.log('panggil function pulsa');
+                    pulsa.pulsa(req,res)
+                  }
+                })
+                .catch(error => res.status(400).send(error));
+              })
+              .catch(error => res.status(400).send(error));
+            } else {
+              return res.send("Callback Xendit Failed")
+            }
+          }})
+          .catch(error => res.status(400).send(error));
+        } else {
+            return res.status(500).send('Invalid Credentials')
+        }
+    }
+}

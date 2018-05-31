@@ -323,11 +323,12 @@ exports.signUpVerify = (req, res) => {
       }
     })
     .then(result => {
+      console.log(result)
       if (result === null){
         res.send({
-          message: 'Phone Terverifikasi'
+          message: 'Hp pernah diverifikasi'
         })
-      } else{
+      } else {
         console.log(result)
         if (result.otp == req.body.otp) {
           db.phonenumber.update({

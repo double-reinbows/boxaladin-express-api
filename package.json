@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "serve": "NODE_ENV=production AUTHOR=ko rei nodemon ./bin/www",
+    "prod": "NODE_ENV=production AUTHOR=korei nodemon ./bin/www",
     "test": "NODE_ENV=test AUTHOR=andrew nodemon /bin/www",
     "testmocha": "NODE_ENV=test mocha --timeout 10000",
     "antomocha": "NODE_ENV=test mocha test/payment_test --timeout 10000",

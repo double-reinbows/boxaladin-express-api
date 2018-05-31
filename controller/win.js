@@ -51,7 +51,7 @@ module.exports = {
         }
       })
       .then(result => {
-        if (result <= 3) {
+        if (result <= 5) {
           res.send({
             result,
             coin : dataUser.coin
@@ -61,7 +61,7 @@ module.exports = {
             message : 'limit habis',
             coin : dataUser.coin
           })
-        } else if ( result > 3){
+        } else if ( result > 5){
           res.send ({
             message : 'limit habis',
             coin : dataUser.coin

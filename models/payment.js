@@ -5,7 +5,8 @@ module.exports = (sequelize, DataTypes) => {
     xenditId: DataTypes.STRING,
     status: DataTypes.STRING,
     amount: DataTypes.INTEGER,
-    availableBanks: DataTypes.TEXT
+    availableBanks: DataTypes.TEXT,
+    availableretail: DataTypes.TEXT
   });
 
   payment.associate = (models) => {

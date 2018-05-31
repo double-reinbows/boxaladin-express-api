@@ -21,10 +21,12 @@ const brandController = require('../controller/brand')
 const productController = require('../controller/product')
 
 const firebaseHelper = require('../helpers/firebase')
-const aladinController = require('../controller/aladin')
+const biddingController = require('../controller/biddingController')
 
 const forgotPassword = require('../controller/forgotPassword')
 const auth = require('../helpers/auth')
+
+const gameRuleController = require('../controller/gamerule');
 
 router.get('/sandbox', (req, res) => {
   let decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
@@ -38,7 +40,7 @@ router.get('/sandbox', (req, res) => {
 router.post('/forgotpassword', forgotPassword.requestViaEmail)
 router.post('/resetpassword', forgotPassword.reset)
 
-router.post('/unlockPrice', aladinController.decreaseAladinPrice)
+router.post('/unlockPrice', biddingController.decreaseAladinPrice)
 router.get('/firebase', firebaseHelper.syncToFirebase)
 
 router.get("/", auth.isLogin, auth.isSuperadmin, ctrl.getAll);
@@ -65,14 +67,17 @@ router.post('/olduserotp', otpCtrl.oldUserSentotp)
 router.post('/olduserverification', phoneCtrl.oldUserVerify)
 
 //-------------------xendit routes-------------------------
+router.post('/virtualaccount', paymentController.createVirtualAccount)
 router.post('/payment', paymentController.createInvoice)
 router.get('/payment/:id', paymentController.retrieveInvoice)
 // router.get('/status/:id/:invoice', paymentController.updateStatus)
 router.post('/callbackurl', callbackController.createCallbackXendit)
+router.post('/callbackfixed', callbackController.callBackFixedXendit)
 router.post('/creditCard', creditCardController.createCreditCard)
 // ---------------------------------------
 
 router.post('/topupKey', topUpController.topUpKeys)
+router.post('/topupva', topUpController.createVirtualAccount )
 router.get('/voucheraladinkey', topUpController.all)
 router.get('/topup/user', topUpController.allByUser)
 router.get('/topup/userpending', topUpController.allPendingByUser)
@@ -85,7 +90,6 @@ router.post('/pulsacallbackurl', callbackController.createCallbackPulsa)
 // -----------------------------------------------------------
 
 // ------------------transaction routes----------------------------
-router.post('/transaction', transactionController.create)
 router.get('/transaction/userPending', transactionController.allPendingByUser)
 router.get('/transaction/user', transactionController.allByUser)
 router.get('/transaction/:id', transactionController.byId)
@@ -109,5 +113,7 @@ router.get('/api/product/:id', productController.retrieve);
 router.post('/api/product', productController.create);
 router.put('/api/product/:id', productController.update);
 router.delete('/api/product/:id', productController.destroy);
+
+router.get('/gamerules', gameRuleController.all);
 
 module.exports = router;

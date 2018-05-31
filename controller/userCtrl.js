@@ -68,11 +68,12 @@ exports.getUser = (req, res) => {
       familyName: result.familyName,
       sex: result.sex,
       email: result.email,
+      typedEmail : result.typedEmail,
       emailVerified: result.emailVerified,
       aladinKeys: result.aladinKeys,
-      coin: result.coin
+      coin: result.coin,
+      typedEmail: result.typedEmail
     }
-
     res.send(userInfo)
   })
   .catch(err => res.send(err))

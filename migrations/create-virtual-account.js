@@ -1,16 +1,21 @@
 'use strict';
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('aladinKeys', {
+    return queryInterface.createTable('virtualAccounts', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      decreasePrice: {
-        allowNull: false,
+      userId: {
         type: Sequelize.INTEGER
+      },
+      bankCode: {
+        type: Sequelize.STRING
+      },
+      virtualAccountNumber: {
+        type: Sequelize.STRING
       },
       createdAt: {
         allowNull: false,
@@ -23,6 +28,6 @@ module.exports = {
     });
   },
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('aladinKeys');
+    return queryInterface.dropTable('virtualAccounts');
   }
 };

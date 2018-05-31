@@ -13,7 +13,11 @@ module.exports = (sequelize, DataTypes) => {
     stock:DataTypes.INTEGER,
     price:DataTypes.INTEGER,
     aladinPrice:DataTypes.INTEGER,
-    pulsaCode:DataTypes.STRING
+    pulsaCode:DataTypes.STRING,
+    displayPrice:DataTypes.INTEGER,
+    decreasePrice: DataTypes.INTEGER,
+    opened: DataTypes.INTEGER,
+    sold: DataTypes.INTEGER
   });
 
   product.associate = (models) => {
@@ -28,6 +32,10 @@ module.exports = (sequelize, DataTypes) => {
     product.hasMany(models.transaction, {
       foreignKey: 'productId',
       as: 'transactions',
+    })
+    product.hasMany(models.aladinkeyLog, {
+      foreignKey: 'productId',
+      as: 'aladinkeyLogs',
     })
   };
 

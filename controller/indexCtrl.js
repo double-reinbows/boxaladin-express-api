@@ -22,7 +22,6 @@ const SECRET = 'aradin'
 let gmailDotCheck = obj => {
   let pattern = /(\w+)\.(\w+)@gmail.com/
   if (pattern.test(obj.email)) {
-    obj.typedEmail = obj.email
     obj.email = obj.email.replace(pattern, `$1$2@gmail.com`)
   }
   return obj
@@ -38,7 +37,6 @@ const handleDotGmail = (obj) => {
     let userWithoutDot = user.split('.').join('')
     var result = userWithoutDot + '@gmail.com'
 
-    obj.typedEmail = obj.email
     obj.email = result
 
     return console.log(result)
@@ -95,7 +93,8 @@ exports.signin = (req, res) => {
           firstName: user.firstName,
           familyName: user.familyName,
           sex: user.sex,
-          emailVerified: user.emailVerified
+          emailVerified: user.emailVerified,
+          typedEmail: user.typedEmail
         },
         process.env.JWT_SECRET
       );
@@ -114,7 +113,7 @@ exports.signin = (req, res) => {
   })
 }
 
-const sendEmailVerification = (email_address, emailToken) => {
+const sendEmailVerification = (email_address, emailToken, typedEmail) => {
   // const decoded = jwt.verify(req.body.token, process.env.JWT_SECRET)
 
   // const emailToken = jwt.sign({
@@ -138,15 +137,161 @@ const sendEmailVerification = (email_address, emailToken) => {
       Body: {
         Html: {
           Charset: 'UTF-8',
-          Data: `Click this link to verify your email address: ${
-            process.env.BA_WEB_HOST
-          }/emailVerification?email=${email_address}&encoded=${emailToken}`
+          Data: `
+          <!DOCTYPE html>
+                  <html>
+                    <head>
+                      <meta charset="utf-8">
+                      <link rel="stylesheet" href="email.css">
+                      <title></title>
+                    </head>
+                    <body style="
+                      width: 50%;
+                      margin: auto;
+                    ">
+                      <header style="
+                        padding-top: 5%;
+                        padding-bottom: 2%;
+                        border-bottom: 5px #FCCD06 solid;
+                        text-align: center;
+                      ">
+                        <img src="https://s3-ap-southeast-1.amazonaws.com/boxaladin.com/BoxAladin.png" style="
+                          height: 100px;
+                        "/>
+                      </header>
+                      <p style="
+                        text-align: center;
+                        padding: 6%;
+                        font-size: 34px;
+                      ">Halo !
+                      </p>
+                      <p style="
+                        text-align: center;
+                        font-size: 30px;
+                      ">
+                        Kamu baru saja mendaftarkan email ${typedEmail}
+                        sebagai akun baru di Boxaladin. Untuk memastikan email ini
+                        milik kamu, klik link dibawah ini:
+                      </p>
+                      <p style="
+                        text-align: center;
+                        font-size: 30px;
+                        padding: 5%;
+                      ">
+                        KLIK GAMBAR DI BAWAH INI UNTUK VERIFIKASI
+                      </p>
+                      <div style="
+                        width: 100%;
+                        padding-bottom: 5%;
+                        border-bottom: 5px #FCCD06 solid;
+                        text-align: center;
+                      ">
+                        <a href="${process.env.BA_WEB_HOST}/emailVerification?email=${email_address}&encoded=${emailToken}">
+                          <img src="https://s3-ap-southeast-1.amazonaws.com/boxaladin.com/logo.png" style="
+                            height: 200px;
+                          " />
+                        </a>
+                      </div>
+                      <p style="
+                        text-align: center;
+                        font-size: 25px;
+                      ">
+                        ATAU KLIK LINK DI BAWAH INI
+                      </p>
+
+                      <p style="
+                        text-align:center;
+                      ">
+                        ${process.env.BA_WEB_HOST}/emailVerification?email=${email_address}&encoded=${emailToken}
+                      </p>
+
+                      <p style="
+                        text-align:center;
+                      ">
+                        Terima Kasih, Box Aladin
+                      </p>
+                    </body>
+                  </html>
+          `
         },
         Text: {
           Charset: 'UTF-8',
-          Data: `Click this link to verify your email address: ${
-            process.env.BA_WEB_HOST
-          }/emailVerification?email=${email_address}&encoded=${emailToken}`
+          Data: `
+          <!DOCTYPE html>
+                  <html>
+                    <head>
+                      <meta charset="utf-8">
+                      <link rel="stylesheet" href="email.css">
+                      <title></title>
+                    </head>
+                    <body style="
+                      width: 50%;
+                      margin: auto;
+                    ">
+                      <header style="
+                        padding-top: 5%;
+                        padding-bottom: 2%;
+                        border-bottom: 5px #FCCD06 solid;
+                        text-align: center;
+                      ">
+                        <img src="https://s3-ap-southeast-1.amazonaws.com/boxaladin.com/BoxAladin.png" style="
+                          height: 100px;
+                        "/>
+                      </header>
+                      <p style="
+                        text-align: center;
+                        padding: 6%;
+                        font-size: 34px;
+                      ">Halo !
+                      </p>
+                      <p style="
+                        text-align: center;
+                        font-size: 30px;
+                      ">
+                        Kamu baru saja mendaftarkan email ${typedEmail}
+                        sebagai akun baru di Boxaladin. Untuk memastikan email ini
+                        milik kamu, klik link dibawah ini:
+                      </p>
+                      <p style="
+                        text-align: center;
+                        font-size: 30px;
+                        padding: 5%;
+                      ">
+                        KLIK GAMBAR DI BAWAH INI UNTUK VERIFIKASI
+                      </p>
+                      <div style="
+                        width: 100%;
+                        padding-bottom: 5%;
+                        border-bottom: 5px #FCCD06 solid;
+                        text-align: center;
+                      ">
+                        <a href="${process.env.BA_WEB_HOST}/emailVerification?email=${email_address}&encoded=${emailToken}">
+                          <img src="https://s3-ap-southeast-1.amazonaws.com/boxaladin.com/logo.png" style="
+                            height: 200px;
+                          " />
+                        </a>
+                      </div>
+                      <p style="
+                        text-align: center;
+                        font-size: 25px;
+                      ">
+                        ATAU KLIK LINK DI BAWAH INI
+                      </p>
+
+                      <p style="
+                        text-align:center;
+                      ">
+                        ${process.env.BA_WEB_HOST}/emailVerification?email=${email_address}&encoded=${emailToken}
+                      </p>
+
+                      <p style="
+                        text-align:center;
+                      ">
+                        Terima Kasih, Box Aladin
+                      </p>
+                    </body>
+                  </html>
+          `
         }
       },
       Subject: {
@@ -245,27 +390,29 @@ exports.signup = (req, res) => {
             req.body.aladinKeys = 0
             req.body.coin = 0
             req.body.emailToken = genRandomString(128)
-      
+            typedEmail = req.body.typedEmail
+            console.log('reqbody', req.body)
             // CREATE USER
             db.user.create(req.body)
-            .then(data => {      
+            .then(data => {
               var token = jwt.sign({
                 id: data.id,
                 username: data.username,
                 email: data.email,
+                typedEmail: data.typedEmail,
                 emailVerified: data.emailVerified,
                 firstName: data.firstName,
                 familyName: data.familyName,
                 sex: data.sex,
-              },process.env.JWT_SECRET)      
-                sendEmailVerification(data.email, data.emailToken)
-      
+              },process.env.JWT_SECRET)
+                sendEmailVerification(data.email, data.emailToken, data.typedEmail)
+
                 // CREATE PHONE
                 db.phonenumber.create({
                   userId: data.id,
                   number: req.body.phonenumber,
                   verified: false,
-                  otp:randomOtp,
+                  otp:0,
                   primary: false
                 })
                 .then(dataPhone => {

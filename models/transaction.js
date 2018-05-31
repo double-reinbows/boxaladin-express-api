@@ -8,7 +8,8 @@ module.exports = (sequelize, DataTypes) => {
     aladinPrice: DataTypes.INTEGER,
     number: DataTypes.STRING,
     status: DataTypes.STRING,
-    description: DataTypes.STRING
+    description: DataTypes.STRING,
+    virtualId : DataTypes.INTEGER
   });
 
   transaction.associate = (models) => {
@@ -21,6 +22,9 @@ module.exports = (sequelize, DataTypes) => {
     transaction.belongsTo(models.user, {
       foreignKey: 'userId',
     });
+    transaction.belongsTo(models.virtualAccount, {
+      foreignKey: 'virtualId'
+    })
     
   };
 

@@ -4,14 +4,15 @@ module.exports={
   sendEmailService(req,res) {
     recevier: req.body.receiver
     email: req.body.email
+    phone: req.body.phone
     subject: req.body.subject
     content: req.body.content
-    sendEmailVerification(req.body.email, req.body.receiver, req.body.subject, req.body.content)
+    sendEmailVerification(req.body.email, req.body.phone, req.body.receiver, req.body.subject, req.body.content)
     res.send(req.body)
   }
 }
 
-const sendEmailVerification = (email, receiver, subject, content) => {
+const sendEmailVerification = (email, phone, receiver, subject, content) => {
   // const decoded = jwt.verify(req.body.token, process.env.JWT_SECRET)
 
   // const emailToken = jwt.sign({
@@ -35,11 +36,11 @@ const sendEmailVerification = (email, receiver, subject, content) => {
       Body: {
         Html: {
           Charset: 'UTF-8',
-          Data: `from ${email} : ${content}`
+          Data: `from ${email}, ${phone} : ${content}`
         },
         Text: {
           Charset: 'UTF-8',
-          Data: `from ${email} : ${content}`
+          Data: `from ${email}, ${phone} : ${content}`
         }
       },
       Subject: {
