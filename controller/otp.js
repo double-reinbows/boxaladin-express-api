@@ -5,6 +5,7 @@ const citcall = require('./phoneCtrl')
 
 module.exports = {
   updateOtp(req, res, json){
+    console.log(json)
     db.user.findOne({
       where: {
         email: req.body.email

@@ -53,8 +53,9 @@ module.exports = {
 							.then(createLog => {
 								console.log('opened', product.opened)
 								// update di firebase
-		
-								const productsRef = firebase.database().ref().child('productsdummy')
+
+								// const productsRef = firebase.database().ref().child('productsdummy')
+								const productsRef = firebase.database().ref().child('products')
 								productsRef.child(result.id).update({
 									id: result.id,
 									// productName: result.productName,
@@ -65,12 +66,12 @@ module.exports = {
 									// brandId: result.brand.id,
 									// categoryId: result.category.id
 								}, function() {
-		
+
 									return res.send({
 										message: 'success',
 										data: result
 									})
-		
+
 								})
 							})
 							.catch(err => res.send(err))

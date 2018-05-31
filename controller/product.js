@@ -99,7 +99,8 @@ module.exports = {
           ]
         })
         .then(result => {
-          const productsRef = firebase.database().ref().child('productsdummy')
+          // const productsRef = firebase.database().ref().child('productsdummy')
+          const productsRef = firebase.database().ref().child('products')
   				productsRef.child(result.id).set({
   					id: result.id,
   					productName: result.productName,
@@ -143,7 +144,8 @@ module.exports = {
           })
           .then(result => {
             // tulis hasil uppdate ke firebase di sini
-            const productsRef = firebase.database().ref().child('productsdummy')
+            // const productsRef = firebase.database().ref().child('productsdummy')
+            const productsRef = firebase.database().ref().child('products')
     				productsRef.child(result.id).update({
     					id: result.id,
     					productName: result.productName,
@@ -174,7 +176,8 @@ module.exports = {
         .destroy()
         .then(result => {
           // hapus data di firebase sesuai id dari result
-          const productsRef = firebase.database().ref().child('productsdummy')
+          // const productsRef = firebase.database().ref().child('productsdummy')
+          const productsRef = firebase.database().ref().child('products')
   				productsRef.child(req.params.id).remove()
           res.status(200).send({ message: 'product deleted successfully.' })
         })

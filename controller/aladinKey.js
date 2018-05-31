@@ -178,7 +178,7 @@ module.exports = {
       return res.send({ msg: 'not verified user' })
     }
 
-    let virtualAccountNumber = ''    
+    let virtualAccountNumber = ''
     return db.key.findById(req.body.keyId)
     .then(data => {
       if (!data) {
@@ -215,11 +215,11 @@ module.exports = {
             if (result === null) {
               console.log('masuk if')
               if (req.body.bankCode === 'BRI') {
-                virtualAccountNumber = 9999000000 + decoded.id
+                virtualAccountNumber = 1268000000 + decoded.id
               } else if ( req.body.bankCode === 'MANDIRI') {
-                  virtualAccountNumber = 9999000000 + decoded.id
+                  virtualAccountNumber = 1268000000 + decoded.id
               } else if ( req.body.bankCode === 'BNI') {
-                  virtualAccountNumber = 9999000000 + decoded.id
+                  virtualAccountNumber = 126800000000 + decoded.id
               }
               const va = virtualAccountNumber.toString()
               axios({
@@ -313,6 +313,7 @@ module.exports = {
               });
             } else {
               console.log('masuk else')
+              console.log(isodate)
               axios({
                 method: 'POST',
                 url: `https://api.xendit.co/callback_virtual_accounts`,
@@ -392,15 +393,15 @@ module.exports = {
                 } else {
                   res.send(error.response.data)
                 }
-              });       
+              });
             }
-          })  
+          })
           .catch(err => res.status(400).send(err));
         })
         .catch(err => res.status(400).send(err));
       })
       .catch(err => res.status(400).send(err));
     })
-    .catch(err => res.status(400).send(err));  
+    .catch(err => res.status(400).send(err));
   }
 };

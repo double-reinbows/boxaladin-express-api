@@ -12,14 +12,18 @@ module.exports = {
           userId: decoded.id,
           status: "PENDING"
         },
-        include: [{ all: true }]
+        include: [
+          { model: db.payment },
+          { model: db.product },
+          { model: db.virtualAccount }
+        ]
       })
       .then((data) => {
-        data.map(transaction => {
-          if (transaction.payment) {
-            transaction.payment.availableBanks = JSON.parse(transaction.payment.availableBanks)
-          }
-        });
+        // data.map(transaction => {
+        //   if (transaction.payment) {
+        //     transaction.payment.availableBanks = JSON.parse(transaction.payment.availableBanks)
+        //   }
+        // });
         res.send(data);
       })
 
@@ -34,15 +38,16 @@ module.exports = {
           userId: decoded.id
         },
         include: [
-          { all: true }
-        ]
+          { model: db.payment },
+          { model: db.product },
+          { model: db.virtualAccount }        ]
       })
       .then(data => {
-        data.map(transaction => {
-          if (transaction.payment) {
-            transaction.payment.availableBanks = JSON.parse(transaction.payment.availableBanks)
-          }
-        })
+        // data.map(transaction => {
+        //   if (transaction.payment) {
+        //     transaction.payment.availableBanks = JSON.parse(transaction.payment.availableBanks)
+        //   }
+        // })
         res.send(data)
       })
 
@@ -63,7 +68,7 @@ module.exports = {
       ]
     })
       .then(data => {
-        data.payment.availableBanks = JSON.parse(data.payment.availableBanks)
+        // data.payment.availableBanks = JSON.parse(data.payment.availableBanks)
         res.send(data)
       })
 
