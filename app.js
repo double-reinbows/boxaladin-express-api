@@ -43,12 +43,8 @@ var reward = require('./routes/reward');
 var claim = require('./routes/claim');
 var admin = require('./routes/admin');
 var lose = require('./routes/gamecount');
-<<<<<<< HEAD
-var cms = require('./routes/cms')
-=======
 var cms = require('./routes/cms');
 var history = require('./routes/history');
->>>>>>> testing
 
 var app = express();
 app.use(cors())
@@ -72,18 +68,11 @@ app.use('/', index);
 app.use('/users', users);
 app.use('/win', win);
 app.use('/reward', reward);
-<<<<<<< HEAD
-app.use('/claim',  claim);
-app.use('/admin',  admin);
-app.use('/lose',  lose);
-app.use('/cms',  cms)
-=======
 app.use('/claim', claim);
 app.use('/admin', admin);
 app.use('/lose', lose);
 app.use('/cms', cms);
 app.use('/history', history);
->>>>>>> testing
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
