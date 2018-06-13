@@ -370,12 +370,13 @@ exports.signup = (req, res) => {
         db.phonenumber.findOne({
           where: {
             number: req.body.phonenumber,
-            primary : true
+            primary : true,
+            verified: true,
           }
         })
         .then(result => {
           let phoneIsUsed = {}
-          if (result !== null) {
+          if (result) {
             res.send({
               phoneIsUsed
             })
@@ -413,7 +414,7 @@ exports.signup = (req, res) => {
                   number: req.body.phonenumber,
                   verified: false,
                   otp:0,
-                  primary: false
+                  primary: true,
                 })
                 .then(dataPhone => {
                   otpCitCall.otp(req, res, data)
