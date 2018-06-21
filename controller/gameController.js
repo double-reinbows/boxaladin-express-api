@@ -41,7 +41,7 @@ module.exports = {
             const winToken = genRandomString(128);
             db.win.create({
               userId: decoded.id,
-              gameRuleId: 1, //TODO: maybe randomise on gamerule and tell frontend what User won
+              gameRuleId: [4, 5], //TODO: maybe randomise on gamerule and tell frontend what User won
               winToken: winToken,
             })
             .then((data) => {
@@ -49,7 +49,7 @@ module.exports = {
             });
           } else if (((gc.dataValues.count + 1) >= 100) && ((gc.dataValues.count + 1) % 100 === 0)) {
             const winToken = genRandomString(128);
-            let winOptions = [2, 3];
+            let winOptions = [4, 5];
             db.win.create({
               userId: decoded.id,
               gameRuleId: winOptions[Math.floor(Math.random()*winOptions.length)], //TODO: maybe randomise on gamerule and tell frontend what User won
