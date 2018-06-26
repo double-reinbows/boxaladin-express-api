@@ -10,7 +10,7 @@ router.get('/checkcoin/user', auth.isLogin, win.checkCoinById)
 
 // router.put('/resettoken/:id', win.resetToken)
 
-router.post('/', auth.isLogin, win.create)
+// router.post('/', auth.isLogin, win.create)
 router.post('/claimfreepulsa', auth.isLogin, win.claimFreePulsa)
 
 module.exports = router

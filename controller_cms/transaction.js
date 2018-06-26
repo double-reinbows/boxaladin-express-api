@@ -12,7 +12,6 @@ module.exports = {
     // CONTOH URL DARI FRONTEND:
     // ?page=${this.state.page}&limit=${this.state.limit}&orderBy=${this.state.orederBy}&orderDirection=${this.state.orderDirection}&filterBy=${this.state.filterBy}&filterValue=${this.state.filterValue}&startDate=${this.state.startDate}&endDate=${this.state.endDate}
 
-    console.log('--- QUERY --- :', req.query)
 
     let where = {
       paymentId: {
@@ -87,7 +86,7 @@ module.exports = {
     // CONTOH URL DARI FRONTEND:
     // ?page=${this.state.page}&limit=${this.state.limit}&orderBy=${this.state.orederBy}&orderDirection=${this.state.orderDirection}&filterBy=${this.state.filterBy}&filterValue=${this.state.filterValue}&startDate=${this.state.startDate}&endDate=${this.state.endDate}
 
-    console.log('--- QUERY --- :', req.query)
+    console.log('--- QUERY --- FREE:', req.query)
 
     let where = {
       $or: [
@@ -116,7 +115,7 @@ module.exports = {
       offset = (req.query.page - 1) * limit
     }
 
-    if (req.query.startDate !== null && req.query.endDate !== null) {
+    if (req.query.startDate && req.query.endDate) {
       where.createdAt = {
         $gte: new Date(req.query.startDate + '.00:00:00'),
         $lte: new Date(req.query.endDate + '.23:59:59')
@@ -140,5 +139,20 @@ module.exports = {
       return res.send(err)
     })
   },
+
+  allTopup: (req, res) => {
+    model.topup.findAll({
+      include: [{
+        all: true
+      }]
+    })
+  .then(result => {
+    return res.send(result)
+  })
+  .catch(err => {
+    console.log('ERROR FIND TOPUPS:', err)
+    return res.send(err)
+  })
+}
 
 }

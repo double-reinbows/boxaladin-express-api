@@ -11,17 +11,17 @@ module.exports = {
     var email1 = req.body.email
     var user = email1.split('@')[0]
     var provider = email1.split('@')[1]
-  
+
     if (provider == 'gmail.com') {
       let userWithoutDot = user.split('.').join('')
       var result = userWithoutDot + '@gmail.com'
       var emailFilter = result
     } else {
       var emailFilter = email1
-    } 
+    }
 
     let hashedPass = hasher(req.body.password)
-  
+
     model.user.findOne({
       where: {
         $or: [{
@@ -96,95 +96,94 @@ module.exports = {
   },
 
   getUserWithPhone: (req, res) => {
-    model.sequelize.query(`SELECT u.id, u.email, u."aladinKeys" FROM users AS u ORDER BY u.id ASC`, {
-      model: model.user,
+    model.user.findAll({
+      include: [{
+        all: true
+      }]
+    }).then(dataUser => {
+      res.send(dataUser)
     })
-      .then(data => {
-        res.send(data)
-      })
-      .catch(err => res.send(err))
+    .catch(err => res.send(err))
   },
 
-  // getUserWithPhone: (req, res) => {
-  //   model.user.findAll({
-  //   include: [{
-  //     all: true
-  //   }]
-  // })
-  //   .then(dataUser => {
-  //     res.send(dataUser)
-  //   })
-  //   .catch(err => res.send(err))
+  //   getAll: (req, res) => {
+  //     let where = {
+  //       id: {
+  //         $ne: 0
+  //       },
+  //     }
+
+  //     let order = []
+  //     let limit = req.query.limit || 50
+  //     let offset = 0
+
+  //     if (req.query.filterBy) {
+  //       where[req.query.filterBy] = req.query.filterValue
+  //     }
+
+  //     if (req.query.orderBy) {
+  //       order.push([ req.query.orderBy, req.query.orderDirection ])
+  //     }
+
+  //     if (req.query.page === null) {
+  //       req.query.page = 1
+  //     }
+
+  //     if (req.query.page > 1) {
+  //       offset = (req.query.page - 1) * limit
+  //     }
+
+  //     if (req.query.startDate && req.query.endDate) {
+  //       where.createdAt = {
+  //         $gte: new Date(req.query.startDate + '.00:00:00'),
+  //         $lte: new Date(req.query.endDate + '.23:59:59')
+  //       }
+  //     }
+
+  //     model.user.count()
+  //     .then(countResult => {
+
+  //       model.user.findAll({
+  //         where: where,
+  //         order: order,
+  //         limit: limit,
+  //         offset: offset,
+  //         include: [{
+  //           all: true
+  //         }],
+  //         // where: [{
+  //         //   primary: true
+  //         // }]
+  //       })
+  //       .then(result => {
+  //         return res.send({
+  //           data: result,
+  //           length: countResult
+  //         })
+  //       })
+  //       .catch(err => {
+  //         console.log('ERROR FIND USER:', err)
+  //         return res.send(err)
+  //       })
+
+  //     })
+  //     .catch(err => {
+  //       console.log('ERROR COUNT USER:', err)
+  //       return res.send(err)
+  //     })
   // },
 
-    getAll: (req, res) => {
-
-      console.log('--- QUERY --- :', req.query)
-
-      let where = {
-        id: {
-          $ne: 0
-        },
-      }
-  
-      let order = []
-      let limit = req.query.limit || 50
-      let offset = 0
-  
-      if (req.query.filterBy) {
-        where[req.query.filterBy] = req.query.filterValue
-      }
-  
-      if (req.query.orderBy) {
-        order.push([ req.query.orderBy, req.query.orderDirection ])
-      }
-  
-      if (req.query.page === null) {
-        req.query.page = 1
-      }
-  
-      if (req.query.page > 1) {
-        offset = (req.query.page - 1) * limit
-      }
-  
-      if (req.query.startDate && req.query.endDate) {
-        where.createdAt = {
-          $gte: new Date(req.query.startDate + '.00:00:00'),
-          $lte: new Date(req.query.endDate + '.23:59:59')
-        }
-      }
-  
-      model.user.count()
-      .then(countResult => {
-  
-        model.user.findAll({
-          where: where,
-          order: order,
-          limit: limit,
-          offset: offset,
-          include: [{
-            all: true
-          }],
-          // where: [{
-          //   primary: true
-          // }]
-        })
-        .then(result => {
-          return res.send({
-            data: result,
-            length: countResult
-          })
-        })
-        .catch(err => {
-          console.log('ERROR FIND USER:', err)
-          return res.send(err)
-        })
-  
-      })
-      .catch(err => {
-        console.log('ERROR COUNT USER:', err)
-        return res.send(err)
-      })
+  getAll: (req, res) => {
+    model.user.findAll({
+      order: [['id', 'ASC']],
+      include: [
+        { all: true },
+      ]
+    })
+    .then(dataUser => {
+      res.send(dataUser)
+    })
+    .catch(err => console.log(err))
   },
 
   findUser: (req, res) => {
@@ -199,12 +198,12 @@ module.exports = {
       } else {
         model.phonenumber.findOne({
           where:[{
-            userId : dataUser.id 
+            userId : dataUser.id
           }]
         })
         .then(phoneUser => {
           if (phoneUser === null ){
-            res.send({ 
+            res.send({
               message: 'null',
               user: dataUser
             })
@@ -217,6 +216,6 @@ module.exports = {
         })
       }
     })
-    .catch(err => res.send(err)) 
+    .catch(err => res.send(err))
   }
 }

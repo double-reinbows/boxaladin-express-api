@@ -1,11 +1,11 @@
 var chai = require("chai");
 var chaiHttp = require("chai-http");
 var should = chai.should();
-var payment = require('../controller/payment')
+var payment = require('../controller/paymentController')
 var modelPayment = require('../models').payment;
 var token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwidXNlcm5hbWUiOiJhbmRyZXciLCJlbWFpbCI6ImFuZHJld0BnbWFpbC5jb20iLCJmaXJzdE5hbWUiOiJhbmRyZXciLCJmYW1pbHlOYW1lIjoiYW5kcmV3Iiwic2V4IjoiTSIsImVtYWlsVmVyaWZpZWQiOmZhbHNlLCJpYXQiOjE1MjAzOTc2Mjh9.tkm5Grgwzd_jkqtqKNaimGZQhY97UW37BmTPfHtgaoI'
 
-// untuk tes transaction dibagian controller get pending dan all user, 
+// untuk tes transaction dibagian controller get pending dan all user,
 // bagian mapping data parse avail bank di comment
 
 describe("test transaction", () => {

@@ -230,7 +230,8 @@ module.exports = {
           order: [ [ 'createdAt', 'DESC' ]]
         }).then(dataWin => {
           if (!dataWin){
-            res.send('No Win Data')
+            res.send('No Win Data');
+            return;
           }
           // console.log('DICK', dataWin[0].dataValues.id);
           // return;
@@ -252,15 +253,16 @@ module.exports = {
             let provider = getProvider(req.body.phone);
             let pulsaCode = getMobPulsaCode(provider, rule.pulsaAmount);
             // return;
+            // console.log('DICK');
             let postTransactionP = Model.transaction.create({
               paymentId: 0,
               productId: 0,
               userId: decoded.id,
-              pulsaId: 'null',
+              pulsaId: 'Callback from MobilePulsa not yet received',
               aladinPrice: 0,
               number: req.body.phone,
               status: 'PENDING',
-              description: pulsaCode,
+              description: provider + ' ' + rule.pulsaAmount.toString(),
               // createdAt: new Date(),
               // updatedAt: new Date(),
             }).then(transactionResult => {

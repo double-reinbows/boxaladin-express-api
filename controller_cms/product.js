@@ -116,7 +116,7 @@ module.exports = {
         .destroy()
         .then(result => {
           // hapus data di firebase sesuai id dari result
-          const productsRef = firebase.database().ref().child('prodproductsdummyucts')
+          const productsRef = firebase.database().ref().child('productsdummy')
           productsRef.child(req.params.id).remove()
           res.status(200).send({ message: 'product deleted successfully.' })
         })

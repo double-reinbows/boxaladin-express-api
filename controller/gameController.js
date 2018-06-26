@@ -28,7 +28,7 @@ module.exports = {
         })
         db.gamecount.findOne()
         .then((gc) => {
-          console.log('CUNT', gc.dataValues);
+          // console.log('CUNT', gc.dataValues);
           db.gamecount.update({
             count: gc.dataValues.count + 1,
           }, {
@@ -70,7 +70,7 @@ module.exports = {
               return res.status(200).send({message: 'Win', winToken: data.winToken, winType: data.gameRuleId});
             });
           } else {
-            console.log('SUCK SHIT LOL!');
+            // console.log('SUCK SHIT LOL!');
             return res.status(200).send({message: 'Lose'});
           }
         })

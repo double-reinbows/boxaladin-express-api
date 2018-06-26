@@ -215,11 +215,11 @@ module.exports = {
             if (result === null) {
               console.log('masuk if')
               if (req.body.bankCode === 'BRI') {
-              virtualAccountNumber = 1268000000 + decoded.id
+                virtualAccountNumber = 9999000000 + decoded.id
               } else if ( req.body.bankCode === 'MANDIRI') {
-                  virtualAccountNumber = 1268000000 + decoded.id
+                virtualAccountNumber = 9999000000 + decoded.id
               } else if ( req.body.bankCode === 'BNI') {
-                  virtualAccountNumber = 126800000000 + decoded.id
+                virtualAccountNumber = 9999000000 + decoded.id
               }
               const va = virtualAccountNumber.toString();
               console.log('OMG', va, req.body, dataPayment, isodate);
@@ -283,13 +283,13 @@ module.exports = {
                           message: 'new va'
                         })
                       })
-                      .catch(error => res.status(400).send(error));
+                      // .catch(error => res.status(400).send(error));
                     })
-                    .catch(error => res.status(400).send(error));
+                    // .catch(error => res.status(400).send(error));
                   })
-                  .catch(error => res.status(400).send(error));
+                  // .catch(error => res.status(400).send(error));
                 })
-                .catch(error => res.status(400).send(error));
+                // .catch(error => res.status(400).send(error));
               })
               .catch(error => {
                 if (error.response.data.error_code === 'DUPLICATE_CALLBACK_VIRTUAL_ACCOUNT_ERROR'){
@@ -368,11 +368,11 @@ module.exports = {
                         message: 'va already exist'
                       })
                     })
-                    .catch(error => res.status(400).send(error));
+                    // .catch(error => res.status(400).send(error));
                   })
-                  .catch(error => res.status(400).send(error));
+                  // .catch(error => res.status(400).send(error));
                 })
-                .catch(error => res.status(400).send(error));
+                // .catch(error => res.status(400).send(error));
               })
               .catch(error => {
                 if (error.response.data.error_code === 'DUPLICATE_CALLBACK_VIRTUAL_ACCOUNT_ERROR'){
@@ -397,11 +397,11 @@ module.exports = {
               });
             }
           })
-          .catch(err => res.status(400).send(err));
+          // .catch(err => res.status(400).send(err));
         })
-        .catch(err => res.status(400).send(err));
+        // .catch(err => res.status(400).send(err));
       })
-      .catch(err => res.status(400).send(err));
+      // .catch(err => res.status(400).send(err));
     })
     .catch(err => res.status(400).send(err));
   }

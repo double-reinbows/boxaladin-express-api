@@ -8,6 +8,7 @@ const gamerule = require('../controller_cms/gamerule')
 const key = require('../controller_cms/key')
 const xendit = require('../controller_cms/xendit')
 const phoneCtrl = require('../controller/phoneCtrl')
+const history = require('../controller_cms/history')
 
 router.get('/', auth.isLogin, auth.isSuperadmin, user.getAll)
 router.get('/phone', auth.isLogin, auth.isSuperadmin, user.getUserWithPhone)
@@ -28,6 +29,9 @@ router.get('/gamerule', auth.isLogin, auth.isSuperadmin, gamerule.all)
 
 router.post('/login', user.login)
 router.post('/create', auth.isLogin, auth.isSuperadmin ,user.create)
+
+router.get('/key', auth.isLogin, auth.isAdmin, history.keyHistory)
+router.get('/pulsa', auth.isLogin, auth.isAdmin, history.pulsaHistory)
 
 router.put('/gamerule/:id', auth.isLogin, auth.isSuperadmin, gamerule.update)
 

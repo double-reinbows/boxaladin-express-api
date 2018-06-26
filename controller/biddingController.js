@@ -54,8 +54,8 @@ module.exports = {
 								console.log('opened', product.opened)
 								// update di firebase
 
-								// const productsRef = firebase.database().ref().child('productsdummy')
-								const productsRef = firebase.database().ref().child('products')
+								const productsRef = firebase.database().ref().child('productsdummy')
+								// const productsRef = firebase.database().ref().child('products')
 								productsRef.child(result.id).update({
 									id: result.id,
 									// productName: result.productName,

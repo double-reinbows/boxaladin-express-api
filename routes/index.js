@@ -3,12 +3,13 @@ const router = express.Router();
 
 const jwt = require('jsonwebtoken')
 
-const paymentController = require('../controller/payment')
+const paymentController = require('../controller/paymentController')
 const callbackController = require('../controller/callback')
 const pulsaController = require('../controller/pulsa')
 const transactionController = require('../controller/transaction')
 const creditCardController = require('../controller/creditCard')
 const topUpController = require('../controller/aladinKey')
+const aladinKeyLogController = require('../controller/aladinKeyLogController')
 
 const ctrl = require('../controller/indexCtrl')
 const phoneCtrl = require('../controller/phoneCtrl')
@@ -75,6 +76,7 @@ router.get('/payment/:id', paymentController.retrieveInvoice)
 router.post('/callbackurl', callbackController.createCallbackXendit)
 router.post('/callbackfixed', callbackController.callBackFixedXendit)
 router.post('/creditCard', creditCardController.createCreditCard)
+router.delete('/virtualaccount', auth.isLogin, paymentController.closeVirtualAccount);
 // ---------------------------------------
 
 router.post('/topupKey', topUpController.topUpKeys)
@@ -117,5 +119,8 @@ router.delete('/api/product/:id', productController.destroy);
 
 router.get('/gamerules', gameRuleController.all);
 router.get('/game', gameController.play);
+
+router.put('/logopen', aladinKeyLogController.increaseOpen)
+router.put('/logsold', aladinKeyLogController.increaseSold)
 
 module.exports = router;

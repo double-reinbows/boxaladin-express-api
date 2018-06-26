@@ -44,7 +44,6 @@ var claim = require('./routes/claim');
 var admin = require('./routes/admin');
 // var lose = require('./routes/gamecount');
 var cms = require('./routes/cms');
-var history = require('./routes/history');
 
 var app = express();
 app.use(cors())
