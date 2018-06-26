@@ -81,7 +81,7 @@ module.exports = {
                       password pada email ${userResult.typedEmail}. Untuk mengganti
                       password, klik link dibawah ini:
                       </p>
-                      <a href="${process.env.BA_WEB_HOST}/resetpassword?email=${emailFilter}&encoded=${emailToken}">
+                      <a href="${process.env.BA_WEB_HOST}/resetpassword/${emailFilter}/${emailToken}">
                       <p style="
                         text-align: center;
                         font-size: 30px;
