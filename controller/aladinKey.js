@@ -29,6 +29,7 @@ module.exports = {
         status: "PENDING",
         amount: data.price,
         availableBanks: "null",
+        availableretail: "null"
       })
       .then((dataPayment) => {
         let newId = decoded.id + ('-') + dataPayment.id
@@ -38,7 +39,8 @@ module.exports = {
         userId: decoded.id,
         keyId: req.body.keyId,
         xenditId: newId,
-        status: 'PENDING'
+        status: 'PENDING',
+        virtualId: 0
         })
         .then((dataTopUp) => {
           axios({
@@ -54,45 +56,51 @@ module.exports = {
               description: "TopUp Aladin Key"
             },
           })
-          .then(({data}) => {
-            invoice = data.id,
-            banksArr_Obj = data.available_banks
+          .then((data) => {
+            let dataAxios = data.data
+            console.log('dataaxios', dataAxios)
+            invoice = dataAxios.id,
+            banksArr_Obj = dataAxios.available_banks
             banksStr = JSON.stringify(banksArr_Obj)
+            {dataAxios.available_retail_outlets ? (retailArr_Obj = dataAxios.available_retail_outlets[0].payment_code) : (retailArr_Obj= 'null')}
             db.payment.update({
               invoiceId: invoice,
               xenditId: newId,
-              availableBanks: banksStr
+              availableBanks: banksStr,
+              availableretail: retailArr_Obj
             },{
               where:{
                 id: dataPayment.id
               }
             })
-            .then((data)=>{
-              db.topup
-              .findOne({
+            .then(dataUpdate=>{
+              db.topup.findOne({
                 where: {
                   paymentId: dataPayment.id
                 }
               })
-              .then(data => {
+              .then(dataTopUp => {
                 if (!data) {
                   return res.status(404).send({
                     message: 'Data Not Found',
                   });
                 }
-                return res.status(200).send(data);
+                return res.status(200).send({
+                  dataTopUp,
+                  dataAxios
+                }); 
               })
-              .catch(error => res.status(400).send(error));
+              // .catch(error => res.status(400).send(error));
             })
-            .catch(err => res.status(400).send(error));
+            // .catch(err => res.status(400).send(error));
           })
-          .catch(error => res.status(400).send(error));
+          // .catch(error => console.log(error));
         })
-        .catch(error => res.status(400).send(error));
+        // .catch(error => res.status(400).send(error));
       })
-      .catch(error => res.status(400).send(error));
+      // .catch(error => res.status(400).send(error));
     })
-    .catch(error => res.status(400).send(error));
+    .catch(error => console.log(error));
   },
 
   all(req, res) {
@@ -192,6 +200,7 @@ module.exports = {
         status: "PENDING",
         amount: data.price,
         availableBanks: "null",
+        availableretail: "null"
     })
     .then(dataPayment => {
       let newId = decoded.id + ('-') + dataPayment.id

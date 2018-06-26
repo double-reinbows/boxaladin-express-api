@@ -66,13 +66,12 @@ module.exports = {
                 invoice = data.id,
                 banksArr_Obj = data.available_banks
                 banksStr = JSON.stringify(banksArr_Obj)
-                retailArr_Obj = data.available_retail_outlets[0].payment_code
-                retailStr = JSON.stringify(retailArr_Obj)
+                {data.available_retail_outlets ? (retailArr_Obj = data.available_retail_outlets[0].payment_code) : (retailArr_Obj= 'null')}
                 return db.payment.update({
                   invoiceId: invoice,
                   xenditId: newId,
                   availableBanks: banksStr,
-                  availableretail: retailStr
+                  availableretail: retailArr_Obj
                 },{
                   where:{
                     id: dataPayment.id
@@ -135,6 +134,7 @@ module.exports = {
       status: "PENDING",
       amount: req.body.amount,
       availableBanks: "null",
+      availableretail: "null"
     })
     .then(dataPayment => {
       let decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
