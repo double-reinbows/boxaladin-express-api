@@ -120,7 +120,7 @@ router.delete('/api/product/:id', productController.destroy);
 router.get('/gamerules', gameRuleController.all);
 router.get('/game', gameController.play);
 
-router.put('/logopen', aladinKeyLogController.increaseOpen)
+router.put('/logopen', auth.isLogin, aladinKeyLogController.increaseOpen)
 router.put('/logsold', aladinKeyLogController.increaseSold)
 
 module.exports = router;
