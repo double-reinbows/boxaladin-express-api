@@ -88,7 +88,7 @@ module.exports = {
                 return res.status(200).send({
                   dataTopUp,
                   dataAxios
-                }); 
+                });
               })
               // .catch(error => res.status(400).send(error));
             })
@@ -223,12 +223,22 @@ module.exports = {
             console.log('isodate', isodate)
             if (result === null) {
               console.log('masuk if')
-              if (req.body.bankCode === 'BRI') {
-                virtualAccountNumber = 9999000000 + decoded.id
-              } else if ( req.body.bankCode === 'MANDIRI') {
-                virtualAccountNumber = 9999000000 + decoded.id
-              } else if ( req.body.bankCode === 'BNI') {
-                virtualAccountNumber = 9999000000 + decoded.id
+              if (process.env.ENV !== 'prod') {
+                if (req.body.bankCode === 'BRI') {
+                  virtualAccountNumber = 9999000000 + decoded.id
+                } else if ( req.body.bankCode === 'MANDIRI') {
+                    virtualAccountNumber = 9999000000 + decoded.id
+                } else if ( req.body.bankCode === 'BNI') {
+                    virtualAccountNumber = 9999000000 + decoded.id
+                }
+              } else if (process.env.ENV === 'prod') {
+                if (req.body.bankCode === 'BRI') {
+                  virtualAccountNumber = 1268000000 + decoded.id
+                } else if ( req.body.bankCode === 'MANDIRI') {
+                    virtualAccountNumber = 1268000000 + decoded.id
+                } else if ( req.body.bankCode === 'BNI') {
+                    virtualAccountNumber = 126800000000 + decoded.id
+                }
               }
               const va = virtualAccountNumber.toString();
               console.log('OMG', va, req.body, dataPayment, isodate);
