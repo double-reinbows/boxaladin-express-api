@@ -32,6 +32,7 @@ router.post('/create', auth.isLogin, auth.isSuperadmin ,user.create)
 
 router.get('/key', auth.isLogin, auth.isAdmin, history.keyHistory)
 router.get('/pulsa', auth.isLogin, auth.isAdmin, history.pulsaHistory)
+router.get('/openproduct', auth.isLogin, auth.isAdmin, history.openHistory)
 
 router.put('/gamerule/:id', auth.isLogin, auth.isSuperadmin, gamerule.update)
 

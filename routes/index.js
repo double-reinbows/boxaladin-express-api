@@ -77,6 +77,7 @@ router.post('/callbackurl', callbackController.createCallbackXendit)
 router.post('/callbackfixed', callbackController.callBackFixedXendit)
 router.post('/creditCard', creditCardController.createCreditCard)
 router.delete('/virtualaccount', auth.isLogin, paymentController.closeVirtualAccount);
+// router.post('/cancelinvoice', paymentController.cancelInvoice)
 // ---------------------------------------
 
 router.post('/topupKey', topUpController.topUpKeys)

@@ -118,7 +118,8 @@ module.exports = {
         },
         include: [
           { model: db.payment },
-          { model: db.key }
+          { model: db.key },
+          { model: db.virtualAccount }
         ]
       })
       .then(data => {
@@ -143,8 +144,8 @@ module.exports = {
         },
         include: [
           { model: db.payment },
-          { model: db.key }
-
+          { model: db.key },
+          { model: db.virtualAccount }
         ]
       })
       .then(data => {
@@ -166,7 +167,8 @@ module.exports = {
         },
         include: [
           { model: db.payment },
-          { model: db.key }
+          { model: db.key },
+          { model: db.virtualAccount }
         ]
       })
       .then(data => {

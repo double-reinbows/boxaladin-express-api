@@ -12,16 +12,17 @@ module.exports = {
         model: db.payment
       },
     ],
-      where: [{
-        createdAt: {
-          $between: [new Date(new Date() - 24 * 60 * 60 * 1000), new Date()]
-        },
-      },{
-        status: "PAID"
-      }
-    ]
+    //   where: [{
+    //     createdAt: {
+    //       $between: [new Date(new Date() - 24 * 60 * 60 * 1000), new Date()]
+    //     },
+    //   },{
+    //     status: "PAID"
+    //   }
+    // ]
     })
     .then(dataTopUp => {
+      // res.send(dataTopUp)
         const map = dataTopUp.map(data => data.key.keyAmount);
         for (var i = 0, sum = 0; i < map.length; sum += map[i++]);
         res.status(200).send({sum})
@@ -40,23 +41,31 @@ module.exports = {
         model: db.product
       },
     ],
-      where: [{
-        createdAt: {
-          $between: [new Date(new Date() - 24 * 60 * 60 * 1000), new Date()]
-        },
-      },{
-        status: "PAID"
-      }
-    ]
+    //   where: [{
+    //     createdAt: {
+    //       $between: [new Date(new Date() - 24 * 60 * 60 * 1000), new Date()]
+    //     },
+    //   },{
+    //     status: "PAID"
+    //   }
+    // ]
     })
     .then(dataPulsa => {
-      // res.send(dataPulsa)
-        const map = dataPulsa.map(data => data.product.displayPrice);
-        for (var i = 0, pulsaSold = 0; i < map.length; pulsaSold += map[i++]);
-        res.status(200).send({pulsaSold})
+      res.send(dataPulsa)
+        // const map = dataPulsa.map(data => data.product.displayPrice);
+        // for (var i = 0, pulsaSold = 0; i < map.length; pulsaSold += map[i++]);
+        // res.status(200).send({pulsaSold})
       }
     )
     .catch( err => console.log(err))
+  },
+
+  openHistory(req, res) {
+    db.product.findAll()
+    .then(dataProduct => {        
+      const map = dataProduct.map(data => data.dataValues);  
+      res.send(map)
+      })
   }
 
 }

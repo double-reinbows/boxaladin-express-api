@@ -127,6 +127,7 @@ module.exports = {
     let date = new Date();
     date.setHours(date.getHours() + 6);
     let isodate = date.toISOString();
+    console.log('isodeate', isodate)
     let virtualAccountNumber = ''
     return db.payment.create({
       invoiceId: "null",
@@ -405,6 +406,7 @@ module.exports = {
       getInvoiceP.then(data => {
         if (!Array.isArray(data) || !data.length) { return res.send('Invoice not found'); }
         const row = data[0].dataValues.id; //remember the id to update status if Xendit succeeds
+        console.log('HALO', data)
         let xenditP = axios({
           method: 'PATCH',
           url: `https://api.xendit.co/callback_virtual_accounts/${data[0].dataValues.invoiceId}`,
@@ -430,7 +432,57 @@ module.exports = {
           }
         })
       })
-    }).catch(err => { res.send(err.response.data) })
-
+    }).catch(err => { console.log(err) })
   },
+
+  // cancelInvoice(req, res) {
+  //   let decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET);
+  //   let now = new Date;
+  //   db.virtualAccount.findOne({
+  //     where:{
+  //       userId: decoded.id,
+  //       bankCode: req.body.bank
+  //     }
+  //   })
+  //   .then( dataVA => {
+  //     console.log(dataVA)
+  //     if (!dataVA) { return res.send('VA Not Found'); }
+  //     return db.payment.findAll({
+  //       limit: 1,
+  //       where: {
+  //         availableBanks: {ilike: '%' + dataVA.dataValues.virtualAccountNumber},
+  //         status: 'PENDING',
+  //       },
+  //       order: [ [ 'createdAt', 'DESC' ]]
+  //     })
+  //     .then( dataPayment => {
+  //       console.log('datapayment', dataPayment[0].invoiceId)
+  //       const row = dataPayment[0].dataValues.id
+  //       axios({
+  //         method: 'PATCH',
+  //         url: `https://api.xendit.co/callback_virtual_accounts/${dataPayment[0].invoiceId}`,
+  //         headers: {
+  //           authorization: process.env.XENDIT_AUTHORIZATION,
+  //         },
+  //         data: {
+  //           expiration_date: now,
+  //           expected_amount: dataPayment[0].amount,
+  //         },
+  //       })
+  //       .then(updateXendit => {
+  //         if (updateXendit.status === 200) {
+  //           db.payment.update({
+  //             status: 'CANCELLED',
+  //           }, {
+  //             where: {
+  //               id: row,
+  //             }
+  //           }).catch(err => {console.log('UPDATE FAIL', err)});
+  //           return res.send('Fixed VA closed');
+  //         }
+  //       })
+  //     })
+  //   })
+  //   .catch(error => console.log(error))
+  // }
 }
