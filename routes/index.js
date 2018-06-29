@@ -122,6 +122,7 @@ router.get('/gamerules', gameRuleController.all);
 router.get('/game', gameController.play);
 
 router.put('/logopen', auth.isLogin, aladinKeyLogController.increaseOpen)
-router.put('/logsold', aladinKeyLogController.increaseSold)
+router.put('/logsold', auth.isLogin, aladinKeyLogController.increaseSold)
+router.post('/logbid' ,auth.isLogin, aladinKeyLogController.logBid)
 
 module.exports = router;

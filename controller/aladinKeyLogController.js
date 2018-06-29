@@ -61,7 +61,15 @@ module.exports = {
       })
     })
     .catch(err => res.send(err))
+  },
+
+  logBid(req, res) {
+    let decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET);
+    db.aladinkeyLog.create({
+      userId: decoded.id,
+      productId: req.body.productId,
+      priceAfter: req.body.priceAfter,
+      priceBefore: req.body.priceBefore
+    })
   }
 }
-
-// buat update payment opened dan sold karena ganti flow
