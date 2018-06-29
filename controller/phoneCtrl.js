@@ -85,12 +85,12 @@ exports.postPhoneNumber = (req, res) => {
 }
 
 exports.sendSmsVerification = (req, res) => {
-  var decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)  
+  var decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
   var randomOtp = Math.floor(Math.random()*900000) + 100000;
-  
+
   db.phonenumber.findById(req.body.phoneId)
   .then(findResult => {
-    
+
     db.phonenumber.update({
       number: findResult.number,
       primary: findResult.primary,
@@ -103,19 +103,19 @@ exports.sendSmsVerification = (req, res) => {
       }
     })
     .then(updateResult => {
-      
+
       db.phonenumber.findById(findResult.id)
       .then(data => {
-        
+
         let message = `Box Aladin OTP: ${data.otp}`
 
         awsHelper.sendSMS({
           phone: data.number,
           message
         })
-        
+
         return res.send({ message: 'OTP sent' })
-      
+
       })
       .catch(err => res.send(err))
 
@@ -234,7 +234,7 @@ exports.changePrimary = (req, res) => {
     if (findResult.otp != req.body.otp) {
       res.send({ message: 'Wrong OTP'})
     } else {
-      
+
       db.phonenumber.findAll({
         where: {
           userId: decoded.id
@@ -270,7 +270,7 @@ exports.changePrimary = (req, res) => {
     }
 
   })
-  
+
 }
 
 exports.getAllPhone = (req, res) => {
@@ -278,7 +278,7 @@ exports.getAllPhone = (req, res) => {
     where: {
       userId: req.params.id,
       primary: 'TRUE'
-    },    
+    },
   })
   .then(result => {
     res.send(result)
@@ -369,13 +369,11 @@ exports.signUpVerify = (req, res) => {
           res.send({
             message: 'incorrect otp'
           })
-          .catch(err => console.log(err))
+          //.catch(err => console.log(err))
         }
       }
-    })
-    .catch(err => console.log(err))
-  })
-  .catch(err => console.log(err))
+    })//.catch(err => console.log(err))
+  }).catch(err => console.log(err))
 }
 
 exports.oldUserVerify = (req, res) => {

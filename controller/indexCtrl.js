@@ -354,11 +354,12 @@ exports.resendEmailVerification = (req, res) => {
 }
 
 exports.signup = (req, res) => {
+  handleDotGmail(req.body);
   db.user
     .findOne({
       where: {
         email: req.body.email,
-        emailVerified: true
+        // emailVerified: true
       }
     })
     .then(found => {
@@ -377,11 +378,11 @@ exports.signup = (req, res) => {
         .then(result => {
           let phoneIsUsed = {}
           if (result) {
-            res.send({
+            return res.send({
               phoneIsUsed
             })
           } else {
-            handleDotGmail(req.body)
+            // handleDotGmail(req.body)
 
             req.body.password = hash(req.body.password)
             var salt = Math.floor(Math.random() * 90000) + 10000
