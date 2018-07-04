@@ -13,7 +13,7 @@ module.exports = {
     })
     .then(dataUser => {
       console.log('user', dataUser)
-      if (json.rc === '00' || json.rc == '06'){
+      if (json.call_status === 'ANSWERED'){
         var phone = json.token
         var splitNumber = phone.split('')
         if (splitNumber[0] === '0') {

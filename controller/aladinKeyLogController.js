@@ -71,5 +71,7 @@ module.exports = {
       priceAfter: req.body.priceAfter,
       priceBefore: req.body.priceBefore
     })
+    //sending null so frontend isn't stuck waiting
+    res.send(console.log('log'))
   }
 }

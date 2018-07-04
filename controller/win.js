@@ -20,6 +20,8 @@ function getProvider(phone) {
     return 'Indosat';
   } else if (['0895','0896','0897','0898','0899'].includes(phone)) {
     return 'Tri';
+  } else if (['0838','0837','0831','0832'].includes(phone)) {
+    return 'Axis';
   } else {
     console.log('UNKOWN PROVIDER');
     return null;
@@ -64,6 +66,15 @@ function getMobPulsaCode(provider, pulsaAmount) {
         return 'xld50000';
       case 100000:
         return 'xld100000';
+    }
+  } else if (provider === 'Axis') {
+    switch (pulsaAmount) {
+      case 10000:
+        return 'haxis10000';
+      case 50000:
+        return 'haxis50000';
+      case 100000:
+        return 'haxis100000';
     }
   } else if (provider === 'Tri') {
     switch (pulsaAmount) {

@@ -12,17 +12,12 @@ exports.all = (req, res) => {
         all: true
       }
     ]
-  })
-  .then(result => res.send(result))
-  .catch(err => res.send(err))
+  }).then(result => res.send(result)).catch(err => res.send(err))
 }
 
 exports.postPhoneNumber = (req, res) => {
-  var randomOtp = Math.floor(Math.random()*900000) + 100000;
   var decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
-
-  var phone = req.body.phonenumber
-  var splitNumber = phone.split('')
+  var splitNumber = req.body.phonenumber.split('')
 
   if (splitNumber[0] === '0') {
     splitNumber.splice(0, 1, '0')
@@ -39,49 +34,26 @@ exports.postPhoneNumber = (req, res) => {
   } else if (splitNumber.length === 0) {
     var newNumber = splitNumber.join('')
   } else {
-    var newNumber = phone
+    var newNumber = req.body.phonenumber.replace(/\D/g,'');
   }
 
-  db.phonenumber.findAll({
+  db.phonenumber.findOne({
     where: {
       userId: decoded.id,
+      number : newNumber,
     }
-  })
-  .then(result => {
-    // var primaryStatus = null
-    // result.length == 0 ? primaryStatus = true : primaryStatus = false
-
-    db.phonenumber.findOne({
-      where: {
-        userId : decoded.id,
-        number : newNumber
-      }
+  }).then(result => {
+    //user already has this number on their account
+    if (result) {return res.send('duplicate number')}
+    res.send({message: 'data added'})
+    db.phonenumber.create({
+      userId: decoded.id,
+      number: newNumber,
+      verified: false,
+      otp: 99999,
+      primary: false
     })
-    .then(checkNumber => {
-      if (checkNumber === null){
-        db.phonenumber.create({
-          userId: decoded.id,
-          number: newNumber,
-          verified: false,
-          otp: randomOtp,
-          primary: false
-        })
-        .then(data => {
-          res.send({
-            message: 'data added',
-            data: data.dataValues
-          })
-        })
-        .catch(err => console.log(err))
-      } else if ( checkNumber !== null) {
-        console.log('duplicate')
-        res.send('duplicate number')
-      } else {
-        res.send('err')
-      }
-    })
-  })
-  .catch(errCreate => console.log(errCreate))
+  }).catch(errCreate => console.log(errCreate))
 }
 
 exports.sendSmsVerification = (req, res) => {

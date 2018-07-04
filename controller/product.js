@@ -186,4 +186,20 @@ module.exports = {
       })
       .catch(error => res.status(400).send(error));
   },
+
+  updateWatch(req, res) {
+    const productsRef = firebase.database().ref().child('productsdummy')          
+    // const productsRef = firebase.database().ref().child('products')
+    const productRef = productsRef.child(req.body.productId)
+    setTimeout(function() {
+      productRef.once('value', snap => {
+        if (snap.val().watching > 0) {
+          productRef.update({
+            watching: snap.val().watching -1
+          })
+          res.send(console.log('updated'))
+        }
+      })  
+    }, 15000);
+  }
 };
