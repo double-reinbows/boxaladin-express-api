@@ -25,8 +25,7 @@ module.exports = {
     ]
 		})
 		.then(result => {
-			// const productsRef = firebase.database().ref().child('products')
-			const productsRef = firebase.database().ref().child('productsdummy')
+			const productsRef = firebase.database().ref().child(process.env.FIREBASE_DB)
 			result.map((data, idx) => {
 				productsRef.child(data.id).set({
 					id: data.id,
