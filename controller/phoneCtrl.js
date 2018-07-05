@@ -291,60 +291,54 @@ exports.signUpVerify = (req, res) => {
       where: {
         number: req.body.phonenumber,
         verified: false,
-        userId: dataUser.id
+        userId: dataUser.id,
+        primary: true,
       }
     })
     .then(result => {
       console.log(result)
-      if (result === null){
-        res.send({
+      if (!result){
+        return res.send({
           message: 'Hp pernah diverifikasi'
         })
       } else {
-        console.log(result)
-        if (result.otp == req.body.otp) {
+        console.log('found number: ',result)
+        //check otp is longer than 2, less than 2 means it's an error code
+        if (result.otp > 99 && result.otp == req.body.otp) {//double = due to string vs int
           db.phonenumber.update({
             verified: true,
-            primary: true
           }, {
             where: {
-              id: result.id
+              id: result.id,
+            }
+          });
+          db.user.update({
+            aladinKeys: 5,
+          },{
+            where:{
+              id: result.userId,
+            }
+          }).then((finalResult) => {
+            if (finalResult.length === 1) {
+              return res.send({
+                message: 'phone verified',
+              })
+            } else if (finalResult.length > 1) {
+              //TODO: send an email that tells us we just gave keys to more than
+              //one account!!!
+            } else {
+              return res.send({
+                message: 'Failed to add free keys',
+              })
             }
           })
-          .then(updateResult => {
-            db.user.findOne({
-              where:{
-                id: result.userId
-              }
-            })
-            .then((resultUser) => {
-              var key = parseInt(resultUser.dataValues.aladinKeys) + 5
-              db.user.update({
-                aladinKeys: key
-              },{
-                where:{
-                  id: resultUser.dataValues.id
-                }
-              })
-              .then((finalResult) => {
-                res.send({
-                  message: 'phone verified',
-                  data: finalResult
-                })
-              })
-              .catch(error =>res.status(400).send(error));
-            })
-            .catch(error => res.status(400).send(error));
-          })
-          .catch(err => res.send(err))
         } else {
           res.send({
             message: 'incorrect otp'
           })
-          //.catch(err => console.log(err))
         }
       }
-    })//.catch(err => console.log(err))
+    })
   }).catch(err => console.log(err))
 }
 

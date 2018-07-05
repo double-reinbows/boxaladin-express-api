@@ -247,11 +247,12 @@ module.exports = {
           // console.log('DICK', dataWin[0].dataValues.id);
           // return;
           // else if ( dataWin.winToken === req.body.winToken ){
+          const winRow = dataWin[0].dataValues.id;
           let nullWinP = db.win.update({
             winToken: null
           }, {
             where: {
-              id : dataWin[0].dataValues.id
+              id : winRow,
             }
           });
 
@@ -286,8 +287,8 @@ module.exports = {
               //   }
               // })
               // .then(dataProduct => {
-                var newId = decoded.id + ('-free-') + transactionResult.dataValues.id
-                var sign = md5('081380572721' + process.env.PULSA_KEY + newId)
+                var newId = decoded.id + ('-free-') + winRow;
+                var sign = md5('081380572721' + process.env.PULSA_KEY + newId);
                 // console.log('DICK', pulsaCode);
                 var pulsa =
                   `<?xml version="1.0" ?>
