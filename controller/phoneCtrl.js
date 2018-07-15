@@ -281,65 +281,76 @@ exports.otp = (req, res, data) => {
 
 exports.signUpVerify = (req, res) => {
   console.log('email verify', req.body.email)
-  db.user.findOne({
+  //find all primary numbers
+  db.phonenumber.findAll({
     where: {
-      email: req.body.email
+      number: req.body.phonenumber,
+      primary: true,
     }
-  })
-  .then(dataUser => {
-    db.phonenumber.findOne({
-      where: {
-        number: req.body.phonenumber,
-        verified: false,
-        userId: dataUser.id,
-        primary: true,
-      }
-    })
-    .then(result => {
-      console.log(result)
-      if (!result){
+  }).then(phoneNumbers => {
+    //Check phone numbers aren't verified
+    for (let i=0; i<phoneNumbers.length; i++) {
+      if (phoneNumbers[i].dataValues.verified === true) {
         return res.send({
           message: 'Hp pernah diverifikasi'
         })
-      } else {
-        console.log('found number: ',result)
-        //check otp is longer than 2, less than 2 means it's an error code
-        if (result.otp > 99 && result.otp == req.body.otp) {//double = due to string vs int
-          db.phonenumber.update({
-            verified: true,
-          }, {
-            where: {
-              id: result.id,
-            }
-          });
-          db.user.update({
-            aladinKeys: 5,
-          },{
-            where:{
-              id: result.userId,
-            }
-          }).then((finalResult) => {
-            if (finalResult.length === 1) {
-              return res.send({
-                message: 'phone verified',
-              })
-            } else if (finalResult.length > 1) {
-              //TODO: send an email that tells us we just gave keys to more than
-              //one account!!!
-            } else {
-              return res.send({
-                message: 'Failed to add free keys',
-              })
-            }
-          })
-        } else {
-          res.send({
-            message: 'incorrect otp'
-          })
+      }
+    }
+    //Sucessfully checked the phone number has never been verified
+    db.user.findOne({
+      where: {
+        email: req.body.email
+      }
+    }).then(dataUser => {
+      if (!dataUser) {return res.send('User not in database');}
+      //Find number associated with the User
+      let result = null;
+      for (let i=0; i<phoneNumbers.length; i++) {
+        if (phoneNumbers[i].dataValues.userId === dataUser.id) {
+          result = phoneNumbers[i].dataValues;
         }
       }
+      if (!result) {return res.send('Number cannot be verified');}
+      console.log("BLAH", result);
+      //Found a number that is verified=false and is linked to the given email
+      if (result.otp > 99 && result.otp == req.body.otp) {//double = due to string vs int
+        db.phonenumber.update({
+          verified: true,
+        }, {
+          where: {
+            id: result.id,
+          }
+        });
+        db.user.update({
+          aladinKeys: 5,
+        },{
+          where:{
+            id: result.userId,
+          }
+        }).then((finalResult) => {
+          if (finalResult.length === 1) {
+            return res.send({
+              message: 'phone verified',
+            })
+          } else if (finalResult.length > 1) {
+            //TODO: send an email that tells us we just gave keys to more than
+            //one account!!!
+          } else {
+            return res.send({
+              message: 'Failed to add free keys',
+            })
+          }
+        })
+      } else {
+        res.send({
+          message: 'incorrect otp'
+        })
+      }
     })
-  }).catch(err => console.log(err))
+  }).catch(err => {
+    console.log('ERROR VERIFYING OTP', err);
+    return res.send('err');
+  })
 }
 
 exports.oldUserVerify = (req, res) => {
