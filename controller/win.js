@@ -61,11 +61,11 @@ function getMobPulsaCode(provider, pulsaAmount) {
   } else if (provider === 'Indosat') {
     switch (pulsaAmount) {
       case 10000:
-        return 'xld10000';
+        return 'hindosat10000';
       case 50000:
-        return 'xld50000';
+        return 'hindosat50000';
       case 100000:
-        return 'xld100000';
+        return 'hindosat100000';
     }
   } else if (provider === 'Axis') {
     switch (pulsaAmount) {
@@ -79,11 +79,11 @@ function getMobPulsaCode(provider, pulsaAmount) {
   } else if (provider === 'Tri') {
     switch (pulsaAmount) {
       case 10000:
-        return 'hindosat10000';
+        return 'hthree10000';
       case 50000:
-        return 'hindosat50000';
+        return 'hthree50000';
       case 100000:
-        return 'hindosat100000';
+        return 'hthree100000';
     }
   } else  {
     return null;
