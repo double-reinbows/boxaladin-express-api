@@ -94,6 +94,7 @@ module.exports = {
 
   all: (req, res) => {
     Model.win.findAll({
+      order: [['id', 'ASC']],
       include: [
         { all: true }
       ]
@@ -159,6 +160,7 @@ module.exports = {
     const decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
 
     Model.win.findAll({
+      order: [['id', 'ASC']],
       where: {
         userId: decoded.id
       },
@@ -287,8 +289,8 @@ module.exports = {
               //   }
               // })
               // .then(dataProduct => {
-                var newId = decoded.id + ('-free-') + winRow;
-                var sign = md5('081380572721' + process.env.PULSA_KEY + newId);
+                const newId = decoded.id + ('-free-') + winRow;
+                const sign = md5('081380572721' + process.env.PULSA_KEY + newId);
                 // console.log('DICK', pulsaCode);
                 var pulsa =
                   `<?xml version="1.0" ?>

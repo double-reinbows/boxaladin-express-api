@@ -18,7 +18,7 @@ module.exports = {
     model.user.findOne({
       where: {
         email: emailFilter
-      }
+      },
     })
     .then(dataUser => {
       if (dataUser == null) {

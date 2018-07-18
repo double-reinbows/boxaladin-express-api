@@ -4,7 +4,9 @@ module.exports = {
 
   all: (req, res) => {
     let decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET);
-    let grPromise = db.gamerule.findAll();
+    let grPromise = db.gamerule.findAll({
+      order: [['id', 'ASC']]
+    });
     db.phonenumber.findOne({
       where: {
         userId: decoded.id,

@@ -7,6 +7,7 @@ const axios = require('axios')
 
 exports.all = (req, res) => {
   db.phonenumber.findAll({
+    order: [['id', 'ASC']],
     include: [
       {
         all: true
@@ -100,7 +101,9 @@ exports.sendSmsVerification = (req, res) => {
 exports.getPhoneByUser = (req, res) => {
   var decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
 
+
   db.phonenumber.findAll({
+    order: [['id', 'ASC']],
     where: {
       userId: decoded.id
     }

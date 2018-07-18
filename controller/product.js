@@ -193,7 +193,7 @@ module.exports = {
           productRef.update({
             watching: snap.val().watching -1
           })
-          res.send(console.log('updated'))
+          res.send('updated')
         }
       })
     }, 15000);

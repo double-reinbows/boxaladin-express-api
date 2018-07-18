@@ -5,13 +5,7 @@
     "database": "boxaladin",
     "host": "localhost",
     "port": "5432",
-    "dialect": "postgres",
-    "pool": {
-      "max": 5,
-      "min": 0,
-      "idle": 20000,
-      "acquire": 20000
-    }
+    "dialect": "postgres"
   },
   "test": {
     "username": "boxaladin",

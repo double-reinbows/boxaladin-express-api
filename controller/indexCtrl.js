@@ -93,16 +93,16 @@ exports.signin = (req, res) => {
           firstName: user.firstName,
           familyName: user.familyName,
           sex: user.sex,
-          emailVerified: user.emailVerified,
-          typedEmail: user.typedEmail
+          typedEmail: user.typedEmail,
+          wallet: user.wallet
         },
-        process.env.JWT_SECRET
-      );
+        process.env.JWT_SECRET, {
+          expiresIn: "7 days"
+        });
       res.send(
       {
         message: 'login success',
-        token: token,
-
+        token: token
       }
     )
     } else if (user.password.substr(6) !== hashedPass.substr(6)) {
@@ -391,9 +391,9 @@ exports.signup = (req, res) => {
             req.body.emailVerified = false
             req.body.aladinKeys = 0
             req.body.coin = 0
+            req.body.wallet = 0
             req.body.emailToken = genRandomString(128)
             typedEmail = req.body.typedEmail
-            console.log('reqbody', req.body)
             // CREATE USER
             db.user.create(req.body)
             .then(data => {
@@ -406,7 +406,13 @@ exports.signup = (req, res) => {
                 firstName: data.firstName,
                 familyName: data.familyName,
                 sex: data.sex,
-              },process.env.JWT_SECRET)
+                wallet: data.wallet,
+                token: data.token,
+                aladinKeys: data.aladinKeys
+              },
+              process.env.JWT_SECRET, {
+                expiresIn: "7 days"
+              });
                 sendEmailVerification(data.email, data.emailToken, data.typedEmail)
 
                 // CREATE PHONE
@@ -430,7 +436,7 @@ exports.signup = (req, res) => {
                 });
               })
               .catch(error => {
-                console.log('error create user:', error.message)
+                console.log('error create user:', error)
                 return res.send(error)
               });
             }

@@ -3,18 +3,21 @@
 module.exports = {
   up: (queryInterface, Sequelize) => {
     queryInterface.addColumn(
-      'payments',
-      'expiredAt',
-      Sequelize.DATE
+      'users',
+      'wallet',
+      {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0
+      }
     );
   },
 
 
   down: (queryInterface, Sequelize) => {
     queryInterface.removeColumn(
-      'payments',
-      'expiredAt',
-      Sequelize.DATE
+      'users',
+      'wallet'
     );
   }
 };

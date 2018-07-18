@@ -12,6 +12,7 @@ module.exports = {
           userId: decoded.id,
           status: "PENDING"
         },
+        order: [['id', 'ASC']],
         include: [
           { model: db.payment },
           { model: db.product },
@@ -37,6 +38,7 @@ module.exports = {
         where: {
           userId: decoded.id
         },
+        order: [['id', 'ASC']],
         include: [
           { model: db.payment },
           { model: db.product },

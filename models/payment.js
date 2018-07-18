@@ -6,7 +6,8 @@ module.exports = (sequelize, DataTypes) => {
     status: DataTypes.STRING,
     amount: DataTypes.INTEGER,
     availableBanks: DataTypes.TEXT,
-    availableretail: DataTypes.TEXT
+    availableretail: DataTypes.TEXT,
+    expiredAt: DataTypes.DATE
   });
 
   payment.associate = (models) => {
@@ -18,6 +19,10 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'paymentId',
       as: 'topups',
     });    
+    payment.hasMany(models.walletLog, {
+      foreignKey: 'paymentId',
+      as: 'walletLogs',
+    });
   };
 
   return payment;

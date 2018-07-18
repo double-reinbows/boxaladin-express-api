@@ -4,11 +4,11 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "prod": "NODE_ENV=production AUTHOR=korei nodemon ./bin/www",
-    "test": "NODE_ENV=test AUTHOR=andrew nodemon /bin/www",
+    "prod": "NODE_ENV=production ./bin/www",
+    "test": "NODE_ENV=test nodemon /bin/www",
     "testmocha": "NODE_ENV=test mocha --timeout 10000",
     "antomocha": "NODE_ENV=test mocha test/payment_test --timeout 10000",
-    "dev": "NODE_ENV=development AUTHOR=pewe nodemon ./bin/www"
+    "dev": "NODE_ENV=development nodemon ./bin/www"
   },
   "dependencies": {
     "aws-sdk": "^2.180.0",
@@ -27,6 +27,7 @@
     "js-md5": "^0.7.3",
     "jsonwebtoken": "^8.1.0",
     "md5": "^2.2.1",
+    "moment": "^2.22.2",
     "morgan": "~1.8.1",
     "nodemailer": "^4.6.4",
     "nodemon": "^1.13.3",

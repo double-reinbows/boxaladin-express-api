@@ -14,7 +14,6 @@ if (nodeEnv === 'development') {
   var envPath = path.resolve('.env.prod');
 }
 // var envPath = nodeEnv === 'development' ? path.resolve('.env.dev') : path.resolve('.env.prod');
-console.log('author: ',process.env.AUTHOR);
 console.log('envPath: ',envPath);
 require('dotenv').config({path: envPath})
 var firebase = require('firebase')

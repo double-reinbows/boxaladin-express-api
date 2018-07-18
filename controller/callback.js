@@ -5,94 +5,98 @@ const pulsa = require('./pulsa')
 const xml = require("xml-parse");
 
 module.exports = {
+    /*
+     * This is called by Xendit for Alfamart payments
+     */
     createCallbackXendit(req, res) {
       if(req.headers['x-callback-token']!==undefined && req.headers['x-callback-token']===process.env.XENDIT_TOKEN)
-      {      
+      {
         const xenditExternalid = req.body.external_id;
-        db.payment.findOne({
-          where: {
-            xenditId : xenditExternalid
-          }
-        })
-        .then(data => {
-          if (!data) {
-            return res.status(404).send({
-              message: 'Id Not Found',
-            });
-          }else{
-            if(data.status === 'PENDING'&& req.body.status === 'PAID'){
-              console.log('update payment');
-              db.payment.update({
-                status: req.body.status
-              },{
-                where:{
-                  xenditId: xenditExternalid
-                }
-              })
-              .then(() => {
-                console.log('cari transaction sesuai xenditId', xenditExternalid);
-                db.transaction.findOne({
-                  where:{
-                    pulsaId: xenditExternalid
-                  }
-                })
-                .then((resultTransaction) => {
-                  if(resultTransaction === null){
-                    db.topup.findOne({
-                      where:{
-                        xenditId: xenditExternalid
-                      },
-                      include:[
-                        {all:true}
-                      ]
-                    })
-                    .then((resultTopUp)=>{
-                      db.topup.update({
-                        status: "PAID"
-                      }, {
-                        where: {
-                          xenditId: xenditExternalid
-                        }
-                      })
-                      .then(dataUpdate =>{
-                        db.user.findOne({
-                          where:{
-                            id: resultTopUp.dataValues.userId
-                          }
-                        })
-                        .then((resultUser) => {
-                          var key = parseInt(resultUser.dataValues.aladinKeys) + parseInt(resultTopUp.key.dataValues.keyAmount)
-                          db.user.update({
-                            aladinKeys: key
-                          },{
-                            where:{
-                              id: resultUser.dataValues.id
-                            }
-                          })
-                          .then((result) => {
-                            res.send(result)
-                          })
-                          .catch(error =>res.status(400).send(error));
-                        })
-                        .catch(error => res.status(400).send(error));
-                      })
-                      .catch(error => res.status(400).send(error));
-                    })
-                    .catch(error => res.status(400).send(error));
-                  } else {
-                    console.log('panggil function pulsa');
-                    pulsa.pulsa(req,res)
-                  }
-                })
-                .catch(error => res.status(400).send(error));
-              })
-              .catch(error => res.status(400).send(error));
-            } else {
-              return res.send("Callback Xendit Failed")
+        const splitInfo = xenditExternalid.split('-')
+        //[0] = W / T / P
+        //[1] = user id
+        //[2] = payment id
+
+        if (req.body.hasOwnProperty('amount')) {
+          db.payment.update({
+            status: "PAID"
+            }, {
+            where: {
+              id: splitInfo[2]
             }
-          }})
-          .catch(error => res.status(400).send(error));
+          });
         } else {
+          //Xendit is only sending VA status, nothing else to do
+          return;
+        }
+        if (splitInfo[0] === 'W') {
+          db.user.findOne({
+              where: {
+                id: splitInfo[1]
+              }
+          })
+          .then( dataUser => {
+            db.user.update({
+              wallet: dataUser.wallet + req.body.amount
+            }, {
+              where: {
+                id: splitInfo[1]
+              }
+            });
+          }).catch(err => console.log(err));
+
+          db.walletLog.update({
+            status: 'PAID',
+          }, {
+            where: {
+              paymentId: splitInfo[2],
+            }
+          });
+          res.send('sukses saldo');
+        } else if (splitInfo[0] === 'T') {
+
+          db.topup.update({
+            status: "PAID"
+          }, {
+            where: {
+              paymentId: splitInfo[2]
+            }
+          });
+
+          let topupP = db.topup.findOne({
+            where: {
+              paymentId : splitInfo[2]
+            },
+            include: [
+              {
+                model : db.key
+              }
+            ]
+          });
+
+          let userP = db.user.findOne({
+            where:{
+              id: splitInfo[1]
+            }
+          });
+          Promise.all([userP, topupP]).then( values => {
+            let key = parseInt(values[0].dataValues.aladinKeys) + parseInt(values[1].key.dataValues.keyAmount);
+            db.user.update({
+              aladinKeys: key
+            },{
+              where:{
+                id: splitInfo[1]
+              }
+            })
+            res.send('top success');
+          });
+        } else if (splitInfo[0] === 'P') {
+          pulsa.pulsa(req,res)
+        } else {
+          return res.send('error transaction');
+          console.log('error transaction');
+        }
+      } else {
             return res.status(500).send('Invalid Credentials')
         }
   },
@@ -133,7 +137,7 @@ module.exports = {
     }
   },
 
-    // Contoh payload yang dikirim dari xendit:
+// ********************** Contoh payload yang dikirim dari xendit: ***********************
     // {
     //   id: "579c8d61f23fa4ca35e52da4",
     //   user_id: "5781d19b2e2385880609791c",
@@ -152,7 +156,7 @@ module.exports = {
     //   updated: "2016-10-10T08:15:03.404Z",
     //   created: "2016-10-10T08:15:03.404Z"
 
-    //payload fixed VA
+// ************************** payload fixed VA ***************************************
   //   {
   //     id: "58a435201b6ce2a355f46070",
   //     owner_id: "5824128aa6f9f9b648be9d76",
@@ -168,104 +172,108 @@ module.exports = {
   //     created: "2017-02-15T11:01:52.896Z",
   //     updated: "2017-02-15T11:01:52.896Z"
   // }
-
+    /*
+     * This is called by Xendit for (fixed) VA payments
+     */
     callBackFixedXendit(req, res) {
       console.log('xendit req body', req.body)
       if(req.headers['x-callback-token']!==undefined && req.headers['x-callback-token']===process.env.XENDIT_TOKEN)
-      {      
+      {
         const xenditExternalid = req.body.external_id;
-        db.payment.findOne({
-          where: {
-            xenditId : xenditExternalid
-          }
-        })
-        .then(data => {
-          if (!data) {
-            return res.status(404).send({
-              message: 'Id Not Found',
-            });
-          }else{
-            if(data.status === 'PENDING'){
-              console.log('update payment');
-              db.payment.update({
-                status: 'PAID'
-              },{
-                where:{
-                  xenditId: xenditExternalid
-                }
-              })
-              .then(() => {
-                console.log('cari transaction sesuai xenditId', xenditExternalid);
-                db.transaction.findOne({
-                  where:{
-                    pulsaId: xenditExternalid
-                  }
-                })
-                .then((resultTransaction) => {
-                  if(resultTransaction === null){
-                    db.topup.findOne({
-                      where:{
-                        xenditId: xenditExternalid
-                      },
-                      include:[
-                        {all:true}
-                      ]
-                    })
-                    .then( resultTopUp => {
-                      console.log('update topup')
-                      db.topup.update({
-                        status: "PAID"
-                      }, {
-                        where: {
-                          xenditId: xenditExternalid
-                        }
-                      })
-                      .then(dataUpdate =>{
-                        db.user.findOne({
-                          where:{
-                            id: resultTopUp.dataValues.userId
-                          }
-                        })
-                        .then((resultUser) => {
-                          var key = parseInt(resultUser.dataValues.aladinKeys) + parseInt(resultTopUp.key.dataValues.keyAmount)
-                          db.user.update({
-                            aladinKeys: key
-                          },{
-                            where:{
-                              id: resultUser.dataValues.id
-                            }
-                          })
-                          .then((result) => {
-                            res.send(result)
-                          })
-                          .catch(error =>res.status(400).send(error));
-                        })
-                        .catch(error => res.status(400).send(error));
-                      })
-                      .catch(error => res.status(400).send(error));
-                    })
-                    .catch(error => res.status(400).send(error));
-                  } else {
-                    console.log('panggil function pulsa');
-                    pulsa.pulsa(req,res)
-                  }
-                })
-                .catch(error => res.status(400).send(error));
-              })
-              .catch(error => res.status(400).send(error));
-            } else {
-              return res.send("Callback Xendit Failed")
+        const splitInfo = xenditExternalid.split('-')
+        //[0] = W / T / P
+        //[1] = user id
+        //[2] = payment id
+
+        if (req.body.hasOwnProperty('amount')) {
+          db.payment.update({
+            status: "PAID"
+            }, {
+            where: {
+              id: splitInfo[2]
             }
-          }})
-          .catch(error => res.status(400).send(error));
+          });
         } else {
-            return res.status(500).send('Invalid Credentials')
+          //Xendit is only sending VA status, nothing else to do
+          return;
         }
+
+        if (splitInfo[0] === 'W') {
+          db.user.findOne({
+              where: {
+                id: splitInfo[1]
+              }
+          })
+          .then( dataUser => {
+            db.user.update({
+              wallet: dataUser.wallet + req.body.amount
+            }, {
+              where: {
+                id: splitInfo[1]
+              }
+            });
+          }).catch(err => console.log(err));
+
+          db.walletLog.update({
+            status: 'PAID',
+          }, {
+            where: {
+              paymentId: splitInfo[2],
+            }
+          });
+          res.send('sukses saldo');
+        } else if (splitInfo[0] === 'T') {
+
+          db.topup.update({
+            status: "PAID"
+          }, {
+            where: {
+              paymentId: splitInfo[2]
+            }
+          });
+
+          let topupP = db.topup.findOne({
+            where: {
+              paymentId : splitInfo[2]
+            },
+            include: [
+              {
+                model : db.key
+              }
+            ]
+          });
+
+          let userP = db.user.findOne({
+            where:{
+              id: splitInfo[1]
+            }
+          });
+          Promise.all([userP, topupP]).then( values => {
+            let key = parseInt(values[0].dataValues.aladinKeys) + parseInt(values[1].key.dataValues.keyAmount);
+            db.user.update({
+              aladinKeys: key
+            },{
+              where:{
+                id: splitInfo[1]
+              }
+            })
+            res.send('top success');
+          });
+        } else if (splitInfo[0] === 'P') {
+          pulsa.pulsa(req,res)
+        } else {
+          return res.send('error transaction');
+          console.log('error transaction');
+        }
+      } else {
+        return res.status(500).send('Invalid Credentials')
+      }
     },
+
     callBackPromoFixedXendit(req, res) {
       console.log('xendit req body', req.body)
       if(req.headers['x-callback-token']!==undefined && req.headers['x-callback-token']===process.env.XENDIT_TOKEN)
-      {      
+      {
         const xenditExternalid = req.body.external_id;
         db.payment.findOne({
           where: {
@@ -304,7 +312,7 @@ module.exports = {
                         },
                       },{
                         status: "PAID"
-                        } 
+                        }
                       ]
                     })
                     .then(findPaid => {

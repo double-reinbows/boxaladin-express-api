@@ -35,9 +35,7 @@ module.exports = {
           id: req.body.productId
         }
       })
-      .then(result => {
-        console.log('sukses')
-      })
+      res.send('open 1')
     })
     .catch(err => res.send(err))
   },
@@ -56,9 +54,7 @@ module.exports = {
           id: req.body.productId
         }
       })
-      .then(result => {
-        console.log('sukses')
-      })
+      res.send('sold 1')
     })
     .catch(err => res.send(err))
   },
@@ -72,6 +68,6 @@ module.exports = {
       priceBefore: req.body.priceBefore
     })
     //sending null so frontend isn't stuck waiting
-    res.send(console.log('log'))
+    res.send('log')
   }
 }

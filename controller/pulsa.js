@@ -13,16 +13,16 @@ module.exports = {
       }
     })
     .then(dataTransaction => {
-      console.log('daat transaksi', dataTransaction)
-      var refId = req.body.external_id
+      console.log('data transaksi', dataTransaction)
+      const refId = req.body.external_id
       db.product.findOne({
         where: {
           id: dataTransaction.productId
         }
       })
       .then(dataProduct => {
-        var sign = md5('081380572721' + process.env.PULSA_KEY + refId)        
-        var pulsa = `<?xml version="1.0" ?>
+        const sign = md5('081380572721' + process.env.PULSA_KEY + refId)        
+        const pulsa = `<?xml version="1.0" ?>
                     <mp>
                       <commands>topup</commands>
                       <username>081380572721</username>
@@ -62,5 +62,48 @@ module.exports = {
       .catch(err => res.send(err))
     })
     .catch(err => res.send(err))
+  },
+
+  pulsaWallet(req, res, price, dataUser, dataTransaction, dataProduct){
+    console.log('data transaksi', dataTransaction)
+    const refId = dataTransaction.pulsaId
+    const sign = md5('081380572721' + process.env.PULSA_KEY + refId)        
+    const pulsa = `<?xml version="1.0" ?>
+                <mp>
+                  <commands>topup</commands>
+                  <username>081380572721</username>
+                  <ref_id>${refId}</ref_id>
+                  <hp>${dataTransaction.number}</hp>
+                  <pulsa_code>${dataProduct.pulsaCode}</pulsa_code>
+                  <sign>${sign}</sign>
+                </mp>`
+    axios.post(process.env.MOBILE_PULSA, pulsa, {
+        headers: {
+            'Content-Type': 'text/xml',
+        },
+        httpsAgent: new https.Agent({ rejectUnauthorized: false })
+    })
+    .then((data) => {
+      let json = CircularJSON.stringify(data.data);
+      let dataJson = JSON.parse(json)
+      let convertJson = convert.xml2json(dataJson, { compact: true})
+      let object = JSON.parse(convertJson)
+      db.transaction.update({
+        status: object.mp.message._text,
+        },{
+          where:{
+            id: dataTransaction.id
+          }
+        }),
+        db.user.update({
+          wallet: dataUser.wallet - price
+        }, {
+          where: {
+            id: dataUser.id
+          }
+        })
+        console.log('sukses')
+      })
+    .catch(err => console.log(err))
   }
 };

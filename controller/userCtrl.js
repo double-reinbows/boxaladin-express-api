@@ -72,7 +72,8 @@ exports.getUser = (req, res) => {
       emailVerified: result.emailVerified,
       aladinKeys: result.aladinKeys,
       coin: result.coin,
-      typedEmail: result.typedEmail
+      typedEmail: result.typedEmail,
+      wallet: result.wallet
     }
     res.send(userInfo)
   })

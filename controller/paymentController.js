@@ -3,11 +3,13 @@ const transaction = require('../models').transaction;
 const jwt = require('jsonwebtoken')
 const axios = require ('axios')
 const db = require('../models')
+const moment = require('moment')
+const bankCode = require('../helpers/bankCode')
+
 let invoice = ""
 let banksArr_Obj = ""
 let banksStr = ""
 let retailArr_Obj = ""
-let retailStr = ""
 
 module.exports = {
   createInvoice(req, res) {
@@ -18,7 +20,8 @@ module.exports = {
       status: "PENDING",
       amount: req.body.amount,
       availableBanks: "null",
-      availableretail: "null"
+      availableretail: "null",
+      expiredAt: moment().utcOffset(0).add(24, 'hours').toISOString()
     })
     .then(dataPayment => {
       let decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
@@ -46,7 +49,7 @@ module.exports = {
               }
             })
             .then( productUpdate => {
-              let newId = decoded.id + '-' + dataTransaction.dataValues.paymentId
+              const newId = 'P' + '-' + decoded.id + '-' + dataTransaction.dataValues.paymentId
               var productDescription = resultProduct.dataValues.productName
               axios({
                 method: 'POST',
@@ -98,7 +101,10 @@ module.exports = {
                           message: 'Data Not Found'
                         });
                       }
-                      return res.status(200).send(dataFinal);
+                      return res.status(200).send({
+                        dataFinal,
+                        status: 200
+                      });
                     })
                   }))
                 })
@@ -124,18 +130,16 @@ module.exports = {
   },
 
   createVirtualAccount(req, res) {
-    let date = new Date();
-    date.setHours(date.getHours() + 6);
-    let isodate = date.toISOString();
+    const isodate = moment().utcOffset(0).add(12, 'hours').toISOString()
     console.log('isodeate', isodate)
-    let virtualAccountNumber = ''
     return db.payment.create({
       invoiceId: "null",
       xenditId: 'null',
       status: "PENDING",
       amount: req.body.amount,
       availableBanks: "null",
-      availableretail: "null"
+      availableretail: "null",
+      expiredAt: new Date()
     })
     .then(dataPayment => {
       let decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
@@ -164,7 +168,7 @@ module.exports = {
               }
             })
             .then(productUpdate => {
-              let newId = decoded.id + '-' + dataTransaction.dataValues.paymentId
+              const newId = 'P' + '-' + decoded.id + '-' + dataTransaction.dataValues.paymentId
               var productDescription = resultProduct.dataValues.productName
               return db.virtualAccount.findOne({
                 where: {
@@ -175,25 +179,7 @@ module.exports = {
               .then(result => {
                 if (result === null) {
                   console.log('masuk if')
-                  if (process.env.ENV !== 'prod') {
-                    if (req.body.bankCode === 'BRI') {
-                      virtualAccountNumber = 9999000000 + decoded.id
-                    } else if ( req.body.bankCode === 'MANDIRI') {
-                        virtualAccountNumber = 9999000000 + decoded.id
-                    } else if ( req.body.bankCode === 'BNI') {
-                        virtualAccountNumber = 9999000000 + decoded.id
-                    }
-                  } else if (process.env.ENV === 'prod') {
-                    if (req.body.bankCode === 'BRI') {
-                      virtualAccountNumber = 1268000000 + decoded.id
-                    } else if ( req.body.bankCode === 'MANDIRI') {
-                        virtualAccountNumber = 1268000000 + decoded.id
-                    } else if ( req.body.bankCode === 'BNI') {
-                        virtualAccountNumber = 126800000000 + decoded.id
-                    }
-                  }
-                  const va = virtualAccountNumber.toString()
-                  console.log(va)
+                  const va = bankCode(req.body.bankCode, decoded).toString()
                   console.log(isodate)
                   axios({
                     method: 'POST',
@@ -213,14 +199,13 @@ module.exports = {
                     }
                   })
                   .then(dataBalikan => {
-                    console.log('data xendit', dataBalikan)
                     const data = dataBalikan.data
-                    console.log(data)
                     console.log('const data', data)
                     return db.payment.update({
                       invoiceId: data.id,
                       xenditId: newId,
-                      availableBanks: data.account_number
+                      availableBanks: data.account_number,
+                      expiredAt: isodate
                     }, {
                       where:{
                         id: dataPayment.id
@@ -250,9 +235,7 @@ module.exports = {
                           })
                           .then( dataFinal => {
                             res.send({
-                              data,
                               dataFinal,
-                              dataVirtual,
                               status: 200,
                               amount : req.body.amount,
                               message: 'new va'
@@ -301,17 +284,18 @@ module.exports = {
                       is_closed: true,
                       expected_amount: req.body.amount,
                       virtual_account_number: result.virtualAccountNumber,
-                      is_single_use: true,
+                      is_single_use : true,
                       expiration_date: isodate
                     },
                   })
                   .then(dataBalikan => {
-                    console.log('data xendit', dataBalikan)
                     const data = dataBalikan.data
+                    console.log('data', data)
                     db.payment.update({
                       invoiceId: data.id,
                       xenditId: newId,
-                      availableBanks: data.account_number
+                      availableBanks: data.account_number,
+                      expiredAt: data.expiration_date
                     }, {
                       where:{
                         id: dataPayment.id
@@ -335,9 +319,7 @@ module.exports = {
                         })
                         .then(dataFinal => {
                           res.send({
-                            data,
                             dataFinal,
-                            result,
                             status: 200,
                             amount : req.body.amount,
                             message: 'va already exist'
@@ -374,7 +356,7 @@ module.exports = {
           })
         })
       })
-      .catch(err => res.status(400).send(err));
+      .catch(err => console.log(err));
   },
   /*
    * This function takes a bank name, looks it up in the virtualAccounts table and then attempts to
@@ -406,7 +388,7 @@ module.exports = {
       getInvoiceP.then(data => {
         if (!Array.isArray(data) || !data.length) { return res.send('Invoice not found'); }
         const row = data[0].dataValues.id; //remember the id to update status if Xendit succeeds
-        console.log('HALO', data)
+        console.log('HALO', data[0].dataValues.invoiceId)
         let xenditP = axios({
           method: 'PATCH',
           url: `https://api.xendit.co/callback_virtual_accounts/${data[0].dataValues.invoiceId}`,
@@ -435,54 +417,38 @@ module.exports = {
     }).catch(err => { console.log(err) })
   },
 
-  // cancelInvoice(req, res) {
-  //   let decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET);
-  //   let now = new Date;
-  //   db.virtualAccount.findOne({
-  //     where:{
-  //       userId: decoded.id,
-  //       bankCode: req.body.bank
-  //     }
-  //   })
-  //   .then( dataVA => {
-  //     console.log(dataVA)
-  //     if (!dataVA) { return res.send('VA Not Found'); }
-  //     return db.payment.findAll({
-  //       limit: 1,
-  //       where: {
-  //         availableBanks: {ilike: '%' + dataVA.dataValues.virtualAccountNumber},
-  //         status: 'PENDING',
-  //       },
-  //       order: [ [ 'createdAt', 'DESC' ]]
-  //     })
-  //     .then( dataPayment => {
-  //       console.log('datapayment', dataPayment[0].invoiceId)
-  //       const row = dataPayment[0].dataValues.id
-  //       axios({
-  //         method: 'PATCH',
-  //         url: `https://api.xendit.co/callback_virtual_accounts/${dataPayment[0].invoiceId}`,
-  //         headers: {
-  //           authorization: process.env.XENDIT_AUTHORIZATION,
-  //         },
-  //         data: {
-  //           expiration_date: now,
-  //           expected_amount: dataPayment[0].amount,
-  //         },
-  //       })
-  //       .then(updateXendit => {
-  //         if (updateXendit.status === 200) {
-  //           db.payment.update({
-  //             status: 'CANCELLED',
-  //           }, {
-  //             where: {
-  //               id: row,
-  //             }
-  //           }).catch(err => {console.log('UPDATE FAIL', err)});
-  //           return res.send('Fixed VA closed');
-  //         }
-  //       })
-  //     })
-  //   })
-  //   .catch(error => console.log(error))
-  // }
+  tesVa(req, res) {
+    let decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
+    const isodate = moment().utcOffset(0).add(12, 'hours').toISOString()
+    console.log('date', date)
+    console.log('isodate', isodate)
+    const va = bankCode(req.body.bankCode, decoded).toString()
+    axios({
+      method: 'POST',
+      url: `https://api.xendit.co/callback_virtual_accounts`,
+      headers: {
+        authorization: process.env.XENDIT_AUTHORIZATION
+      },
+      data: {
+        external_id: req.body.externalId,
+        bank_code: req.body.bankCode,
+        name: 'Pt Boxaladin AsiaPasific ',
+        is_closed: true,
+        expected_amount: req.body.amount,
+        virtual_account_number: va,
+        is_single_use : true,
+        expiration_date: isodate
+      }
+    })
+    .then(dataBalikan => {
+      console.log(dataBalikan)
+      const data = dataBalikan.data
+      console.log('const data', data)
+      res.send(data)
+    })
+    .catch(err => console.log(err));
+
+  }
+
+
 }

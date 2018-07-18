@@ -15,6 +15,10 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'virtualId',
       as: 'topups',
     });
+    virtualAccount.hasMany(models.walletLog, {
+      foreignKey: 'virtualId',
+      as: 'walletLogs',
+    });
   };
   return virtualAccount;
 };

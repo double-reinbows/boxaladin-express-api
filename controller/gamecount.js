@@ -3,7 +3,9 @@ const model = require('../models')
 module.exports = {
 
   all: (req, res) => {
-    model.gamecount.findAll()
+    model.gamecount.findAll({
+      order: [['id', 'ASC']],
+    })
     .then(result => res.send(result))
     .catch(err => res.send(err))
   },

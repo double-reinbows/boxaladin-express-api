@@ -8,7 +8,7 @@ const callbackController = require('../controller/callback')
 const pulsaController = require('../controller/pulsa')
 const transactionController = require('../controller/transaction')
 const creditCardController = require('../controller/creditCard')
-const topUpController = require('../controller/aladinKey')
+const aladinkeyController = require('../controller/aladinKey')
 const aladinKeyLogController = require('../controller/aladinKeyLogController')
 
 const ctrl = require('../controller/indexCtrl')
@@ -29,6 +29,8 @@ const auth = require('../helpers/auth')
 
 const gameRuleController = require('../controller/gamerule');
 const gameController = require('../controller/gameController');
+
+const walletController = require('../controller/walletController')
 
 router.get('/sandbox', (req, res) => {
   let decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
@@ -78,14 +80,20 @@ router.post('/callbackfixed', callbackController.callBackFixedXendit)
 router.post('/creditCard', creditCardController.createCreditCard)
 router.delete('/virtualaccount', auth.isLogin, paymentController.closeVirtualAccount);
 // router.post('/cancelinvoice', paymentController.cancelInvoice)
+router.post('/fixedwallet', walletController.fixedvaWallet)
+router.post('/alfawallet', walletController.alfamartWallet)
+router.post('/walletkey', walletController.walletBuyKey)
+router.post('/walletpulsa', walletController.walletBuyPulsa)
+router.get('/walletstatus', walletController.walletStatus)
+router.get('/walletstatus/:id', walletController.byId)
 // ---------------------------------------
 
-router.post('/topupKey', topUpController.topUpKeys)
-router.post('/topupva', topUpController.createVirtualAccount )
-router.get('/voucheraladinkey', topUpController.all)
-router.get('/topup/user', topUpController.allByUser)
-router.get('/topup/userpending', topUpController.allPendingByUser)
-router.get('/topup/:id', topUpController.byId)
+router.post('/topupKey', aladinkeyController.topUpKeys)
+router.post('/topupva', aladinkeyController.createVirtualAccount )
+router.get('/voucheraladinkey', aladinkeyController.all)
+router.get('/topup/user', aladinkeyController.allByUser)
+router.get('/topup/userpending', aladinkeyController.allPendingByUser)
+router.get('/topup/:id', aladinkeyController.byId)
 router.post('/creditCardTopup', creditCardController.createCreditCardTopup)
 
 // ------------------pulsa routes----------------------------
@@ -126,4 +134,5 @@ router.put('/logsold', auth.isLogin, aladinKeyLogController.increaseSold)
 router.post('/logbid' , auth.isLogin, aladinKeyLogController.logBid)
 router.post('/watching', productController.updateWatch)
 
+router.post('/tesva', paymentController.tesVa)
 module.exports = router;

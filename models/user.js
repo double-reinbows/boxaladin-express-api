@@ -59,6 +59,9 @@ module.exports = function(sequelize, DataTypes) {
     coin: {
       type: DataTypes.INTEGER,
     },
+    wallet: {
+      type: DataTypes.INTEGER,
+    },
     role: {
       type: DataTypes.STRING,
       allowNull: true
@@ -100,8 +103,12 @@ module.exports = function(sequelize, DataTypes) {
     user.hasMany(models.aladinkeyLog, {
       foreignKey: 'userId',
       as: 'aladinkeyLogs',
-    })
+    });
 
+    user.hasMany(models.walletLog, {
+      foreignKey: 'userId',
+      as: 'walletLogs',
+    });
   };
 
   return user;
