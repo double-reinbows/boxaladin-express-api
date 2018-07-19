@@ -84,17 +84,15 @@ exports.signin = (req, res) => {
         message: 'username or email not found'
       })
     } else if (user.password.substr(6) === hashedPass.substr(6)) {
-      let token = jwt.sign(
+      const token = jwt.sign(
         {
           id: user.id,
-          username: user.username || user.email,
           email: user.email,
-          emailVerified: user.emailVerified,
-          firstName: user.firstName,
-          familyName: user.familyName,
-          sex: user.sex,
           typedEmail: user.typedEmail,
-          wallet: user.wallet
+          emailVerified: user.emailVerified,
+          wallet: user.wallet,
+          key: user.aladinKeys,
+          coin: user.coin
         },
         process.env.JWT_SECRET, {
           expiresIn: "7 days"
@@ -397,18 +395,14 @@ exports.signup = (req, res) => {
             // CREATE USER
             db.user.create(req.body)
             .then(data => {
-              var token = jwt.sign({
+              const token = jwt.sign({
                 id: data.id,
-                username: data.username,
                 email: data.email,
                 typedEmail: data.typedEmail,
                 emailVerified: data.emailVerified,
-                firstName: data.firstName,
-                familyName: data.familyName,
-                sex: data.sex,
                 wallet: data.wallet,
-                token: data.token,
-                aladinKeys: data.aladinKeys
+                key: data.aladinKeys,
+                coin: data.coin
               },
               process.env.JWT_SECRET, {
                 expiresIn: "7 days"

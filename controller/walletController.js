@@ -216,10 +216,8 @@ module.exports = {
       return res.send({ msg: 'not verified user' })
     }
     //reI
-    console.log("HI", req.body.keyId);
     db.key.findById(req.body.keyId)
     .then(dataKey => {
-      console.log("HELLO", dataKey);
       if (!dataKey) {
         return res.status(404).send({
           message: 'Key Not Found',
@@ -230,67 +228,84 @@ module.exports = {
           message: 'saldo tidak mencukupi',
           wallet: decoded.wallet
         })
-      }
-      db.user.findOne({
-        where: {
-          id: decoded.id
-        }
-      })
-      .then(dataUser => {
-        if ( dataUser.wallet < dataKey.price) {//check User has enough money in DB
-          return res.send({
-            message: 'saldo tidak mencukupi',
-            wallet: dataUser.wallet
-          })
-        }
-
-        //Update user balance
-        db.user.update({
-          wallet: dataUser.wallet - dataKey.price,
-          aladinKeys: dataUser.aladinKeys + dataKey.keyAmount
-        }, {
+      } else if(decoded.wallet >= dataKey.price) {
+        return db.user.findOne({
           where: {
             id: decoded.id
           }
         })
-
-        db.payment.create ({
-          invoiceId: "wallet",
-          xenditId: 'null',
-          status: "PAID",
-          amount: dataKey.price,
-          availableBanks: "wallet",
-          availableretail: "wallet",
-          expiredAt: new Date(),
-        })
-        .then(dataPayment => {
-          const newId = 'W' + '-' + decoded.id + '-' + dataPayment.id
-
-          db.payment.update({
-            xenditId: newId,
-            invoiceId: 'wallet' + '-' + dataPayment.id
-          },{
-            where:{
-              id: dataPayment.id
-            }
-          })
-
-          db.topup.create({
-          paymentId: dataPayment.id,
-          userId: decoded.id,
-          keyId: req.body.keyId,
-          xenditId: newId,
-          status: 'PAID',
-          virtualId: 0
-          })
-          .then(dataTopUp => {
-            res.send({
-              message: 'topup sukses',
-              dataTopUp
+        .then(dataUser => {
+          if (dataUser.wallet >= dataKey.price){
+            return db.user.update({
+              wallet: dataUser.wallet - dataKey.price,
+              aladinKeys: dataUser.aladinKeys + dataKey.keyAmount
+            }, {
+              where: {
+                id: decoded.id
+              },
+              returning: true,
+              plain: true
             })
-          })
+            .then( updateUser => {
+              const user = updateUser[1].dataValues
+              const token = jwt.sign(
+                {
+                  id: user.id,
+                  email: user.email,
+                  typedEmail: user.typedEmail,
+                  emailVerified: user.emailVerified,
+                  wallet: user.wallet,
+                  key: user.aladinKeys,
+                  coin: user.coin
+                },
+                process.env.JWT_SECRET, {
+                  expiresIn: "7 days"
+                })
+              return db.payment.create ({
+                invoiceId: "wallet",
+                xenditId: 'null',
+                status: "PAID",
+                amount: dataKey.price,
+                availableBanks: "wallet",
+                availableretail: "wallet",
+                expiredAt: new Date(),
+              })
+              .then(dataPayment => {
+                const newId = 'W' + '-' + decoded.id + '-' + dataPayment.id
+  
+                return db.payment.update({
+                  xenditId: newId,
+                  invoiceId: 'wallet' + '-' + dataPayment.id
+                },{
+                  where:{
+                    id: dataPayment.id
+                  }
+                }),
+                db.topup.create({
+                paymentId: dataPayment.id,
+                userId: decoded.id,
+                keyId: req.body.keyId,
+                xenditId: newId,
+                status: 'PAID',
+                virtualId: 0
+                })
+                .then(dataTopUp => {
+                  res.send({
+                    message: 'topup sukses',
+                    dataTopUp,
+                    token: token
+                  })
+                })
+              })
+            })
+          } else {
+            return res.send({
+              message: 'saldo tidak mencukupi',
+              wallet: decoded.wallet
+            })
+          }
         })
-      })
+      }
     })
     .catch(error => console.log(error));
   },
@@ -312,78 +327,79 @@ module.exports = {
           message: 'saldo tidak mencukupi',
           wallet: decoded.wallet
         })
-      }
-
-      return db.user.findOne({
-        where: {
-          id: decoded.id
-        }
-      })
-      .then(dataUser => {
-        if ( dataUser.wallet < price) {
-          return res.send({
-            message: 'saldo tidak mencukupi',
-            wallet: dataUser.wallet
-          })
-        }
-        // else {
-        return db.payment.create({
-          invoiceId: "wallet",
-          xenditId: 'null',
-          status: "PAID",
-          amount: price,
-          availableBanks: "wallet",
-          availableretail: "wallet",
-          expiredAt: new Date()
+      } else if (decoded.wallet >= price){
+        return db.user.findOne({
+          where: {
+            id: decoded.id
+          }
         })
-        .then(dataPayment => {
-          const newId = 'W' + '-' +decoded.id + '-' + dataPayment.id
-
-          db.payment.update({
-          xenditId: newId,
-          invoiceId: 'wallet' + '-' + dataPayment.id
-          }, {
-            where: {
-              id: dataPayment.id
-            }
+        .then(dataUser => {
+          if ( dataUser.wallet >= price) {
+            return db.payment.create({
+            invoiceId: "wallet",
+            xenditId: 'null',
+            status: "PAID",
+            amount: price,
+            availableBanks: "wallet",
+            availableretail: "wallet",
+            expiredAt: new Date()
           })
+          .then(dataPayment => {
+            const newId = 'W' + '-' +decoded.id + '-' + dataPayment.id
 
-          return db.product.findOne({
-            where: {
-              id: req.body.productId
-            }
-          })
-          .then(dataProduct => {
-            return db.transaction.create({
-              paymentId: dataPayment.id,
-              productId: req.body.productId,
-              userId: decoded.id,
-              pulsaId: newId,
-              number: req.body.phoneNumber,
-              status: "PAID",
-              aladinPrice: price,
-              virtualId: 0,
-              description: dataProduct.productName
+            db.payment.update({
+            xenditId: newId,
+            invoiceId: 'wallet' + '-' + dataPayment.id
+            }, {
+              where: {
+                id: dataPayment.id
+              }
             })
-            .then(dataFinal => {
-            console.log('panggil function pulsa');
-            pulsa.pulsaWallet(req, res,price, dataUser.dataValues, dataFinal.dataValues, dataProduct.dataValues)
-            res.send({
-              dataFinal,
-              status: 200,
-              message: 'sukses pulsa'
+
+            return db.product.findOne({
+              where: {
+                id: req.body.productId
+              }
             })
-              return db.product.update({
-                sold: dataProduct.sold + 1
-              }, {
-                where: {
-                  id: req.body.productId
-                }
+            .then(dataProduct => {
+              return db.transaction.create({
+                paymentId: dataPayment.id,
+                productId: req.body.productId,
+                userId: decoded.id,
+                pulsaId: newId,
+                number: req.body.phoneNumber,
+                status: "PAID",
+                aladinPrice: price,
+                virtualId: 0,
+                description: dataProduct.productName
+              })
+              .then(dataFinal => {
+              console.log('panggil function pulsa');
+              pulsa.pulsaWallet(req, res,price, dataUser.dataValues, dataFinal.dataValues, dataProduct.dataValues)
+              res.send({
+                dataFinal,
+                status: 200,
+                message: 'sukses pulsa'
+              })
+                return db.product.update({
+                  sold: dataProduct.sold + 1
+                }, {
+                  where: {
+                    id: req.body.productId
+                  }
+                })
               })
             })
           })
+          }
+          else {
+            return res.send({
+              message: 'saldo tidak mencukupi',
+              wallet: dataUser.wallet
+            })
+          }
         })
-      })
+      }
     })
     .catch(err => console.log(err))
   },

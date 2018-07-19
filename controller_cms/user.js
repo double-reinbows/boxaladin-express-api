@@ -43,14 +43,10 @@ module.exports = {
 
       } else if (user.password.substr(6) === hashedPass.substr(6)) {
 
-        let token = jwt.sign({
+        const token = jwt.sign({
           id: user.id,
-          username: user.username || user.email,
           email: user.email,
           emailVerified: user.emailVerified,
-          firstName: user.firstName,
-          familyName: user.familyName,
-          sex: user.sex,
           emailVerified: user.emailVerified,
           role: user.role,
         }, process.env.JWT_SECRET);

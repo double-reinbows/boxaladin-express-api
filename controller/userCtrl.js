@@ -11,17 +11,19 @@ exports.refreshToken = (req, res) => {
       id: decoded.id
     }
   })
-  .then(data => {
+  .then(user => {
 
-    let token = jwt.sign({
-      id: data.id,
-      username: data.username,
-      email: data.email,
-      emailVerified: data.emailVerified,
-      firstName: data.firstName,
-      familyName: data.familyName,
-      sex: data.sex,
-    }, process.env.JWT_SECRET)
+    const token = jwt.sign({
+      id: user.id,
+      email: user.email,
+      typedEmail: user.typedEmail,
+      emailVerified: user.emailVerified,
+      wallet: user.wallet,
+      key: user.aladinKeys,
+      coin: user.coin
+    }, process.env.JWT_SECRET, {
+      expiresIn: "7 days"
+    })
 
     return res.send({
       msg: 'refresh token success',
@@ -63,21 +65,16 @@ exports.getUser = (req, res) => {
   .then(result => {
     const userInfo = {
       id: result.id,
-      username: result.username,
-      firstName: result.firstName,
-      familyName: result.familyName,
-      sex: result.sex,
       email: result.email,
       typedEmail : result.typedEmail,
       emailVerified: result.emailVerified,
+      wallet: result.wallet,
       aladinKeys: result.aladinKeys,
-      coin: result.coin,
-      typedEmail: result.typedEmail,
-      wallet: result.wallet
+      coin: result.coin
     }
     res.send(userInfo)
   })
-  .catch(err => res.send(err))
+  .catch(err => console.log(err))
 }
 
 exports.decreaseCoin = (req, res) => {
