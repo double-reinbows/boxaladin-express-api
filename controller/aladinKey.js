@@ -14,9 +14,9 @@ module.exports = {
   //Called when a User wants to purchase AladinKeys
   topUpKeys(req, res) {
     const decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
-    if (decoded.emailVerified == false) {
-      return res.send('not verified user' )
-    }
+    // if (decoded.emailVerified == false) {
+    //   return res.send('not verified user' )
+    // }
     db.key.findById(req.body.keyId)
     .then(data => {
       if (!data) {
@@ -24,14 +24,14 @@ module.exports = {
           message: 'Key Not Found',
         });
       }
-      db.payment.create ({
+      return db.payment.create ({
         invoiceId: "null",
         xenditId: 'null',
         status: "PENDING",
         amount: data.price,
         availableBanks: "null",
         availableretail: "null",
-        expiredAt: moment().utcOffset(0).add(24, 'hours').toISOString()
+        expiredAt: new Date()
       })
       .then((dataPayment) => {
         const newId = 'T' + '-' + decoded.id + ('-') + dataPayment.id
@@ -66,13 +66,15 @@ module.exports = {
           console.log('dataaxios', dataAxios)
           banksArr_Obj = dataAxios.available_banks
           banksStr = JSON.stringify(banksArr_Obj)
-          {dataAxios.available_retail_outlets ? (retailArr_Obj = dataAxios.available_retail_outlets[0].payment_code) : (retailArr_Obj= 'null')}
+          {dataAxios.available_retail_outlets ? (retailArr_Obj = dataAxios.available_retail_outlets[0].payment_code) : (retailArr_Obj= 'ALFAMART SEDANG TIDAK BISA DIGUNAKAN')}
 
           //update payment with Xendit details
           db.payment.update({
             invoiceId: dataAxios.id,
+            xenditId: newId,
             availableBanks: banksStr,
-            availableretail: retailArr_Obj
+            availableretail: retailArr_Obj,
+            expiredAt: dataAxios.expiry_date
           },{
             where:{
               id: dataPayment.id
@@ -161,9 +163,9 @@ module.exports = {
   createVirtualAccount(req, res) {
     const decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
     const isodate = moment().utcOffset(0).add(12, 'hours').toISOString()
-    if (decoded.emailVerified == false) {
-      return res.send({ msg: 'not verified user' })
-    }
+    // if (decoded.emailVerified == false) {
+    //   return res.send({ msg: 'not verified user' })
+    // }
 
     return db.key.findById(req.body.keyId)
     .then(data => {

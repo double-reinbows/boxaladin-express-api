@@ -71,8 +71,8 @@ router.post('/olduserotp', otpCtrl.oldUserSentotp)
 router.post('/olduserverification', phoneCtrl.oldUserVerify)
 
 //-------------------xendit routes-------------------------
-router.post('/virtualaccount', paymentController.createVirtualAccount)
-router.post('/payment', paymentController.createInvoice)
+router.post('/virtualaccount', auth.isVerified, paymentController.createVirtualAccount)
+router.post('/payment', auth.isVerified, paymentController.createInvoice)
 router.get('/payment/:id', paymentController.retrieveInvoice)
 // router.get('/status/:id/:invoice', paymentController.updateStatus)
 router.post('/callbackurl', callbackController.createCallbackXendit)
@@ -80,16 +80,16 @@ router.post('/callbackfixed', callbackController.callBackFixedXendit)
 router.post('/creditCard', creditCardController.createCreditCard)
 router.delete('/virtualaccount', auth.isLogin, paymentController.closeVirtualAccount);
 // router.post('/cancelinvoice', paymentController.cancelInvoice)
-router.post('/fixedwallet', walletController.fixedvaWallet)
-router.post('/alfawallet', walletController.alfamartWallet)
-router.post('/walletkey', walletController.walletBuyKey)
-router.post('/walletpulsa', walletController.walletBuyPulsa)
+router.post('/fixedwallet', auth.isVerified, walletController.fixedvaWallet)
+router.post('/alfawallet', auth.isVerified, walletController.alfamartWallet)
+router.post('/walletkey', auth.isVerified, walletController.walletBuyKey)
+router.post('/walletpulsa', auth.isVerified, walletController.walletBuyPulsa)
 router.get('/walletstatus', walletController.walletStatus)
 router.get('/walletstatus/:id', walletController.byId)
 // ---------------------------------------
 
-router.post('/topupKey', aladinkeyController.topUpKeys)
-router.post('/topupva', aladinkeyController.createVirtualAccount )
+router.post('/topupKey', auth.isVerified, aladinkeyController.topUpKeys)
+router.post('/topupva', auth.isVerified, aladinkeyController.createVirtualAccount )
 router.get('/voucheraladinkey', aladinkeyController.all)
 router.get('/topup/user', aladinkeyController.allByUser)
 router.get('/topup/userpending', aladinkeyController.allPendingByUser)
@@ -109,22 +109,22 @@ router.get('/transaction/:id', transactionController.byId)
 
 router.get('/api/category', categoryController.list);
 router.get('/api/category/:id', categoryController.retrieve);
-router.post('/api/category', categoryController.create);
-router.put('/api/category/:id', categoryController.update);
-router.delete('/api/category/:id', categoryController.destroy);
+router.post('/api/category', auth.isLogin, auth.isSuperadmin, categoryController.create);
+router.put('/api/category/:id', auth.isLogin, auth.isSuperadmin, categoryController.update);
+router.delete('/api/category/:id', auth.isLogin, auth.isSuperadmin, categoryController.destroy);
 
 router.get('/api/brand', brandController.list);
 router.get('/api/brand/:id', brandController.retrieve);
-router.post('/api/brand', brandController.create);
-router.put('/api/brand/:id', brandController.update);
-router.delete('/api/brand/:id', brandController.destroy);
+router.post('/api/brand', auth.isLogin, auth.isSuperadmin, brandController.create);
+router.put('/api/brand/:id', auth.isLogin, auth.isSuperadmin, brandController.update);
+router.delete('/api/brand/:id', auth.isLogin, auth.isSuperadmin, brandController.destroy);
 
 router.get('/api/product/filter', productController.filter);
 router.get('/api/product', productController.list);
 router.get('/api/product/:id', productController.retrieve);
-router.post('/api/product', productController.create);
-router.put('/api/product/:id', productController.update);
-router.delete('/api/product/:id', productController.destroy);
+router.post('/api/product', auth.isLogin, auth.isSuperadmin, productController.create);
+router.put('/api/product/:id', auth.isLogin, auth.isSuperadmin, productController.update);
+router.delete('/api/product/:id', auth.isLogin, auth.isSuperadmin, productController.destroy);
 
 router.get('/gamerules', gameRuleController.all);
 router.get('/game', gameController.play);

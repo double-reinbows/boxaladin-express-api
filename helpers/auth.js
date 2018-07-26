@@ -68,3 +68,16 @@ exports.isAdmin = (req, res, next) => {
 
   }
 }
+
+exports.isVerified = (req, res, next) => {
+  const decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
+
+  if (decoded.emailVerified === false) {
+    res.send({
+      message: 'not verified user',
+      msg: 'not verified user'
+    })
+  } else {
+    next()
+  }
+}

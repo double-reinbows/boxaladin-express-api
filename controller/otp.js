@@ -108,21 +108,23 @@ module.exports = {
       }
     })
     .then(checkNumber => {
-      if (checkNumber.length === 0){
-        db.phonenumber.create({
-          userId: decoded.id,
-          number: newNumber,
-          verified: false,
-          otp: 404,
-          primary: false
-        })
-        .then(data => {
-          citcall.otp(req, res)
-          res.send('phone created')
-        })
-        .catch(err => res.send(err))
-      } else if (checkNumber.length !== 0) {
-          res.send('ada no hp verified/primary')
+      if (checkNumber.length === 0) {
+        // db.phonenumber.create({
+        //   userId: decoded.id,
+        //   number: newNumber,
+        //   verified: false,
+        //   otp: 404,
+        //   primary: false
+        // });
+        return res.send('number does not match');
+      } else {
+        for (let i=0; i<checkNumber.length; i++) {
+          if (checkNumber[i].verified === true) {
+            return res.send('ada no hp verified/primary')
+          }
+        }
+        citcall.otp(req, res)
+        return res.send('phone created')
       }
     })
     .catch(err => console.log(err))

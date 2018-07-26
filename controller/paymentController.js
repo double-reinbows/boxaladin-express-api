@@ -21,7 +21,7 @@ module.exports = {
       amount: req.body.amount,
       availableBanks: "null",
       availableretail: "null",
-      expiredAt: moment().utcOffset(0).add(24, 'hours').toISOString()
+      expiredAt: new Date()
     })
     .then(dataPayment => {
       let decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
@@ -69,12 +69,13 @@ module.exports = {
                 invoice = data.id,
                 banksArr_Obj = data.available_banks
                 banksStr = JSON.stringify(banksArr_Obj)
-                {data.available_retail_outlets ? (retailArr_Obj = data.available_retail_outlets[0].payment_code) : (retailArr_Obj= 'null')}
+                {data.available_retail_outlets ? (retailArr_Obj = data.available_retail_outlets[0].payment_code) : (retailArr_Obj= 'ALFAMART SEDANG TIDAK BISA DIGUNAKAN')}
                 return db.payment.update({
                   invoiceId: invoice,
                   xenditId: newId,
                   availableBanks: banksStr,
-                  availableretail: retailArr_Obj
+                  availableretail: retailArr_Obj,
+                  expiredAt: data.expiry_date
                 },{
                   where:{
                     id: dataPayment.id

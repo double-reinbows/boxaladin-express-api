@@ -61,9 +61,13 @@ module.exports = {
   },
 
   openHistory(req, res) {
-    db.product.findAll()
-    .then(dataProduct => {        
-      const map = dataProduct.map(data => data.dataValues);  
+    db.product.findAll({
+      order: [
+        ['id','ASC']
+      ]
+    })
+    .then(dataProduct => {
+      const map = dataProduct.map(data => data.dataValues);
       res.send(map)
       })
   }

@@ -163,5 +163,25 @@ exports.buyCoinWithAladinKey = (req, res) => {
     console.log(err)
     return res.send(err)
   })
+}
 
+exports.checkUser = (req, res) => {
+  const decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
+
+  db.user.findOne({
+    where: { id: decoded.id }
+  })
+  .then(result => {
+    const userInfo = {
+      id: result.id,
+      email: result.email,
+      typedEmail : result.typedEmail,
+      emailVerified: result.emailVerified,
+      wallet: result.wallet,
+      aladinKeys: result.aladinKeys,
+      coin: result.coin
+    }
+    res.send(userInfo)
+  })
+  .catch(err => console.log(err))
 }

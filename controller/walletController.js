@@ -7,18 +7,17 @@ const pulsa = require('./pulsa')
 
 module.exports = {
   alfamartWallet(req, res) {
-    const isodate = moment().add(24, 'hours').toISOString();
     const decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
-    const limit = 2000000
     db.user.findOne({
       where: {
         id: decoded.id
       }
     })
     .then(dataUser => {
-      if (decoded.emailVerified == false) {
-        return res.send('not verified user' )
-      } else if ( dataUser.wallet + req.body.amount >= 2000000) {
+      // if (decoded.emailVerified == false) {
+      //   return res.send('not verified user' )
+      // }
+      if ( dataUser.wallet + req.body.amount >= 2000000) {
         return res.send('maksimum limit wallet')
       }
       if (req.body.amount <= 2000000 && req.body.amount >= 200000) {
@@ -30,7 +29,7 @@ module.exports = {
           amount: req.body.amount,
           availableBanks: "null",
           availableretail: "null",
-          expiredAt: isodate
+          expiredAt: new Date()
         })
         .then(dataPayment => {
           const newId = 'W' + '-' +decoded.id + '-' + dataPayment.id
@@ -49,13 +48,15 @@ module.exports = {
           })
           .then(dataResponse => {
             const data = dataResponse.data
+            console.log('data', data)
             let retailArr_Obj = ''
-            {data.available_retail_outlets ? (retailArr_Obj = data.available_retail_outlets[0].payment_code) : (retailArr_Obj= 'null')}
+            {data.available_retail_outlets ? (retailArr_Obj = data.available_retail_outlets[0].payment_code) : (retailArr_Obj= 'ALFAMART SEDANG TIDAK BISA DIGUNAKAN')}
             return db.payment.update({
               invoiceId: data.id,
               xenditId: newId,
               availableBanks: JSON.stringify(data.available_banks),
-              availableretail: retailArr_Obj
+              availableretail: retailArr_Obj,
+              expiredAt: data.expiry_date
             }, {
               where:{
                 id: dataPayment.id
@@ -86,16 +87,16 @@ module.exports = {
   fixedvaWallet(req, res) {
     const isodate = moment().add(12, 'hours').toISOString();
     const decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
-    const limit = 2000000
     db.user.findOne({
       where: {
         id: decoded.id
       }
     })
     .then(dataUser => {
-      if (decoded.emailVerified === false) {
-      return res.send('not verified user')
-    } else if ( dataUser.wallet + req.body.amount > 2000000) {
+    //   if (decoded.emailVerified === false) {
+    //   return res.send('not verified user')
+    // }
+    if ( dataUser.wallet + req.body.amount > 2000000) {
       return res.send('maksimum limit wallet')
     }
     if (req.body.amount <= 2000000 && req.body.amount >= 200000) {
@@ -212,9 +213,9 @@ module.exports = {
 
   walletBuyKey(req, res) {
     const decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
-    if (decoded.emailVerified == false) {
-      return res.send({ msg: 'not verified user' })
-    }
+    // if (decoded.emailVerified == false) {
+    //   return res.send({ msg: 'not verified user' })
+    // }
     //reI
     db.key.findById(req.body.keyId)
     .then(dataKey => {
@@ -272,7 +273,7 @@ module.exports = {
               })
               .then(dataPayment => {
                 const newId = 'W' + '-' + decoded.id + '-' + dataPayment.id
-  
+
                 return db.payment.update({
                   xenditId: newId,
                   invoiceId: 'wallet' + '-' + dataPayment.id

@@ -47,7 +47,6 @@ module.exports = {
           id: user.id,
           email: user.email,
           emailVerified: user.emailVerified,
-          emailVerified: user.emailVerified,
           role: user.role,
         }, process.env.JWT_SECRET);
 
@@ -213,5 +212,38 @@ module.exports = {
       }
     })
     .catch(err => res.send(err))
-  }
+  },
+
+  findData: (req, res) => {
+      model.user.findOne({
+        where:[{
+          id : req.params.id
+        }]
+      })
+      .then(dataUser => {
+        if (dataUser === null) {
+          res.send({message : 'email not found'})
+        } else {
+          model.phonenumber.findOne({
+            where:[{
+              userId : dataUser.id
+            }]
+          })
+          .then(phoneUser => {
+            if (phoneUser === null ){
+              res.send({
+                message: 'null',
+                user: dataUser
+              })
+            } else {
+              res.send({
+                user: dataUser,
+                phone: phoneUser
+              })
+            }
+          })
+        }
+      })
+      .catch(err => res.send(err))
+    }
 }

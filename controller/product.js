@@ -87,7 +87,11 @@ module.exports = {
         stock: req.body.stock,
         price: req.body.price,
         aladinPrice: req.body.price,
-        pulsaCode: req.body.pulsaCode
+        pulsaCode: req.body.pulsaCode,
+        displayPrice: req.body.displayPrice,
+        decreasePrice: req.body.decreasePrice,
+        opened: 0,
+        sold: 0
       })
       .then(data => {
         product.findOne({
@@ -106,11 +110,10 @@ module.exports = {
   					price: result.price,
   					aladinPrice: result.aladinPrice,
   					brand: result.brand.brandName,
-  					category: result.category.categoryName,
-  					brandId: result.brand.id,
-  					categoryId: result.category.id,
             watching: 0,
-            brandLogo: result.brand.brandLogo
+            brandLogo: result.brand.brandLogo,
+            displayPrice: result.displayPrice,
+            decreasePrice: result.decreasePrice
   				})
 
           res.status(201).send(data)
