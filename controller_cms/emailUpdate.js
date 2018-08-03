@@ -10,11 +10,14 @@ module.exports = {
         typedEmail: req.body.email
       }]
     })
-    .then( data => {
-      if (data[0].toString() === '1') {
+    .then( result => {
+      //TODO: investigate if result[]0] is number or string
+      if (result[0].toString() === '1') {
         res.send('verifikasi email telah di update')
+      } else if (parseInt(result[0].toString()) > 2) {
+        res.send('update email lebih dari satu')
       } else {
-        res.send('data tidak ditemukan')
+        res.send('data tidak ditemukan sama sekali')
       }
     })
   },
@@ -24,22 +27,14 @@ module.exports = {
       username: req.body.username,
       firstName: req.body.firstname,
       familyName: req.body.familyname,
-      password: hasher(req.body.password),
-      email: req.body.email
+      email: req.body.email,
+      emailVerified: req.body.emailVerified,
+      sex: req.body.sex
     }, {
       where: [{
         id: req.params.id
       }]
     })
-    .then( data => {
-      if (data[0].toString() === '1') {
-        res.send('email telah di update')
-      } else {
-        res.send('data tidak ditemukan')
-      }
-    })
-    .catch(err => {
-      console.log(err);
-    })
+    res.send('data berhasil di update')
   }
 }

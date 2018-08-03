@@ -11,28 +11,29 @@ module.exports = {
     createCallbackXendit(req, res) {
       if(req.headers['x-callback-token']!==undefined && req.headers['x-callback-token']===process.env.XENDIT_TOKEN)
       {
+        console.log(req.body)
         const xenditExternalid = req.body.external_id;
         const splitInfo = xenditExternalid.split('-')
         //[0] = W / T / P
         //[1] = user id
         //[2] = payment id
-
+        console.log(splitInfo)
         if (req.body.hasOwnProperty('amount')) {
           db.payment.update({
             status: "PAID"
             }, {
             where: {
-              id: splitInfo[2]
+              id: parseInt(splitInfo[2])
             }
           });
         } else {
           //Xendit is only sending VA status, nothing else to do
-          return;
+          console.log('else')
         }
         if (splitInfo[0] === 'W') {
           db.user.findOne({
               where: {
-                id: splitInfo[1]
+                id: parseInt(splitInfo[1])
               }
           })
           .then( dataUser => {
@@ -40,7 +41,7 @@ module.exports = {
               wallet: dataUser.wallet + req.body.amount
             }, {
               where: {
-                id: splitInfo[1]
+                id: parseInt(splitInfo[1])
               }
             });
           }).catch(err => console.log(err));
@@ -49,7 +50,7 @@ module.exports = {
             status: 'PAID',
           }, {
             where: {
-              paymentId: splitInfo[2],
+              paymentId: parseInt(splitInfo[2]),
             }
           });
           res.send('sukses saldo');
@@ -59,13 +60,13 @@ module.exports = {
             status: "PAID"
           }, {
             where: {
-              paymentId: splitInfo[2]
+              paymentId: parseInt(splitInfo[2])
             }
           });
 
           let topupP = db.topup.findOne({
             where: {
-              paymentId : splitInfo[2]
+              paymentId : parseInt(splitInfo[2])
             },
             include: [
               {
@@ -85,12 +86,13 @@ module.exports = {
               aladinKeys: key
             },{
               where:{
-                id: splitInfo[1]
+                id: parseInt(splitInfo[1])
               }
             })
             res.send('top success');
           });
         } else if (splitInfo[0] === 'P') {
+          console.log('buy pulsa')
           pulsa.pulsa(req,res)
         } else {
           return res.send('error transaction');
@@ -101,39 +103,75 @@ module.exports = {
         }
   },
 
-  createCallbackPulsa(req, res) {
+  async createCallbackPulsa(req, res) {
     console.log('callback pulsa');
-    let parsedXML = xml.parse(req.body);
+    const parsedXML = xml.parse(req.body);
 
-    let convertJson = convert.xml2json(parsedXML[2].childNodes[0].text, { compact: true})
-    let object = JSON.parse(convertJson)
-    let idTransaction = object.ref_id._text
-    let response =  parsedXML[2].childNodes[9].childNodes[0].text
-    console.log('data', response);
-    if(response === '00'){
+    const convertJson = convert.xml2json(parsedXML[2].childNodes[0].text, { compact: true})
+    const object = JSON.parse(convertJson)
+    const idTransaction = object.ref_id._text
+    const idTransactionSplit = object.ref_id._text.split('-')
+    const response =  parsedXML[2].childNodes[15].childNodes[0].text
+    console.log('response status', response);
+    if(response === '00' && idTransactionSplit[0] === 'P'){
       db.transaction.update({
         status: "SUCCESS"
       },{
         where:{
-          pulsaId: idTransaction
+          paymentId: parseInt(idTransactionSplit[2])
         }
       })
-      .then((data) => {
-        console.log('request callback sukses')
-      })
-      .catch(err => res.send(err))
-    } else {
+      return res.send('request callback sukses')
+    } else if (response === '00' && idTransactionSplit[0] === 'W'){
       db.transaction.update({
-        status: response
+        status: "SUCCESS"
+      }, {
+        where:{
+          paymentId: parseInt(idTransactionSplit[3])
+        }
+      })
+      db.payment.update({
+        status: "PAID"
+      }, {
+        where: {
+          id: parseInt(idTransactionSplit[3])
+        }
+      })
+      const transaction = await db.transaction.findOne({
+        where: {
+          paymentId: parseInt(idTransactionSplit[3]) 
+        }
+      })
+      const user = await db.user.findOne({
+        where: {
+          id: parseInt(idTransactionSplit[2]) 
+        }
+      })
+      db.user.update({
+        wallet: user.wallet - transaction.aladinPrice
+      }, {
+        where: {
+          id: parseInt(idTransactionSplit[2]) 
+        }
+      })
+      return res.send('request callback sukses')
+    } else {
+      db.payment.update({
+        status: 'Hubungi CS Boxaladin di LINE @boxaladin'
+      }, {
+        where: {
+          xenditId: idTransaction
+        }
+      })
+
+      db.transaction.update({
+        status: parsedXML[2].childNodes[9].childNodes[0].text
       },{
         where:{
           pulsaId: idTransaction
         }
       })
-      .then((data) => {
-        console.log("error / failed", response)
-      })
-      .catch(err => res.send(err))
+      return res.send('error')
     }
   },
 

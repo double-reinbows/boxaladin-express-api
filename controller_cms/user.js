@@ -1,6 +1,11 @@
 const jwt = require('jsonwebtoken')
 const model = require('../models')
-
+const Sequelize = require('sequelize');
+const op = Sequelize.Op;
+const operatorsAliases = {
+    $eq: op.eq,
+    $or: op.or,
+}
 const hasher = require('../helpers/aladin_hash')
 const { genRandomString } = require('../helpers/string')
 
@@ -181,11 +186,11 @@ module.exports = {
     .catch(err => console.log(err))
   },
 
-  findUser: (req, res) => {
+  findByEmail: (req, res) => {
     model.user.findOne({
-      where:[{
-        email : req.body.email
-      }]
+      where:{
+        $or: [{email: {$eq: req.body.email} }, { typedEmail: {$eq: req.body.email}}]
+      }
     })
     .then(dataUser => {
       if (dataUser === null) {
@@ -214,33 +219,36 @@ module.exports = {
     .catch(err => res.send(err))
   },
 
-  findData: (req, res) => {
-      model.user.findOne({
-        where:[{
-          id : req.params.id
-        }]
-      })
-      .then(dataUser => {
-        if (dataUser === null) {
-          res.send({message : 'email not found'})
-        } else {
-          model.phonenumber.findOne({
-            where:[{
-              userId : dataUser.id
-            }]
+  findById: (req, res) => {
+
+    const findUser = model.user.findOne({
+      where: [{
+        id: req.params.id
+      }]
+    })
+    const phoneNumber = model.phonenumber.findOne({
+      where: [{
+        userId: req.params.id
+      }]
+    })
+
+    Promise.all([findUser, phoneNumber])
+      .then(data => {
+        console.log(data);
+        if (data[0] === null) {
+          res.send({
+            message: 'email not found'
           })
-          .then(phoneUser => {
-            if (phoneUser === null ){
-              res.send({
-                message: 'null',
-                user: dataUser
-              })
-            } else {
-              res.send({
-                user: dataUser,
-                phone: phoneUser
-              })
-            }
+        } else if (data[1] === null) {
+          res.send({
+            message: 'null',
+            user: data[0]
+          })
+        } else {
+          console.log(data);
+          res.send({
+            user: data[0],
+            phone: data[1]
           })
         }
       })

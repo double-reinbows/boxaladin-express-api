@@ -16,7 +16,7 @@ router.get('/phone', auth.isLogin, auth.isSuperadmin, user.getUserWithPhone)
 router.get('/allPhone', auth.isLogin, auth.isSuperadmin, phoneCtrl.all);
 
 router.get('/balance', auth.isLogin, auth.isSuperadmin, xendit.balance)
-router.post('/finduser', auth.isLogin, auth.isSuperadmin, user.findUser)
+router.post('/finduser', auth.isLogin, auth.isSuperadmin, user.findByEmail)
 
 router.post('/addkey', auth.isLogin, auth.isSuperadmin, key.addKey )
 router.post('/removekey', auth.isLogin, auth.isSuperadmin, key.removeKey)

@@ -248,22 +248,8 @@ module.exports = {
               plain: true
             })
             .then( updateUser => {
-              const user = updateUser[1].dataValues
-              const token = jwt.sign(
-                {
-                  id: user.id,
-                  email: user.email,
-                  typedEmail: user.typedEmail,
-                  emailVerified: user.emailVerified,
-                  wallet: user.wallet,
-                  key: user.aladinKeys,
-                  coin: user.coin
-                },
-                process.env.JWT_SECRET, {
-                  expiresIn: "7 days"
-                })
               return db.payment.create ({
-                invoiceId: "wallet",
+                invoiceId: 'wallet-topupkey',
                 xenditId: 'null',
                 status: "PAID",
                 amount: dataKey.price,
@@ -272,11 +258,9 @@ module.exports = {
                 expiredAt: new Date(),
               })
               .then(dataPayment => {
-                const newId = 'W' + '-' + decoded.id + '-' + dataPayment.id
-
+                const newId = 'W-T' + '-' + decoded.id + '-' + dataPayment.id
                 return db.payment.update({
                   xenditId: newId,
-                  invoiceId: 'wallet' + '-' + dataPayment.id
                 },{
                   where:{
                     id: dataPayment.id
@@ -294,7 +278,7 @@ module.exports = {
                   res.send({
                     message: 'topup sukses',
                     dataTopUp,
-                    token: token
+                    status: 200
                   })
                 })
               })
@@ -321,8 +305,8 @@ module.exports = {
       order: [ [ 'createdAt', 'DESC' ]]
     })
     .then(dataAladinkeyLog => {
-      const price = dataAladinkeyLog[0].dataValues.priceAfter //[0] to take 1st row
-
+      console.log('aladinkey log', dataAladinkeyLog)
+      const price = dataAladinkeyLog[0].priceAfter //[0] to take 1st row
       if (decoded.wallet < price) {//check User has enough money in JWT
         return res.send({
           message: 'saldo tidak mencukupi',
@@ -337,20 +321,19 @@ module.exports = {
         .then(dataUser => {
           if ( dataUser.wallet >= price) {
             return db.payment.create({
-            invoiceId: "wallet",
+            invoiceId: "wallet-pulsa",
             xenditId: 'null',
-            status: "PAID",
+            status: "PROCESS",
             amount: price,
             availableBanks: "wallet",
             availableretail: "wallet",
             expiredAt: new Date()
           })
           .then(dataPayment => {
-            const newId = 'W' + '-' +decoded.id + '-' + dataPayment.id
+            const newId = 'W-P' + '-' +decoded.id + '-' + dataPayment.id
 
             db.payment.update({
             xenditId: newId,
-            invoiceId: 'wallet' + '-' + dataPayment.id
             }, {
               where: {
                 id: dataPayment.id
@@ -369,7 +352,7 @@ module.exports = {
                 userId: decoded.id,
                 pulsaId: newId,
                 number: req.body.phoneNumber,
-                status: "PAID",
+                status: "PROCESS",
                 aladinPrice: price,
                 virtualId: 0,
                 description: dataProduct.productName
@@ -383,7 +366,7 @@ module.exports = {
                 message: 'sukses pulsa'
               })
                 return db.product.update({
-                  sold: dataProduct.sold + 1
+                  noInvoice: dataProduct.noInvoice - 1
                 }, {
                   where: {
                     id: req.body.productId

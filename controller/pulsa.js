@@ -13,14 +13,21 @@ module.exports = {
       }
     })
     .then(dataTransaction => {
-      console.log('data transaksi', dataTransaction)
+      console.log('data transaksi', dataTransaction.dataValues)
       const refId = req.body.external_id
-      db.product.findOne({
+      return db.product.findOne({
         where: {
           id: dataTransaction.productId
         }
       })
       .then(dataProduct => {
+        db.product.update({
+          sold: dataProduct.sold + 1,
+          unpaid: dataProduct.unpaid - 1
+        }, {where: {
+          id: dataTransaction.productId
+        }
+      })
         const sign = md5('081380572721' + process.env.PULSA_KEY + refId)        
         const pulsa = `<?xml version="1.0" ?>
                     <mp>
@@ -31,7 +38,7 @@ module.exports = {
                       <pulsa_code>${dataProduct.dataValues.pulsaCode}</pulsa_code>
                       <sign>${sign}</sign>
                     </mp>`
-        axios.post(process.env.MOBILE_PULSA, pulsa, {
+      return axios.post(process.env.MOBILE_PULSA, pulsa, {
             headers: {
                 'Content-Type': 'text/xml',
             },
@@ -42,7 +49,6 @@ module.exports = {
           let dataJson = JSON.parse(json)
           let convertJson = convert.xml2json(dataJson, { compact: true})
           let object = JSON.parse(convertJson)
-          console.log(object)
           db.transaction.update({
             status: object.mp.message._text,
             },{
@@ -94,14 +100,13 @@ module.exports = {
           where:{
             id: dataTransaction.id
           }
-        }),
-        db.user.update({
-          wallet: dataUser.wallet - price
-        }, {
-          where: {
-            id: dataUser.id
-          }
         })
+        db.product.update({
+          sold: dataProduct.sold + 1,
+        }, {where: {
+          id: dataTransaction.productId
+        }
+      })
         console.log('sukses')
       })
     .catch(err => console.log(err))

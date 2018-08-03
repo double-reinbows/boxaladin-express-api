@@ -187,18 +187,55 @@ module.exports = {
       .catch(error => res.status(400).send(error));
   },
 
-  updateWatch(req, res) {
+  async updateWatch(req, res) {
     const productsRef = firebase.database().ref().child(process.env.FIREBASE_DB)
     const productRef = productsRef.child(req.body.productId)
-    setTimeout(function() {
+    await setTimeout(function() {
       productRef.once('value', snap => {
         if (snap.val().watching > 0) {
           productRef.update({
             watching: snap.val().watching -1
           })
-          res.send('updated')
         }
       })
     }, 15000);
+    res.send('updated')
+  }, 
+
+  async listProductActive(req, res) {
+    let pulsaValue = []
+    let paketDataValue = []
+    const brand = await db.brand.findOne({
+      where: {
+        id: req.params.id
+      }
+    })
+    const product = await db.product.findAll({
+      order: [['displayPrice', 'ASC']],
+      where: {
+        brandId: brand.id,
+        active: true
+      }
+    })
+
+    product.filter(dataPulsa => {
+      return dataPulsa.categoryId === 1
+    })
+    .map(pulsa => {
+      pulsaValue.push(pulsa.dataValues)
+    })
+
+    product.filter(dataPaket => {
+      return dataPaket.categoryId === 2
+    })
+    .map(paketData => {
+      paketDataValue.push(paketData.dataValues)
+    })
+
+    res.send({
+      pulsa: pulsaValue,
+      paketData: paketDataValue,
+      status: 200
+    })
   }
 };

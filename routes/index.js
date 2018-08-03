@@ -121,7 +121,8 @@ router.delete('/api/brand/:id', auth.isLogin, auth.isSuperadmin, brandController
 
 router.get('/api/product/filter', productController.filter);
 router.get('/api/product', productController.list);
-router.get('/api/product/:id', productController.retrieve);
+router.get('/api/product/:id', productController.listProductActive)
+// router.get('/api/product/:id', productController.retrieve);
 router.post('/api/product', auth.isLogin, auth.isSuperadmin, productController.create);
 router.put('/api/product/:id', auth.isLogin, auth.isSuperadmin, productController.update);
 router.delete('/api/product/:id', auth.isLogin, auth.isSuperadmin, productController.destroy);
@@ -130,7 +131,7 @@ router.get('/gamerules', gameRuleController.all);
 router.get('/game', gameController.play);
 
 router.put('/logopen', auth.isLogin, aladinKeyLogController.increaseOpen)
-router.put('/logsold', auth.isLogin, aladinKeyLogController.increaseSold)
+router.put('/lognoinvoice/:id', aladinKeyLogController.increaseNoInvoice)
 router.post('/logbid' , auth.isLogin, aladinKeyLogController.logBid)
 router.post('/watching', productController.updateWatch)
 

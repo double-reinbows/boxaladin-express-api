@@ -18,7 +18,9 @@ module.exports = (sequelize, DataTypes) => {
     decreasePrice: DataTypes.INTEGER,
     opened: DataTypes.INTEGER,
     sold: DataTypes.INTEGER,
-    active: DataTypes.STRING
+    active: DataTypes.STRING,
+    unpaid: DataTypes.INTEGER,
+    noInvoice: DataTypes.INTEGER
   });
 
   product.associate = (models) => {

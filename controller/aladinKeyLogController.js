@@ -35,28 +35,22 @@ module.exports = {
           id: req.body.productId
         }
       })
-      res.send('open 1')
+      return res.send('open 1')
     })
     .catch(err => res.send(err))
   },
 
-  increaseSold (req, res) {
-    db.product.findOne({
-      where:{
-        id: req.body.productId
-      }
-    })
-    .then(product =>{
-      db.product.update({
-        sold: product.sold + 1
-      },  {
-        where:{
-          id: req.body.productId
-        }
-      })
-      res.send('sold 1')
-    })
-    .catch(err => res.send(err))
+  async increaseNoInvoice (req, res) {
+    try {
+      const product = await db.product.findById(req.params.id)
+      db.product.update(
+        {noInvoice: product.noInvoice + 1},
+        {where: {id: req.params.id}}
+      )
+      res.send('update')
+    } catch(err){
+      console.log(err)
+    }
   },
 
   logBid(req, res) {
