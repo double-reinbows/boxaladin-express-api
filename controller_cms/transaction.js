@@ -213,7 +213,7 @@ module.exports = {
           .then(dataPayment => {
             model.topup.create({
                 userId: dataUser.id,
-                keyId: 0,
+                keyId: 5,
                 paymentId: dataPayment.id,
                 xenditId: `ADMIN ${req.body.aladinkeys}`,
                 status: `ADMIN`,

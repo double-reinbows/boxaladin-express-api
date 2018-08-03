@@ -25,6 +25,12 @@ module.exports = {
       keyAmount: '100',
       createdAt : new Date(),
       updatedAt : new Date(),
+    },
+    {
+      price : '0',
+      keyAmount: '0',
+      createdAt : new Date(),
+      updatedAt : new Date(),
     },], {});
   },
 

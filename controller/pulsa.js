@@ -94,6 +94,15 @@ module.exports = {
       let dataJson = JSON.parse(json)
       let convertJson = convert.xml2json(dataJson, { compact: true})
       let object = JSON.parse(convertJson)
+      if (object.mp.message._text !== 'PROCESS'){
+        db.payment.update({
+          status: 'Hubungi CS Boxaladin di LINE @boxaladin'
+        }, {
+          where: {
+            id: dataTransaction.paymentId
+          }
+        })
+      }
       db.transaction.update({
         status: object.mp.message._text,
         },{
