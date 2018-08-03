@@ -106,12 +106,13 @@ module.exports = {
   async createCallbackPulsa(req, res) {
     console.log('callback pulsa');
     const parsedXML = xml.parse(req.body);
-
+    console.log(req.body)
     const convertJson = convert.xml2json(parsedXML[2].childNodes[0].text, { compact: true})
     const object = JSON.parse(convertJson)
+    console.log(object)
     const idTransaction = object.ref_id._text
     const idTransactionSplit = object.ref_id._text.split('-')
-    const response =  parsedXML[2].childNodes[15].childNodes[0].text
+    const response =  parsedXML[2].childNodes[9].childNodes[0].text
     console.log('response status', response);
     if(response === '00' && idTransactionSplit[0] === 'P'){
       db.transaction.update({
