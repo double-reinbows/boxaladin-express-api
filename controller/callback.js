@@ -18,7 +18,11 @@ module.exports = {
         //[1] = user id
         //[2] = payment id
         console.log(splitInfo)
-        if (req.body.hasOwnProperty('amount')) {
+        if (!req.body.hasOwnProperty('amount')) {
+          //Xendit is only sending VA status, nothing else to do
+          console.log('else')
+          return
+        } else {
           db.payment.update({
             status: "PAID"
             }, {
@@ -26,77 +30,75 @@ module.exports = {
               id: parseInt(splitInfo[2])
             }
           });
-        } else {
-          //Xendit is only sending VA status, nothing else to do
-          console.log('else')
-        }
-        if (splitInfo[0] === 'W') {
-          db.user.findOne({
-              where: {
-                id: parseInt(splitInfo[1])
-              }
-          })
-          .then( dataUser => {
-            db.user.update({
-              wallet: dataUser.wallet + req.body.amount
+
+          if (splitInfo[0] === 'W') {
+            db.user.findOne({
+                where: {
+                  id: parseInt(splitInfo[1])
+                }
+            })
+            .then( dataUser => {
+              db.user.update({
+                wallet: dataUser.wallet + req.body.amount
+              }, {
+                where: {
+                  id: parseInt(splitInfo[1])
+                }
+              });
+            }).catch(err => console.log(err));
+
+            db.walletLog.update({
+              status: 'PAID',
             }, {
               where: {
-                id: parseInt(splitInfo[1])
+                paymentId: parseInt(splitInfo[2]),
               }
             });
-          }).catch(err => console.log(err));
+            res.send('sukses saldo');
+          } else if (splitInfo[0] === 'T') {
 
-          db.walletLog.update({
-            status: 'PAID',
-          }, {
-            where: {
-              paymentId: parseInt(splitInfo[2]),
-            }
-          });
-          res.send('sukses saldo');
-        } else if (splitInfo[0] === 'T') {
-
-          db.topup.update({
-            status: "PAID"
-          }, {
-            where: {
-              paymentId: parseInt(splitInfo[2])
-            }
-          });
-
-          let topupP = db.topup.findOne({
-            where: {
-              paymentId : parseInt(splitInfo[2])
-            },
-            include: [
-              {
-                model : db.key
+            db.topup.update({
+              status: "PAID"
+            }, {
+              where: {
+                paymentId: parseInt(splitInfo[2])
               }
-            ]
-          });
+            });
 
-          let userP = db.user.findOne({
-            where:{
-              id: splitInfo[1]
-            }
-          });
-          Promise.all([userP, topupP]).then( values => {
-            let key = parseInt(values[0].dataValues.aladinKeys) + parseInt(values[1].key.dataValues.keyAmount);
-            db.user.update({
-              aladinKeys: key
-            },{
+            let topupP = db.topup.findOne({
+              where: {
+                paymentId : parseInt(splitInfo[2])
+              },
+              include: [
+                {
+                  model : db.key
+                }
+              ]
+            });
+
+            let userP = db.user.findOne({
               where:{
-                id: parseInt(splitInfo[1])
+                id: splitInfo[1]
               }
-            })
-            res.send('top success');
-          });
-        } else if (splitInfo[0] === 'P') {
-          console.log('buy pulsa')
-          pulsa.pulsa(req,res)
-        } else {
-          return res.send('error transaction');
-          console.log('error transaction');
+            });
+            Promise.all([userP, topupP]).then( values => {
+              let key = parseInt(values[0].dataValues.aladinKeys) + parseInt(values[1].key.dataValues.keyAmount);
+              db.user.update({
+                aladinKeys: key
+              },{
+                where:{
+                  id: parseInt(splitInfo[1])
+                }
+              })
+              res.send('top success');
+            });
+          } else if (splitInfo[0] === 'P') {
+            console.log('buy pulsa')
+            pulsa.pulsa(req,res)
+          } else {
+            return res.send('error transaction');
+            console.log('error transaction');
+          }
         }
       } else {
             return res.status(500).send('Invalid Credentials')
@@ -140,19 +142,19 @@ module.exports = {
       })
       const transaction = await db.transaction.findOne({
         where: {
-          paymentId: parseInt(idTransactionSplit[3]) 
+          paymentId: parseInt(idTransactionSplit[3])
         }
       })
       const user = await db.user.findOne({
         where: {
-          id: parseInt(idTransactionSplit[2]) 
+          id: parseInt(idTransactionSplit[2])
         }
       })
       db.user.update({
         wallet: user.wallet - transaction.aladinPrice
       }, {
         where: {
-          id: parseInt(idTransactionSplit[2]) 
+          id: parseInt(idTransactionSplit[2])
         }
       })
       return res.send('request callback sukses')
