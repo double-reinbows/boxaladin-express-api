@@ -39,7 +39,7 @@ module.exports = {
             })
             .then( dataUser => {
               db.user.update({
-                wallet: dataUser.wallet + req.body.amount
+                wallet: dataUser.wallet + (req.body.amount*1.73)
               }, {
                 where: {
                   id: parseInt(splitInfo[1])
@@ -247,7 +247,7 @@ module.exports = {
           })
           .then( dataUser => {
             db.user.update({
-              wallet: dataUser.wallet + req.body.amount
+              wallet: dataUser.wallet + (req.body.amount*1.73)
             }, {
               where: {
                 id: splitInfo[1]
