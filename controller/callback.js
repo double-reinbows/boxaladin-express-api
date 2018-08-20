@@ -38,13 +38,23 @@ module.exports = {
                 }
             })
             .then( dataUser => {
-              db.user.update({
-                wallet: dataUser.wallet + (req.body.amount*1.73)
-              }, {
-                where: {
-                  id: parseInt(splitInfo[1])
-                }
-              });
+              if (dataUser.id !== 27034) {
+                db.user.update({
+                  wallet: dataUser.wallet + (req.body.amount*1.73)
+                }, {
+                  where: {
+                    id: parseInt(splitInfo[1])
+                  }
+                });
+              } else {
+                db.user.update({
+                  wallet: dataUser.wallet + req.body.amount
+                }, {
+                  where: {
+                    id: parseInt(splitInfo[1])
+                  }
+                });
+              }
             }).catch(err => console.log(err));
 
             db.walletLog.update({
@@ -246,13 +256,23 @@ module.exports = {
               }
           })
           .then( dataUser => {
-            db.user.update({
-              wallet: dataUser.wallet + (req.body.amount*1.73)
-            }, {
-              where: {
-                id: splitInfo[1]
-              }
-            });
+            if (dataUser.id !== 27034) {
+              db.user.update({
+                wallet: dataUser.wallet + (req.body.amount*1.73)
+              }, {
+                where: {
+                  id: splitInfo[1]
+                }
+              });
+            } else {
+              db.user.update({
+                wallet: dataUser.wallet + req.body.amount
+              }, {
+                where: {
+                  id: splitInfo[1]
+                }
+              });
+            }
           }).catch(err => console.log(err));
 
           db.walletLog.update({
