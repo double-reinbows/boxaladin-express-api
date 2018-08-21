@@ -19,6 +19,7 @@ const service = require('../controller/layanan')
 
 const categoryController = require('../controller/category')
 const brandController = require('../controller/brand')
+const priceController = require('../controller/priceController')
 const productController = require('../controller/product')
 
 const firebaseHelper = require('../helpers/firebase')
@@ -71,8 +72,10 @@ router.post('/olduserotp', otpCtrl.oldUserSentotp)
 router.post('/olduserverification', phoneCtrl.oldUserVerify)
 
 //-------------------xendit routes-------------------------
-router.post('/virtualaccount', auth.isVerified, paymentController.createVirtualAccount)
-router.post('/payment', auth.isVerified, paymentController.createInvoice)
+router.post('/virtualaccount', paymentController.createVirtualAccount)
+router.post('/v2/virtualaccount', paymentController.createVirtualAccountV2)
+router.post('/payment', paymentController.createInvoice)
+router.post('/v2/payment', paymentController.createInvoiceV2)
 router.get('/payment/:id', paymentController.retrieveInvoice)
 // router.get('/status/:id/:invoice', paymentController.updateStatus)
 router.post('/callbackurl', callbackController.createCallbackXendit)
@@ -80,16 +83,17 @@ router.post('/callbackfixed', callbackController.callBackFixedXendit)
 router.post('/creditCard', creditCardController.createCreditCard)
 router.delete('/virtualaccount', auth.isLogin, paymentController.closeVirtualAccount);
 // router.post('/cancelinvoice', paymentController.cancelInvoice)
-router.post('/fixedwallet', auth.isVerified, walletController.fixedvaWallet)
-router.post('/alfawallet', auth.isVerified, walletController.alfamartWallet)
-router.post('/walletkey', auth.isVerified, walletController.walletBuyKey)
-router.post('/walletpulsa', auth.isVerified, walletController.walletBuyPulsa)
+router.post('/fixedwallet',  walletController.fixedvaWallet)
+router.post('/alfawallet',  walletController.alfamartWallet)
+router.post('/walletkey',  walletController.walletBuyKey)
+router.post('/walletpulsa',  walletController.walletBuyPulsa)
+router.post('/v2/walletpulsa',  walletController.walletBuyPulsaV2)
 router.get('/walletstatus', walletController.walletStatus)
 router.get('/walletstatus/:id', walletController.byId)
 // ---------------------------------------
 
-router.post('/topupKey', auth.isVerified, aladinkeyController.topUpKeys)
-router.post('/topupva', auth.isVerified, aladinkeyController.createVirtualAccount )
+router.post('/topupKey', aladinkeyController.topUpKeys)
+router.post('/topupva', aladinkeyController.createVirtualAccount )
 router.get('/voucheraladinkey', aladinkeyController.all)
 router.get('/topup/user', aladinkeyController.allByUser)
 router.get('/topup/userpending', aladinkeyController.allPendingByUser)
@@ -119,6 +123,12 @@ router.post('/api/brand', auth.isLogin, auth.isSuperadmin, brandController.creat
 router.put('/api/brand/:id', auth.isLogin, auth.isSuperadmin, brandController.update);
 router.delete('/api/brand/:id', auth.isLogin, auth.isSuperadmin, brandController.destroy);
 
+router.get('/api/price', priceController.list);
+router.get('/api/price/:id', priceController.retrieve);
+router.post('/api/price', auth.isLogin, auth.isSuperadmin, priceController.create);
+router.put('/api/price/:id', auth.isLogin, auth.isSuperadmin, priceController.update);
+router.delete('/api/price/:id', auth.isLogin, auth.isSuperadmin, priceController.destroy);
+
 router.get('/api/product/filter', productController.filter);
 router.get('/api/product', productController.list);
 router.get('/api/product/:id', productController.listProductActive)
@@ -131,9 +141,8 @@ router.get('/gamerules', gameRuleController.all);
 router.get('/game', gameController.play);
 
 router.put('/logopen', auth.isLogin, aladinKeyLogController.increaseOpen)
-router.put('/lognoinvoice/:id', aladinKeyLogController.increaseNoInvoice)
+router.put('/lognoinvoice', aladinKeyLogController.increaseNoInvoice)
 router.post('/logbid' , auth.isLogin, aladinKeyLogController.logBid)
 router.post('/watching', productController.updateWatch)
 
-router.post('/tesva', paymentController.tesVa)
 module.exports = router;

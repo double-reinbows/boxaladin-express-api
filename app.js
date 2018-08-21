@@ -19,6 +19,8 @@ require('dotenv').config({path: envPath})
 var firebase = require('firebase')
 var admin = require("firebase-admin")
 var xmlparser = require('express-xml-bodyparser')
+const cron = require("node-cron");
+const bca = require("./controller/bcaCron")
 
 var auth = require("./helpers/auth")
 
@@ -34,6 +36,8 @@ var config = {
   messagingSenderId: "912503242137"
 };
 firebase.initializeApp(config);
+
+// cron.schedule("* * * * *", bca.bcaData);
 
 var index = require('./routes/index');
 var users = require('./routes/users');
@@ -69,7 +73,7 @@ app.use('/reward', reward);
 app.use('/claim',  claim);
 app.use('/admin',  admin);
 // app.use('/lose',  lose);
-app.use('/cms',  cms)
+app.use('/cms', cms);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

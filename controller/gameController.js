@@ -9,12 +9,11 @@ module.exports = {
     db.user.findOne({
       where: {
         id: decoded.id,
-        emailVerified: true,
       }
     })
     .then(user => {
       if (!user) {
-        return res.status(200).send({message: 'Verify Email'});
+        return res.status(200).send({message: 'User not found'});
       }
       // console.log(user.coin,);
       if (user.coin > 0) { //TODO: handle insufficient coin response

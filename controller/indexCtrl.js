@@ -71,9 +71,8 @@ exports.signin = (req, res) => {
 
   let hashedPass = hash(req.body.password)
 
-  db.user.findOne({
-    where: {
-        role: null,
+    db.user.findOne({
+      where: {
         email: emailFilter
         // emailVerified: true
       }
@@ -407,7 +406,7 @@ exports.signup = (req, res) => {
               process.env.JWT_SECRET, {
                 expiresIn: "7 days"
               });
-                sendEmailVerification(data.email, data.emailToken, data.typedEmail)
+                // sendEmailVerification(data.email, data.emailToken, data.typedEmail)
 
                 // CREATE PHONE
                 db.phonenumber.create({

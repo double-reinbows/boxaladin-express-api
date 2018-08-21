@@ -4,6 +4,7 @@ const axios = require('axios')
 const db = require('../models')
 const bankCode = require('../helpers/bankCode')
 const pulsa = require('./pulsa')
+const product = require('../helpers/findProduct')
 
 module.exports = {
   alfamartWallet(req, res) {
@@ -300,7 +301,7 @@ module.exports = {
     db.aladinkeyLog.findAll({
       where: {
         userId: decoded.id,
-        productId: req.body.productId
+        pulsaPriceId: req.body.productId
       },
       order: [ [ 'createdAt', 'DESC' ]]
     })
@@ -372,6 +373,102 @@ module.exports = {
                     id: req.body.productId
                   }
                 })
+              })
+            })
+          })
+          }
+          else {
+            return res.send({
+              message: 'saldo tidak mencukupi',
+              wallet: dataUser.wallet
+            })
+          }
+        })
+      }
+    })
+    .catch(err => console.log(err))
+  },
+
+  walletBuyPulsaV2(req, res) {
+    const decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
+    db.aladinkeyLog.findAll({
+      where: {
+        userId: decoded.id,
+        pulsaPriceId: req.body.priceId
+      },
+      order: [ [ 'createdAt', 'DESC' ]]
+    })
+    .then(dataAladinkeyLog => {
+      console.log('aladinkey', dataAladinkeyLog)
+      const price = dataAladinkeyLog[0].priceAfter //[0] to take 1st row
+      if (decoded.wallet < price) {//check User has enough money in JWT
+        return res.send({
+          message: 'saldo tidak mencukupi',
+          wallet: decoded.wallet
+        })
+      } else if (decoded.wallet >= price){
+        return db.user.findOne({
+          where: {
+            id: decoded.id
+          }
+        })
+        .then(dataUser => {
+          if ( dataUser.wallet >= price) {
+            return db.payment.create({
+            invoiceId: "wallet-pulsa",
+            xenditId: 'null',
+            status: "PROCESS",
+            amount: price,
+            availableBanks: "wallet",
+            availableretail: "wallet",
+            expiredAt: new Date()
+          })
+          .then( async dataPayment => {
+            const newId = 'W-P' + '-' +decoded.id + '-' + dataPayment.id
+            const pulsaPrice = await db.pulsaPrice.findOne({
+              where: {
+                id: req.body.priceId
+              }
+            })
+            db.payment.update({
+            xenditId: newId,
+            }, {
+              where: {
+                id: dataPayment.id
+              }
+            })
+            const check = await product.findProductBought(req, res)
+            if (check.message === 'product not active'){
+              return res.send('product not active')
+            } else if (check.message === 'product not found'){
+              return res.send('product not found')
+            }
+            const productData = check.product
+            return db.transaction.create({
+              paymentId: dataPayment.id,
+              productId: productData.id,
+              userId: decoded.id,
+              pulsaId: newId,
+              number: req.body.phoneNumber,
+              status: "PROCESS",
+              aladinPrice: price,
+              virtualId: 0,
+              description: productData.productName
+            })
+            .then(dataFinal => {
+            console.log('panggil function pulsa');
+            pulsa.pulsaWallet(req, res,price, dataUser.dataValues, dataFinal.dataValues, productData)
+            res.send({
+              dataFinal,
+              status: 200,
+              message: 'sukses pulsa'
+            })
+              return db.pulsaPrice.update({
+                noInvoice: pulsaPrice.noInvoice - 1
+              }, {
+                where: {
+                  id: req.body.priceId
+                }
               })
             })
           })

@@ -14,37 +14,57 @@ const firebase = require('firebase')
 
 module.exports = {
 	syncToFirebase: (req, res) => {
-		db.product.findAll({
-			include: [
-        {
-        model: db.brand,
-      },
-      {
-        model: db.category
-      }
-    ]
-		})
-		.then(result => {
+		// db.product.findAll({
+		// 	include: [
+    //     {
+    //     model: db.brand,
+    //   },
+    //   {
+    //     model: db.category
+    //   }
+    // ]
+		// })
+		// .then(result => {
+		// 	const productsRef = firebase.database().ref().child(process.env.FIREBASE_DB)
+		// 	result.map((data, idx) => {
+		// 		productsRef.child(data.id).set({
+		// 			id: data.id,
+		// 			productName: data.productName,
+		// 			price: data.price,
+		// 			aladinPrice: data.aladinPrice,
+		// 			displayPrice: data.displayPrice,
+		// 			decreasePrice: data.decreasePrice,
+		// 			brand: data.brand.brandName,
+		// 			watching: 0,
+		// 			brandLogo: data.brand.brandLogo
+		// 		})
+		// 	})
+
+		// 	res.send({
+		// 		message: 'writed to firebase',
+		// 		data: result
+		// 	})
+		// })
+    // .catch(err => console.log(err))
+
+    db.pulsaPrice.findAll()
+    .then(result => {
 			const productsRef = firebase.database().ref().child(process.env.FIREBASE_DB)
 			result.map((data, idx) => {
 				productsRef.child(data.id).set({
 					id: data.id,
-					productName: data.productName,
 					price: data.price,
 					aladinPrice: data.aladinPrice,
 					displayPrice: data.displayPrice,
 					decreasePrice: data.decreasePrice,
-					brand: data.brand.brandName,
 					watching: 0,
-					brandLogo: data.brand.brandLogo
 				})
-			})
-
-			res.send({
+      })
+      res.send({
 				message: 'writed to firebase',
-				data: result
-			})
-		})
-		.catch(err => console.log(err))
+    		data: result.dataValues
+        })
+    })
+    .catch(err => console.log(err))
 	}
 }

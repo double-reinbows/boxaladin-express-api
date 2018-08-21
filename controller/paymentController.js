@@ -5,11 +5,7 @@ const axios = require ('axios')
 const db = require('../models')
 const moment = require('moment')
 const bankCode = require('../helpers/bankCode')
-
-// let invoice = ""
-// let banksArr_Obj = ""
-// let banksStr = ""
-// let retailArr_Obj = ""
+const product = require('../helpers/findProduct')
 
 module.exports = {
   createInvoice(req, res) {
@@ -91,6 +87,92 @@ module.exports = {
     .catch(err => console.log(err))
   },
 
+  createInvoiceV2(req, res) {
+    const decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
+    db.payment.create({
+      invoiceId: "null",
+      xenditId: 'null',
+      status: "PENDING",
+      amount: req.body.amount,
+      availableBanks: "null",
+      availableretail: "null",
+      expiredAt: new Date()
+    })
+    .then(async dataPayment => {
+      const newId = 'P' + '-' + decoded.id + '-' + dataPayment.id
+      const check = await product.findProductBought(req, res) //find product using brandid and priceid
+      if (check.message === 'product not active'){
+        return res.send('product not active')
+      } else if (check.message === 'product not found'){
+        return res.send('product not found')
+      }
+      const productData = check.product
+      const price = await db.pulsaPrice.findOne({
+        where: {
+          id: req.body.priceId
+        }
+      })
+      db.pulsaPrice.update({
+        unpaid: price.unpaid + 1,
+        noInvoice: price.noInvoice - 1
+      },{
+        where: {
+          id: req.body.priceId
+        }
+      })
+
+      axios({
+        method: 'POST',
+        url: `https://api.xendit.co/v2/invoices`,
+        headers: {
+          authorization: process.env.XENDIT_AUTHORIZATION
+        },
+        data: {
+          external_id: newId,
+          amount: req.body.amount,
+          payer_email: decoded.email,
+          description: productData.productName
+        },
+      })
+      .then(({data}) => {
+        const banksArr_Obj = data.available_banks
+        const banksStr = JSON.stringify(banksArr_Obj)
+        let retailArr_Obj = ''
+        {data.available_retail_outlets ? (retailArr_Obj = data.available_retail_outlets[0].payment_code) : (retailArr_Obj= 'ALFAMART SEDANG TIDAK BISA DIGUNAKAN')}
+        db.payment.update({
+          invoiceId: data.id,
+          xenditId: newId,
+          availableBanks: banksStr,
+          availableretail: retailArr_Obj,
+          expiredAt: data.expiry_date
+        },{
+          where:{
+            id: dataPayment.id
+          }
+        }),
+
+        db.transaction.create({
+          paymentId: dataPayment.id,
+          productId: productData.id,
+          userId: decoded.id,
+          pulsaId: newId,
+          number: req.body.phoneNumber,
+          status: "PENDING",
+          aladinPrice: req.body.amount,
+          description: productData.productName,
+          virtualId: 0
+        })
+        .then(dataFinal => {
+          res.send({
+            dataFinal,
+            status: 200
+          })
+        })
+      })
+    })
+    .catch(err => console.log(err))
+  },
+
   retrieveInvoice(req, res) {
     return payment
     .findById(req.params.id)
@@ -108,6 +190,7 @@ module.exports = {
   createVirtualAccount(req, res) {
     const isodate = moment().utcOffset(0).add(12, 'hours').toISOString()
     const decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
+    console.log(req.body)
     return db.payment.create({
       invoiceId: "null",
       xenditId: 'null',
@@ -140,6 +223,7 @@ module.exports = {
         }
       })
       .then(result => {
+        let va = ''
         {!result ? (va = bankCode(req.body.bankCode, decoded).toString()) : (va = result.dataValues.virtualAccountNumber)}
         axios({
           method: 'POST',
@@ -233,7 +317,157 @@ module.exports = {
         });
       })
     })
-      .catch(err => console.log(err));
+    .catch(err => console.log(err));
+  },
+
+  createVirtualAccountV2(req, res) {
+    const isodate = moment().utcOffset(0).add(12, 'hours').toISOString()
+    const decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
+    return db.payment.create({
+      invoiceId: "null",
+      xenditId: 'null',
+      status: "PENDING",
+      amount: req.body.amount,
+      availableBanks: "null",
+      availableretail: "null",
+      expiredAt: new Date()
+    })
+    .then(async dataPayment => {
+      const newId = 'P' + '-' +decoded.id + '-' + dataPayment.id
+      const check = await product.findProductBought(req, res) //find product using brandid and priceid
+      if (check.message === 'product not active'){
+        return res.send('product not active')
+      } else if (check.message === 'product not found'){
+        return res.send('product not found')
+      }
+      const productData = check.product
+
+      db.virtualAccount.findOne({
+        where: {
+          userId: decoded.id,
+          bankCode: req.body.bankCode
+        }
+      })
+      .then(result => {
+        let va = ''
+        {!result ? (va = bankCode(req.body.bankCode, decoded).toString()) : (va = result.dataValues.virtualAccountNumber)}
+        axios({
+          method: 'POST',
+          url: `https://api.xendit.co/callback_virtual_accounts`,
+          headers: {
+            authorization: process.env.XENDIT_AUTHORIZATION
+          },
+          data: {
+            external_id: newId,
+            bank_code: req.body.bankCode,
+            name: 'Pt Boxaladin AsiaPasific',
+            is_closed: true,
+            expected_amount: req.body.amount,
+            virtual_account_number: va,
+            is_single_use : true,
+            expiration_date: isodate
+          }
+        })
+        .then( async dataResponse => {
+          const data = dataResponse.data
+          db.payment.update({
+            invoiceId: data.id,
+            xenditId: newId,
+            availableBanks: data.account_number,
+            expiredAt: data.expiration_date
+          }, {
+            where:{
+              id: dataPayment.id
+            }
+          })
+
+          const price = await db.pulsaPrice.findOne({
+            where: {
+              id: req.body.priceId
+            }
+          })
+          db.product.update({
+            unpaid: productData.unpaid + 1
+          }, {
+            where: {
+              id: productData.id
+            }
+          })
+
+          db.pulsaPrice.update({
+            unpaid: price.unpaid + 1,
+            noInvoice: price.noInvoice - 1
+          },{
+            where: {
+              id: req.body.priceId
+            }
+          })
+
+          if (!result){
+            console.log('create new va')
+            return db.virtualAccount.create({
+              userId: decoded.id,
+              bankCode: req.body.bankCode,
+              virtualAccountNumber: va
+            })
+            .then(dataVirtual => {
+              return db.transaction.create({
+                paymentId: dataPayment.id,
+                productId: productData.id,
+                userId: decoded.id ,
+                pulsaId: newId,
+                aladinPrice: req.body.amount,
+                status: "PENDING",
+                number: req.body.phoneNumber,
+                description: productData.productName,
+                virtualId : dataVirtual.id,
+              })
+              .then( dataFinal => {
+                res.send({
+                  dataFinal,
+                  status: 200,
+                  amount : req.body.amount,
+                  message: 'new va'
+                })
+              })
+            })
+          } else {
+            console.log('existing va')
+            return db.transaction.create({
+              paymentId: dataPayment.id,
+              productId: productData.id,
+              userId: decoded.id ,
+              pulsaId: newId,
+              aladinPrice: req.body.amount,
+              status: "PENDING",
+              number: req.body.phoneNumber,
+              description: productData.productName,
+              virtualId : result.id,
+            })
+            .then( dataFinal => {
+              res.send({
+                dataFinal,
+                status: 200,
+                message: 'existing va'
+              })
+            })
+          }
+        })
+        .catch(error => {
+          if (error.response.data.error_code === 'DUPLICATE_CALLBACK_VIRTUAL_ACCOUNT_ERROR'){
+            db.payment.destroy({
+              where: {
+                id: dataPayment.id
+              }
+            })
+            res.send(error.response.data)
+          } else {
+            res.send(error.response.data)
+          }
+        });
+      })
+    })
+    .catch(err => console.log(err));
   },
   /*
    * This function takes a bank name, looks it up in the virtualAccounts table and then attempts to
@@ -278,7 +512,6 @@ module.exports = {
           },
         });
         xenditP.then(data => {
-          console.log('XENDIT', data);
           if (data.status === 200) {
             db.payment.update({
               status: 'CANCELLED',
@@ -292,40 +525,5 @@ module.exports = {
         })
       })
     }).catch(err => { console.log(err) })
-  },
-
-  tesVa(req, res) {
-    let decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
-    const isodate = moment().utcOffset(0).add(12, 'hours').toISOString()
-    console.log('date', date)
-    console.log('isodate', isodate)
-    const va = bankCode(req.body.bankCode, decoded).toString()
-    axios({
-      method: 'POST',
-      url: `https://api.xendit.co/callback_virtual_accounts`,
-      headers: {
-        authorization: process.env.XENDIT_AUTHORIZATION
-      },
-      data: {
-        external_id: req.body.externalId,
-        bank_code: req.body.bankCode,
-        name: 'Pt Boxaladin AsiaPasific ',
-        is_closed: true,
-        expected_amount: req.body.amount,
-        virtual_account_number: va,
-        is_single_use : true,
-        expiration_date: isodate
-      }
-    })
-    .then(dataBalikan => {
-      console.log(dataBalikan)
-      const data = dataBalikan.data
-      console.log('const data', data)
-      res.send(data)
-    })
-    .catch(err => console.log(err));
-
   }
-
-
 }

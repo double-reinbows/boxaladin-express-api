@@ -1,20 +1,20 @@
-const brand = require('../models').brand;
+const pulsaPrice = require('../models').pulsaPrice;
 
 module.exports = {
   list(req, res) {
-    return brand.findAll({
+    return pulsaPrice.findAll({
       order: [['id', 'ASC']],
     })
       .then(data => res.status(201).send(data))
       .catch(err => res.status(400).send(err));
   },
   retrieve(req, res) {
-    return brand
+    return pulsaPrice
       .findById(req.params.id)
       .then(data => {
         if (!data) {
           return res.status(404).send({
-            message: 'Brand Not Found',
+            message: 'pulsaPrice Not Found',
           });
         }
         return res.status(200).send(data);
@@ -22,25 +22,25 @@ module.exports = {
       .catch(error => res.status(400).send(error));
   },  
   create(req, res) {
-    return brand
+    return pulsaPrice
       .create({
-        brandName: req.body.brandName,
+        pulsaPriceName: req.body.pulsaPriceName,
       })
       .then(data => res.status(201).send(data))
       .catch(err => res.status(400).send(err));
   },
   update(req, res) {
-    return brand
+    return pulsaPrice
       .findById(req.params.id)
       .then(data => {
         if (!data) {
           return res.status(404).send({
-            message: 'Brand Not Found',
+            message: 'pulsaPrice Not Found',
           });
         }
         return data
           .update({
-            brandName: req.body.brandName || data.brandName,
+            pulsaPriceName: req.body.pulsaPriceName || data.pulsaPriceName,
           })
           .then(() => res.status(200).send(data))  // Send back the updated data.
           .catch((error) => res.status(400).send(error));
@@ -48,17 +48,17 @@ module.exports = {
       .catch((error) => res.status(400).send(error));
   },
   destroy(req, res) {
-    return brand
+    return pulsaPrice
       .findById(req.params.id)
       .then(data => {
         if (!data) {
           return res.status(400).send({
-            message: 'Brand Not Found',
+            message: 'pulsaPrice Not Found',
           });
         }
         return data
         .destroy()
-        .then(() => res.status(200).send({ message: 'Brand deleted successfully.' }))
+        .then(() => res.status(200).send({ message: 'pulsaPrice deleted successfully.' }))
         .catch(error => res.status(400).send(error));
       })
       .catch(error => res.status(400).send(error));

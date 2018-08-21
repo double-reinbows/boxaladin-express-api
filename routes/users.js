@@ -10,7 +10,7 @@ const ctrl = require('../controller/userCtrl')
 // });
 
 router.get('/info', ctrl.getUser)
-router.get('/checkuser', auth.isLogin, auth.isVerified, ctrl.checkUser)
+router.get('/checkuser', auth.isLogin, ctrl.checkUser)
 router.get('/token', ctrl.refreshToken)
 router.get('/:username', auth.authUser, ctrl.getUserData)
 

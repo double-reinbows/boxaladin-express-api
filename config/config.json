@@ -1,8 +1,8 @@
 {
   "development": {
-    "username": "boxaladin",
+    "username": "andrew",
     "password": null,
-    "database": "wallet",
+    "database": "boxaladin",
     "host": "localhost",
     "port": "5432",
     "dialect": "postgres"

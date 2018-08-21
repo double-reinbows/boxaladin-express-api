@@ -188,8 +188,9 @@ module.exports = {
   },
 
   async updateWatch(req, res) {
-    const productsRef = firebase.database().ref().child(process.env.FIREBASE_DB)
-    const productRef = productsRef.child(req.body.productId)
+    console.log('firebase', req.body)
+    const productsRef = firebase.database().ref().child(req.body.firebase)
+    const productRef = productsRef.child(req.body.id)
     await setTimeout(function() {
       productRef.once('value', snap => {
         if (snap.val().watching > 0) {
@@ -200,7 +201,7 @@ module.exports = {
       })
     }, 15000);
     res.send('updated')
-  }, 
+  },
 
   async listProductActive(req, res) {
     let pulsaValue = []
@@ -237,5 +238,5 @@ module.exports = {
       paketData: paketDataValue,
       status: 200
     })
-  }
+  },
 };

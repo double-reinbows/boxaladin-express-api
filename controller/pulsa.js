@@ -28,7 +28,7 @@ module.exports = {
           id: dataTransaction.productId
         }
       })
-        const sign = md5('081380572721' + process.env.PULSA_KEY + refId)        
+        const sign = md5('081380572721' + process.env.PULSA_KEY + refId)
         const pulsa = `<?xml version="1.0" ?>
                     <mp>
                       <commands>topup</commands>
@@ -73,7 +73,7 @@ module.exports = {
   pulsaWallet(req, res, price, dataUser, dataTransaction, dataProduct){
     console.log('data transaksi', dataTransaction)
     const refId = dataTransaction.pulsaId
-    const sign = md5('081380572721' + process.env.PULSA_KEY + refId)        
+    const sign = md5('081380572721' + process.env.PULSA_KEY + refId)
     const pulsa = `<?xml version="1.0" ?>
                 <mp>
                   <commands>topup</commands>
@@ -113,7 +113,7 @@ module.exports = {
         db.product.update({
           sold: dataProduct.sold + 1,
         }, {where: {
-          id: dataTransaction.productId
+          id: dataProduct.id
         }
       })
         console.log('sukses')

@@ -20,7 +20,8 @@ module.exports = (sequelize, DataTypes) => {
     sold: DataTypes.INTEGER,
     active: DataTypes.STRING,
     unpaid: DataTypes.INTEGER,
-    noInvoice: DataTypes.INTEGER
+    noInvoice: DataTypes.INTEGER,
+    pulsaPriceId: DataTypes.INTEGER
   });
 
   product.associate = (models) => {
@@ -32,6 +33,9 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'categoryId',
       onDelete: 'CASCADE',
     })
+    product.belongsTo(models.pulsaPrice, {
+      foreignKey: 'pulsaPriceId',
+    })
     product.hasMany(models.transaction, {
       foreignKey: 'productId',
       as: 'transactions',
@@ -40,6 +44,7 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'productId',
       as: 'aladinkeyLogs',
     })
+
   };
 
   return product;
