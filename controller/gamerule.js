@@ -8,25 +8,14 @@ module.exports = {
       order: [['id', 'ASC']]
     });
           grPromise.then(data => {
-            if (!userRes) { //email not verified
-              return res.send({
-                msg: 'Unverified',
-                prize1: data[0].dataValues.pulsaAmount,
-                prize2: data[1].dataValues.pulsaAmount,
-                prize3: data[2].dataValues.pulsaAmount,
-                prize4: data[3].dataValues.pulsaAmount,
-                prize5: data[4].dataValues.pulsaAmount,
-              });
-            } else { //everything verified
-              return res.send({
-                msg: 'Verified',
-                prize1: data[0].dataValues.pulsaAmount,
-                prize2: data[1].dataValues.pulsaAmount,
-                prize3: data[2].dataValues.pulsaAmount,
-                prize4: data[3].dataValues.pulsaAmount,
-                prize5: data[4].dataValues.pulsaAmount,
-              });
-            }
+            return res.send({
+              msg: 'Verified',
+              prize1: data[0].dataValues.pulsaAmount,
+              prize2: data[1].dataValues.pulsaAmount,
+              prize3: data[2].dataValues.pulsaAmount,
+              prize4: data[3].dataValues.pulsaAmount,
+              prize5: data[4].dataValues.pulsaAmount,
+            });
           });
   }
 }
