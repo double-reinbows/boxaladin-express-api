@@ -11,13 +11,13 @@ module.exports = {
   bcaInvoice(req, res) {
     const decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
     db.payment.create({
-      invoiceId: 0,
-      xenditId: 'null',
+      invoiceId: 'BCA',
+      xenditId: 'BCA',
       status: "PENDING",
       amount: req.body.amount,
-      availableBanks: "BCA",
-      availableretail: "null",
-      expiredAt: new Date()
+      availableBanks: 7140322355,
+      availableretail: "BCA",
+      expiredAt: moment().add(12, 'hours').toISOString()
       })
       .then(async dataPayment => {
         const newId = 'P' + '-' + decoded.id + '-' + dataPayment.id
@@ -73,13 +73,13 @@ module.exports = {
         });
       }
       return db.payment.create ({
-        invoiceId: "null",
-        xenditId: 'null',
+        invoiceId: "BCA",
+        xenditId: 'BCA',
         status: "PENDING",
         amount: data.price,
-        availableBanks: "null",
-        availableretail: "null",
-        expiredAt: new Date()
+        availableBanks: 7140322355,
+        availableretail: "BCA",
+        expiredAt: moment().add(12, 'hours').toISOString()
       })
       .then((dataPayment) => {
         const newId = 'T' + '-' + decoded.id + ('-') + dataPayment.id
@@ -107,7 +107,7 @@ module.exports = {
       })
     })
     .catch(error => console.log(error));
-  }
+  },
 
   bcaWallet(req, res) {
     const decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
@@ -123,13 +123,13 @@ module.exports = {
       if (req.body.amount >= 200000) {
         console.log('create invoice')
         db.payment.create({
-          invoiceId: 0,
-          xenditId: 'null',
+          invoiceId: 'BCA',
+          xenditId: 'BCA',
           status: "PENDING",
           amount: req.body.amount,
-          availableBanks: "BCA",
-          availableretail: "null",
-          expiredAt: new Date()
+          availableBanks: 7140322355,
+          availableretail: "BCA",
+          expiredAt: moment().add(12, 'hours').toISOString()
         })
         .then(dataResponse => {
           const newId = 'W' + '-' +decoded.id + '-' + dataResponse.id

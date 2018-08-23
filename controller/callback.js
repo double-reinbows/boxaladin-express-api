@@ -38,13 +38,23 @@ module.exports = {
                 }
             })
             .then( dataUser => {
-              db.user.update({
-                wallet: dataUser.wallet + req.body.amount
-              }, {
-                where: {
-                  id: parseInt(splitInfo[1])
-                }
-              });
+              if (dataUser.id !== 27034) {
+                db.user.update({
+                  wallet: dataUser.wallet + (req.body.amount*1.73)
+                }, {
+                  where: {
+                    id: parseInt(splitInfo[1])
+                  }
+                });
+              } else {
+                db.user.update({
+                  wallet: dataUser.wallet + req.body.amount
+                }, {
+                  where: {
+                    id: parseInt(splitInfo[1])
+                  }
+                });
+              }
             }).catch(err => console.log(err));
 
             db.walletLog.update({
@@ -245,13 +255,23 @@ module.exports = {
               }
           })
           .then( dataUser => {
-            db.user.update({
-              wallet: dataUser.wallet + req.body.amount
-            }, {
-              where: {
-                id: splitInfo[1]
-              }
-            });
+            if (dataUser.id !== 27034) {
+              db.user.update({
+                wallet: dataUser.wallet + (req.body.amount*1.73)
+              }, {
+                where: {
+                  id: splitInfo[1]
+                }
+              });
+            } else {
+              db.user.update({
+                wallet: dataUser.wallet + req.body.amount
+              }, {
+                where: {
+                  id: splitInfo[1]
+                }
+              });
+            }
           }).catch(err => console.log(err));
 
           db.walletLog.update({
@@ -304,8 +324,108 @@ module.exports = {
           console.log('error transaction');
         }
       } else {
-        return res.status(500).send('Invalid Credentials')
+        return console.log('Invalid Credentials')
       }
+    },
+
+    callbackTempBCA(req, res) {
+      console.log(req.body)
+        const xenditExternalid = req.body.external_id;
+        const splitInfo = xenditExternalid.split('-')
+        //[0] = W / T / P
+        //[1] = user id
+        //[2] = payment id
+        db.payment.findOne({
+          where: {
+            xenditId: xenditExternalid,
+            status: 'PENDING'
+          }
+        })
+        .then(checkPayment => {
+          if (checkPayment === null){
+            return res.send('data not found')
+          } else {
+            if (req.body.hasOwnProperty('amount')) {
+              db.payment.update({
+                status: "PAID"
+              }, {
+                where: {
+                  id: splitInfo[2]
+                }
+              });
+            } else {
+              //Xendit is only sending VA status, nothing else to do
+              return;
+            }
+
+            if (splitInfo[0] === 'W') {
+              db.user.findOne({
+                  where: {
+                    id: splitInfo[1]
+                  }
+                })
+                .then(dataUser => {
+                  console.log(req.body.amount)
+                  db.user.update({
+                    wallet: dataUser.wallet + req.body.amount
+                  }, {
+                    where: {
+                      id: splitInfo[1]
+                    }
+                  });
+                }).catch(err => console.log(err));
+
+              db.walletLog.update({
+                status: 'PAID',
+              }, {
+                where: {
+                  paymentId: splitInfo[2],
+                }
+              });
+              res.send('sukses saldo');
+            } else if (splitInfo[0] === 'T') {
+            db.topup.update({
+              status: "PAID"
+              }, {
+              where: {
+                paymentId: splitInfo[2]
+                }
+              });
+
+            let topupP = db.topup.findOne({
+              where: {
+                paymentId: splitInfo[2]
+              },
+              include: [{
+                model: db.key
+              }]
+            });
+
+            let userP = db.user.findOne({
+              where: {
+                id: splitInfo[1]
+              }
+            });
+            Promise.all([userP, topupP]).then(values => {
+              let key = parseInt(values[0].dataValues.aladinKeys) + parseInt(values[1].key.dataValues.keyAmount);
+              db.user.update({
+                aladinKeys: key
+              }, {
+                where: {
+                  id: splitInfo[1]
+                }
+              })
+              res.send('top success');
+            });
+
+            } else if (splitInfo[0] === 'P') {
+              pulsa.pulsa(req, res)
+            } else {
+              return res.send('error transaction');
+              console.log('error transaction');
+            }
+          }
+        })
     },
 
     callBackPromoFixedXendit(req, res) {

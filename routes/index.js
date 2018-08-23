@@ -3,6 +3,7 @@ const router = express.Router();
 
 const jwt = require('jsonwebtoken')
 
+const bcaController = require('../controller/bcaController')
 const paymentController = require('../controller/paymentController')
 const callbackController = require('../controller/callback')
 const pulsaController = require('../controller/pulsa')
@@ -90,7 +91,14 @@ router.post('/walletpulsa',  walletController.walletBuyPulsa)
 router.post('/v2/walletpulsa',  walletController.walletBuyPulsaV2)
 router.get('/walletstatus', walletController.walletStatus)
 router.get('/walletstatus/:id', walletController.byId)
+router.post('/callbacktempbca', auth.isSuperadmin, callbackController.callbackTempBCA)
 // ---------------------------------------
+
+//-------------------bca routes-------------------------
+router.post('/bca/pulsa', bcaController.bcaInvoice)
+router.post('/bca/key', bcaController.bcaKey)
+router.post('/bca/wallet',  bcaController.bcaWallet)
+//--------------------------------------------
 
 router.post('/topupKey', aladinkeyController.topUpKeys)
 router.post('/topupva', aladinkeyController.createVirtualAccount )
@@ -132,7 +140,6 @@ router.delete('/api/price/:id', auth.isLogin, auth.isSuperadmin, priceController
 router.get('/api/product/filter', productController.filter);
 router.get('/api/product', productController.list);
 router.get('/api/product/:id', productController.listProductActive)
-// router.get('/api/product/:id', productController.retrieve);
 router.post('/api/product', auth.isLogin, auth.isSuperadmin, productController.create);
 router.put('/api/product/:id', auth.isLogin, auth.isSuperadmin, productController.update);
 router.delete('/api/product/:id', auth.isLogin, auth.isSuperadmin, productController.destroy);
