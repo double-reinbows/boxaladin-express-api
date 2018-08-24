@@ -95,7 +95,8 @@ router.post('/callbacktempbca', auth.isSuperadmin, callbackController.callbackTe
 // ---------------------------------------
 
 //-------------------bca routes-------------------------
-router.post('/bca/pulsa', bcaController.bcaInvoice)
+router.post('/bca/pulsa', bcaController.bcaPulsaInvoice)
+router.post('/bca/paketdata', bcaController.bcaPaketdataInvoice)
 router.post('/bca/key', bcaController.bcaKey)
 router.post('/bca/wallet',  bcaController.bcaWallet)
 //--------------------------------------------

@@ -5,10 +5,66 @@ const axios = require('axios')
 const db = require('../models')
 const moment = require('moment')
 const bankCode = require('../helpers/bankCode')
+const product = require('../helpers/findProduct')
 
 
 module.exports = {
-  bcaInvoice(req, res) {
+  bcaPulsaInvoice(req, res) {
+    const decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
+    db.payment.create({
+      invoiceId: 'BCA',
+      xenditId: 'BCA',
+      status: "PENDING",
+      amount: req.body.amount,
+      availableBanks: 7140322355,
+      availableretail: "BCA",
+      expiredAt: moment().add(12, 'hours').toISOString()
+      })
+      .then(async dataPayment => {
+        const newId = 'P' + '-' + decoded.id + '-' + dataPayment.id
+        const check = await product.findProductBought(req, res)
+        if (check.message === 'product not active'){
+          return res.send('product not active')
+        } else if (check.message === 'product not found'){
+          return res.send('product not found')
+        }
+        const productData = check.product
+        const price = await db.pulsaPrice.findOne({
+          where: {
+            id: req.body.priceId
+          }
+        })
+        db.pulsaPrice.update({
+          unpaid: price.unpaid + 1,
+          noInvoice: price.noInvoice - 1
+        },{
+          where: {
+            id: req.body.priceId
+          }
+        })
+
+        db.transaction.create({
+          paymentId: dataPayment.id,
+          productId: productData.id,
+          userId: decoded.id,
+          pulsaId: newId,
+          number: req.body.phoneNumber,
+          status: "PENDING",
+          aladinPrice: req.body.amount,
+          description: productData.productName,
+          virtualId: 0
+        })
+        .then(dataFinal => {
+          res.send({
+            dataFinal,
+            status: 200
+          })
+        })
+      })
+      .catch(err => console.log(err))
+  },
+
+  bcaPaketdataInvoice(req, res) {
     const decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
     db.payment.create({
       invoiceId: 'BCA',
