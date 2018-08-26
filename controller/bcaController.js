@@ -22,6 +22,13 @@ module.exports = {
       })
       .then(async dataPayment => {
         const newId = 'P' + '-' + decoded.id + '-' + dataPayment.id
+        db.payment.update({
+            xenditId: newId
+          }, {
+          where: {
+            id: dataPayment.id
+          }
+        });
         const check = await product.findProductBought(req, res)
         if (check.message === 'product not active'){
           return res.send('product not active')
