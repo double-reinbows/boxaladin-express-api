@@ -9,7 +9,7 @@ const product = require('../helpers/findProduct')
 
 
 module.exports = {
-  bcaPulsaInvoice(req, res) {
+  async bcaPulsaInvoice(req, res){
     const decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
     const check = await product.findProductBought(req, res)
     if (check.message === 'product not active'){

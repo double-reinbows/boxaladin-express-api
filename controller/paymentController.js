@@ -87,7 +87,7 @@ module.exports = {
     .catch(err => console.log(err))
   },
 
-  createInvoiceV2(req, res) {
+  async createInvoiceV2(req, res) {
     const decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
     const check = await product.findProductBought(req, res)
     if (check.message === 'product not active'){
@@ -319,7 +319,7 @@ module.exports = {
     .catch(err => console.log(err));
   },
 
-  createVirtualAccountV2(req, res) {
+  async createVirtualAccountV2(req, res) {
     const isodate = moment().utcOffset(0).add(12, 'hours').toISOString()
     const decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
     const check = await product.findProductBought(req, res)

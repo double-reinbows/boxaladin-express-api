@@ -389,7 +389,7 @@ module.exports = {
     .catch(err => console.log(err))
   },
 
-  walletBuyPulsaV2(req, res) {
+  async walletBuyPulsaV2(req, res) {
     const decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
     const check = await product.findProductBought(req, res)
     if (check.message === 'product not active'){
