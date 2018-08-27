@@ -367,39 +367,40 @@ exports.oldUserVerify = (req, res) => {
       where: {
         number: req.body.phonenumber,
         verified: false,
-        userId: dataUser.id
+        userId: dataUser.id,
+        primary: true,
       }
     })
     .then(result => {
-      if (result === null){
-        res.send({
+      if (!result){ //can't find appropriate no. to verify
+        return res.send({
           message: 'Phone Terverifikasi'
         })
-      } else{
-        if (result.otp == req.body.otp) {
-          db.phonenumber.update({
-            verified: true,
-            primary: true
-          }, {
-            where: {
-              id: result.id
-            }
-          })
-          .then((finalResult) => {
-            res.send({
-              message: 'phone verified',
-            })
-          })
-          .catch(error =>res.status(400).send(error));
-        } else {
-          res.send({
-            message: 'incorrect otp'
-          })
-          .catch(err => console.log(err))
-        }
+      }
+      if (result.otp == req.body.otp) { //correct OTP
+        db.phonenumber.update({
+          verified: true,
+        }, {
+          where: {
+            id: result.id
+          }
+        })
+        db.user.update({
+          aladinKeys: dataUser.aladinKeys + 5
+        }, {
+          where: {
+            id: dataUser.id
+          }
+        })
+        return res.send({
+          message: 'phone verified',
+        })
+      } else { //incorrect OTP
+        return res.send({
+          message: 'incorrect otp'
+        })
       }
     })
-    .catch(err => console.log(err))
   })
   .catch(err => console.log(err))
 }
