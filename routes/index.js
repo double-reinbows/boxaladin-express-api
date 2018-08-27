@@ -61,6 +61,7 @@ router.post('/serviceemail', service.sendEmailService)
 router.get("/phoneNumbers", phoneCtrl.getPhoneByUser);
 router.get("/userwithphone/:id", phoneCtrl.getAllPhone);
 router.post('/phonenumber' , phoneCtrl.postPhoneNumber)
+router.post('/phonenumber/primary' , phoneCtrl.postPrimaryPhoneNumber)
 router.put('/phone/:id', phoneHelper.checkDuplicate, phoneCtrl.changePhone)
 router.delete('/phone/:id', phoneCtrl.removePhone)
 

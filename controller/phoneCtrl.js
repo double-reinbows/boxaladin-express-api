@@ -404,3 +404,52 @@ exports.oldUserVerify = (req, res) => {
   })
   .catch(err => console.log(err))
 }
+
+exports.postPrimaryPhoneNumber = (req, res) => {
+  var decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
+  var splitNumber = req.body.phonenumber.split('')
+
+  if (splitNumber[0] === '0') {
+    splitNumber.splice(0, 1, '0')
+    var newNumber = splitNumber.join('')
+  } else if (splitNumber[0] + splitNumber[1] + splitNumber[2] === '+62') {
+    splitNumber.splice(0, 3, '0')
+    var newNumber = splitNumber.join('')
+  } else if (splitNumber[0] + splitNumber[1] === '62') {
+    splitNumber.splice(0, 2, '0')
+    var newNumber = splitNumber.join('')
+  } else if (splitNumber[0] === '8') {
+    splitNumber.splice(0, 0, '0')
+    var newNumber = splitNumber.join('')
+  } else if (splitNumber.length === 0) {
+    var newNumber = splitNumber.join('')
+  } else {
+    var newNumber = req.body.phonenumber.replace(/\D/g,'');
+  }
+
+  //find all primary numbers
+  db.phonenumber.findAll({
+    where: {
+      number: newNumber,
+      primary: true,
+    }
+  }).then(phoneNumbers => {
+    //Check phone numbers aren't verifieds
+    for (let i=0; i<phoneNumbers.length; i++) {
+      let phoneNumber = phoneNumbers[i].dataValues;
+      if (phoneNumber.verified === true) {
+        return res.send({
+          message: 'Hp pernah diverifikasi'
+        })
+      }
+    }
+    db.phonenumber.create({
+      userId: decoded.id,
+      number: newNumber,
+      verified: false,
+      otp: 0,
+      primary: true
+    })
+    return res.send({message: 'data added'})
+  }).catch(errCreate => console.log(errCreate))
+}
