@@ -89,6 +89,13 @@ module.exports = {
 
   createInvoiceV2(req, res) {
     const decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
+    const check = await product.findProductBought(req, res)
+    if (check.message === 'product not active'){
+      return res.send('product not active')
+    } else if (check.message === 'product not found'){
+      return res.send('product not found')
+    }
+    const productData = check.product
     db.payment.create({
       invoiceId: "null",
       xenditId: 'null',
@@ -99,14 +106,6 @@ module.exports = {
       expiredAt: new Date()
     })
     .then(async dataPayment => {
-      const newId = 'P' + '-' + decoded.id + '-' + dataPayment.id
-      const check = await product.findProductBought(req, res) //find product using brandid and priceid
-      if (check.message === 'product not active'){
-        return res.send('product not active')
-      } else if (check.message === 'product not found'){
-        return res.send('product not found')
-      }
-      const productData = check.product
       const price = await db.pulsaPrice.findOne({
         where: {
           id: req.body.priceId
@@ -323,6 +322,13 @@ module.exports = {
   createVirtualAccountV2(req, res) {
     const isodate = moment().utcOffset(0).add(12, 'hours').toISOString()
     const decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
+    const check = await product.findProductBought(req, res)
+    if (check.message === 'product not active'){
+      return res.send('product not active')
+    } else if (check.message === 'product not found'){
+      return res.send('product not found')
+    }
+    const productData = check.product
     return db.payment.create({
       invoiceId: "null",
       xenditId: 'null',
@@ -334,14 +340,6 @@ module.exports = {
     })
     .then(async dataPayment => {
       const newId = 'P' + '-' +decoded.id + '-' + dataPayment.id
-      const check = await product.findProductBought(req, res) //find product using brandid and priceid
-      if (check.message === 'product not active'){
-        return res.send('product not active')
-      } else if (check.message === 'product not found'){
-        return res.send('product not found')
-      }
-      const productData = check.product
-
       db.virtualAccount.findOne({
         where: {
           userId: decoded.id,

@@ -11,6 +11,13 @@ const product = require('../helpers/findProduct')
 module.exports = {
   bcaPulsaInvoice(req, res) {
     const decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
+    const check = await product.findProductBought(req, res)
+    if (check.message === 'product not active'){
+      return res.send('product not active')
+    } else if (check.message === 'product not found'){
+      return res.send('product not found')
+    }
+    const productData = check.product
     db.payment.create({
       invoiceId: 'BCA',
       xenditId: 'BCA',
@@ -29,13 +36,6 @@ module.exports = {
             id: dataPayment.id
           }
         });
-        const check = await product.findProductBought(req, res)
-        if (check.message === 'product not active'){
-          return res.send('product not active')
-        } else if (check.message === 'product not found'){
-          return res.send('product not found')
-        }
-        const productData = check.product
         const price = await db.pulsaPrice.findOne({
           where: {
             id: req.body.priceId

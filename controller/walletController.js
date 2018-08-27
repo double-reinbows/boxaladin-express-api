@@ -391,6 +391,13 @@ module.exports = {
 
   walletBuyPulsaV2(req, res) {
     const decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
+    const check = await product.findProductBought(req, res)
+    if (check.message === 'product not active'){
+      return res.send('product not active')
+    } else if (check.message === 'product not found'){
+      return res.send('product not found')
+    }
+    const productData = check.product
     db.aladinkeyLog.findAll({
       where: {
         userId: decoded.id,
@@ -400,8 +407,8 @@ module.exports = {
     })
     .then(dataAladinkeyLog => {
       console.log('aladinkey', dataAladinkeyLog)
-      const price = dataAladinkeyLog[0].priceAfter //[0] to take 1st row
-      if (decoded.wallet < price) {//check User has enough money in JWT
+      const price = dataAladinkeyLog[0].priceAfter
+      if (decoded.wallet < price) {
         return res.send({
           message: 'saldo tidak mencukupi',
           wallet: decoded.wallet
@@ -437,13 +444,6 @@ module.exports = {
                 id: dataPayment.id
               }
             })
-            const check = await product.findProductBought(req, res)
-            if (check.message === 'product not active'){
-              return res.send('product not active')
-            } else if (check.message === 'product not found'){
-              return res.send('product not found')
-            }
-            const productData = check.product
             return db.transaction.create({
               paymentId: dataPayment.id,
               productId: productData.id,
