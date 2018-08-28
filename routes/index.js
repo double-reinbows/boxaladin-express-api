@@ -58,12 +58,12 @@ router.get("/emailVerification", ctrl.verifyEmail);
 router.post('/resendemailverification', ctrl.resendEmailVerification)
 router.post('/serviceemail', service.sendEmailService)
 //-------------------phone routes-------------------------
-router.get("/phoneNumbers", phoneCtrl.getPhoneByUser);
-router.get("/userwithphone/:id", phoneCtrl.getAllPhone);
-router.post('/phonenumber' , phoneCtrl.postPhoneNumber)
-router.post('/phonenumber/primary' , phoneCtrl.postPrimaryPhoneNumber)
-router.put('/phone/:id', phoneHelper.checkDuplicate, phoneCtrl.changePhone)
-router.delete('/phone/:id', phoneCtrl.removePhone)
+router.get("/phoneNumbers", auth.isLogin, phoneCtrl.getPhoneByUser);
+router.get("/userwithphone/:id", auth.isLogin, phoneCtrl.getAllPhone);
+router.post('/phonenumber' , auth.isLogin, phoneCtrl.postPhoneNumber)
+router.post('/phonenumber/primary' , auth.isLogin, phoneCtrl.postPrimaryPhoneNumber)
+router.put('/phone/:id', auth.isLogin, phoneHelper.checkDuplicate, phoneCtrl.changePhone)
+router.delete('/phone/:id', auth.isLogin, phoneCtrl.removePhone)
 
 router.post("/changePrimary", phoneCtrl.changePrimary);
 router.post("/smsVerification", phoneCtrl.sendSmsVerification);

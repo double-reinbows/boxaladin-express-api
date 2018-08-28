@@ -171,33 +171,57 @@ exports.removePhone = (req, res) => {
   ))
   .catch(err => res.send(err))
 }
-
+/* 1. Check if number is even changing
+ * 2. Check if User is editing primary, if so check that nobody else has that number as primary + verified
+ * 3. If not primary then change
+ */
 exports.changePhone = (req, res) => {
+
+  var decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
   db.phonenumber.findOne({
     where: {
-      id: req.params.id
+      id: parseInt(req.params.id),
+    }
+  }).then(number => {
+    if (number.primary === true) { //user is changing primary
+      db.phonenumber.findOne({
+        where: {
+          number: req.body.phonenumber,
+          verified: true,
+          primary: true,
+        }
+      }).then(verifiedPrimary => {
+        if (!verifiedPrimary) { //requested number is safe to use
+          db.phonenumber.update({
+            number: req.body.phonenumber,
+          }, {
+            where: {
+              id: parseInt(req.params.id)
+            }
+          })
+          return res.send({
+            message: 'data changed',
+          })
+        }
+        if (verifiedPrimary.userId !== decoded.id) {
+          return res.send({message: 'Someone else has taken this number'})
+        } else if (verifiedPrimary.userId === decoded.id) {
+          return res.send({message: 'User has already verified this number'})
+        }
+      })
+    } else { //changing non-primary
+      db.phonenumber.update({ //UPDATE
+        number: req.body.phonenumber,
+      }, {
+        where: {
+          id: parseInt(req.params.id)
+        }
+      })
+      return res.send({
+        message: 'data changed',
+      })
     }
   })
-  .then(result => {
-    db.phonenumber.update({
-      number: req.body.phonenumber || result.number,
-      verified: req.body.verified || result.verified,
-      primary: req.body.primaryStatus || result.primaryStatus
-    }, {
-      where: {
-        id: parseInt(req.params.id)
-      }
-    })
-    .then(data => {
-      res.send(
-        // message: 'data changed',
-        // data: data
-        data.dataValues
-      )
-    })
-    .catch(err => console.log(err))
-  })
-  .catch(errChange => console.log(errChange))
 }
 
 exports.changePrimary = (req, res) => {
@@ -440,6 +464,10 @@ exports.postPrimaryPhoneNumber = (req, res) => {
       if (phoneNumber.verified === true) {
         return res.send({
           message: 'Hp pernah diverifikasi'
+        })
+      } else if (phoneNumber.userId === decoded.id) {
+        return res.send({
+          message: 'User adding duplicate primary',
         })
       }
     }
