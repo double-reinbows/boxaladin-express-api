@@ -176,13 +176,16 @@ exports.removePhone = (req, res) => {
  * 3. If not primary then change
  */
 exports.changePhone = (req, res) => {
-
+  //TODO: access phonenumbers table only ONCE
   var decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
   db.phonenumber.findOne({
     where: {
       id: parseInt(req.params.id),
     }
   }).then(number => {
+    if (number.userId !== decoded.id) {
+      return res.send({message: 'User does not own this number!'});
+    }
     if (number.primary === true) { //user is changing primary
       db.phonenumber.findOne({
         where: {
