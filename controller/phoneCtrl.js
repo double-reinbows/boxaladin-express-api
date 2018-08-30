@@ -99,7 +99,7 @@ exports.sendSmsVerification = (req, res) => {
 }
 
 exports.getPhoneByUser = (req, res) => {
-  var decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
+  const decoded = jwt.verify(req.headers.token, process.env.JWT_SECRET)
 
   db.phonenumber.findAll({
     order: [['id', 'ASC']],
@@ -107,20 +107,17 @@ exports.getPhoneByUser = (req, res) => {
       userId: decoded.id
     }
   })
-  .then(result => {
-    var dataPhoneNumbers = []
-    result.map(data => {
+  .then(async result => {
+    let dataPhoneNumbers = []
+    await result.map(data => {
       dataPhoneNumbers.push({
         id: data.id,
         userId: data.userId,
         number: data.number,
         verified: data.verified,
         primary: data.primary,
-        createdAt: data.createdAt,
-        updatedAt: data.updatedAt
       })
     })
-
     res.send({
       messsage: 'data found',
       data: dataPhoneNumbers
