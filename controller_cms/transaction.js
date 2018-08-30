@@ -130,9 +130,9 @@ module.exports = {
               xenditId: 'ADMIN',
               status: req.body.status || 'NO STATUS',
               amount: req.body.amount,
-              availableBanks: `Note : ${req.body.note ? req.body.note : 'No Note'}`,
-              expiredAt: new Date(),
-              createdAt: new Date(req.body.year, req.body.month - 1, req.body.day , req.body.hours || 7 - 7, req.body.minutes || 0, req.body.seconds || 0, 0) || new Date()
+              availableBanks: `Note : ${req.body.note ? req.body.note : 'No Note'}`
+              // expiredAt: new Date(),
+              // createdAt: new Date(req.body.year, req.body.month - 1, req.body.day , req.body.hours || 7 - 7, req.body.minutes || 0, req.body.seconds || 0, 0) || new Date()
             })
             .then(dataPayment => {
              if (req.body.amount > 0) {

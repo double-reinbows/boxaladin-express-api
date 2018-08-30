@@ -8,6 +8,7 @@ const operatorsAliases = {
 }
 const hasher = require('../helpers/aladin_hash')
 const { genRandomString } = require('../helpers/string')
+const paginate = require('express-paginate');
 
 module.exports = {
 
@@ -42,7 +43,7 @@ module.exports = {
 
       if (user == null) {
 
-        res.send({
+        return res.send({
           message: 'username or email not found'
         })
 
@@ -55,14 +56,14 @@ module.exports = {
           role: user.role,
         }, process.env.JWT_SECRET);
 
-        res.send({
+        return res.send({
           message: 'login success',
           token: token,
         })
 
       } else if (user.password.substr(6) !== hashedPass.substr(6)) {
 
-        res.send({
+        return res.send({
           message: 'password incorrect'
         })
 
@@ -91,99 +92,34 @@ module.exports = {
     })
     .catch(err => {
       console.log('ERROR CREATE USER ADMIN:', err)
-      return res.send(err)
+      res.send(err)
     })
   },
 
-  getUserWithPhone: (req, res) => {
-    model.user.findAll({
-      include: [{
-        all: true
-      }]
-    }).then(dataUser => {
-      res.send(dataUser)
-    })
-    .catch(err => res.send(err))
-  },
-
-  //   getAll: (req, res) => {
-  //     let where = {
-  //       id: {
-  //         $ne: 0
-  //       },
-  //     }
-
-  //     let order = []
-  //     let limit = req.query.limit || 50
-  //     let offset = 0
-
-  //     if (req.query.filterBy) {
-  //       where[req.query.filterBy] = req.query.filterValue
-  //     }
-
-  //     if (req.query.orderBy) {
-  //       order.push([ req.query.orderBy, req.query.orderDirection ])
-  //     }
-
-  //     if (req.query.page === null) {
-  //       req.query.page = 1
-  //     }
-
-  //     if (req.query.page > 1) {
-  //       offset = (req.query.page - 1) * limit
-  //     }
-
-  //     if (req.query.startDate && req.query.endDate) {
-  //       where.createdAt = {
-  //         $gte: new Date(req.query.startDate + '.00:00:00'),
-  //         $lte: new Date(req.query.endDate + '.23:59:59')
-  //       }
-  //     }
-
-  //     model.user.count()
-  //     .then(countResult => {
-
-  //       model.user.findAll({
-  //         where: where,
-  //         order: order,
-  //         limit: limit,
-  //         offset: offset,
-  //         include: [{
-  //           all: true
-  //         }],
-  //         // where: [{
-  //         //   primary: true
-  //         // }]
-  //       })
-  //       .then(result => {
-  //         return res.send({
-  //           data: result,
-  //           length: countResult
-  //         })
-  //       })
-  //       .catch(err => {
-  //         console.log('ERROR FIND USER:', err)
-  //         return res.send(err)
-  //       })
-
-  //     })
-  //     .catch(err => {
-  //       console.log('ERROR COUNT USER:', err)
-  //       return res.send(err)
-  //     })
-  // },
-
-  getAll: (req, res) => {
-    model.user.findAll({
-      order: [['id', 'ASC']],
+  getAll(req, res){
+    model.user.findAndCountAll({
+      limit: req.query.limit, 
+      offset: req.skip,
+      order: [
+        ['id', 'ASC']
+      ],
       include: [
-        { all: true },
+        {
+          model: model.phonenumber,
+          as: 'phonenumbers'
+        }
       ]
-    })
-    .then(dataUser => {
-      res.send(dataUser)
-    })
-    .catch(err => console.log(err))
+      })
+      .then(results => {
+        const itemCount = results.count;
+        const pageCount = Math.ceil(results.count / req.query.limit);
+        return res.send({
+          users: results.rows,
+          pageCount,
+          itemCount,
+          pages: paginate.getArrayPages(req)(5, pageCount, req.query.page)
+        });
+    }).catch(err => console.log(err))
   },
 
   findByEmail: (req, res) => {
@@ -194,7 +130,7 @@ module.exports = {
     })
     .then(dataUser => {
       if (dataUser === null) {
-        res.send({message : 'email not found'})
+        return res.send({message : 'email not found'})
       } else {
         model.phonenumber.findOne({
           where:[{
@@ -203,12 +139,12 @@ module.exports = {
         })
         .then(phoneUser => {
           if (phoneUser === null ){
-            res.send({
+            return res.send({
               message: 'null',
               user: dataUser
             })
           } else {
-            res.send({
+            return res.send({
               user: dataUser,
               phone: phoneUser
             })
@@ -236,17 +172,17 @@ module.exports = {
       .then(data => {
         console.log(data);
         if (data[0] === null) {
-          res.send({
+          return res.send({
             message: 'email not found'
           })
         } else if (data[1] === null) {
-          res.send({
+          return res.send({
             message: 'null',
             user: data[0]
           })
         } else {
           console.log(data);
-          res.send({
+          return res.send({
             user: data[0],
             phone: data[1]
           })
