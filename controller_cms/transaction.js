@@ -1,153 +1,121 @@
 const model = require('../models')
 const moment = require('moment')
+const paginate = require('express-paginate');
 
 module.exports = {
-
-  /* function ini terima query; page, limit, orderBy, orderDirection (ASC / DESC), filterBy, filterValue,
-   * startDate (2018-03-27), endDate (2018-03-28)
-   * kalau tidak kirim query 'limit', default limitnya jadi 50
-   * CONTOH URL DARI FRONTEND:
-   * ?page=${this.state.page}&limit=${this.state.limit}&orderBy=${this.state.orederBy}&orderDirection=${this.state.orderDirection}&filterBy=${this.state.filterBy}&filterValue=${this.state.filterValue}&startDate=${this.state.startDate}&endDate=${this.state.endDate}
-   */
-  all: (req, res) => {
-    let where = {
-      paymentId: {
-        $ne: 0
+  allv2(req, res){
+    model.transaction.findAndCountAll({
+      limit: req.query.limit, 
+      offset: req.skip,
+      order: [
+        ['id', 'DESC']
+      ],
+      where: {
+        pulsaId: {'$ne': 'null' }
       },
-    }
-
-    let order = []
-    let limit = req.query.limit || 50
-    let offset = 0
-
-    if (req.query.filterBy) {
-      where[req.query.filterBy] = req.query.filterValue
-    }
-
-    if (req.query.orderBy) {
-      order.push([req.query.orderBy, req.query.orderDirection])
-    }
-
-    if (req.query.page === null) {
-      req.query.page = 1
-    }
-
-    if (req.query.page > 1) {
-      offset = (req.query.page - 1) * limit
-    }
-
-    if (req.query.startDate && req.query.endDate) {
-      where.createdAt = {
-        $gte: new Date(req.query.startDate + '.00:00:00'),
-        $lte: new Date(req.query.endDate + '.23:59:59')
-      }
-    }
-
-        model.transaction.findAll({
-             where,
-             order,
-             limit,
-             offset,
-            include: [{
-              all: true
-            }]
-          })
-          .then(result => {
-            return res.send({
-              data: result,
-              // length: result.length()
-            })
-          })
-          .catch(err => {
-            console.log('ERROR FIND TRANSACTION:', err)
-            return res.send(err)
-          })
-      .catch(err => {
-        console.log('ERROR COUNT TRANSACTION:', err)
-        return res.send(err)
+      include: [
+        {model: model.user},
+        {model: model.payment}
+      ]
       })
+      .then(results => {
+        const itemCount = results.count;
+        const pageCount = Math.ceil(results.count / req.query.limit);
+        return res.send({
+          transaction: results.rows,
+          pageCount,
+          itemCount,
+          pages: paginate.getArrayPages(req)(5, pageCount, req.query.page)
+        });
+    }).catch(err => console.log(err))
   },
 
-  // function ini terima query; page, limit, orderBy, orderDirection (ASC / DESC), filterBy, filterValue,
-  // startDate (2018-03-27), endDate (2018-03-28)
-
-  // kalau tidak kirim query 'limit', default limitnya jadi 50
-
-  // CONTOH URL DARI FRONTEND:
-  // ?page=${this.state.page}&limit=${this.state.limit}&orderBy=${this.state.orederBy}&orderDirection=${this.state.orderDirection}&filterBy=${this.state.filterBy}&filterValue=${this.state.filterValue}&startDate=${this.state.startDate}&endDate=${this.state.endDate}
-  allFree: (req, res) => {
-    console.log('--- QUERY --- FREE:', req.query)
-
-    let where = {
-      $or: [{
-          paymentId: {
-            $eq: 0
+  allFree(req, res) {
+    model.transaction.findAndCountAll({
+      limit: req.query.limit, 
+      offset: req.skip,
+      order: [
+        ['id', 'DESC']
+      ],
+      where: {
+        $or: [{
+            paymentId: {
+              $eq: 0
+            }
+          },
+          {
+            description: 'FREE'
           }
-        },
-        {
-          description: 'FREE'
-        }
+        ]
+      },
+      include: [
+        {model: model.user},
       ]
-    }
-
-    let order = []
-    let limit = req.query.limit || 50
-    let offset = 0
-
-    if (req.query.filterBy) {
-      where[req.query.filterBy] = req.query.filterValue
-    }
-
-    if (req.query.orderBy) {
-      order.push([req.query.orderBy, req.query.orderDirection])
-    }
-
-    if (req.query.page === null) {
-      req.query.page = 1
-    }
-
-    if (req.query.page > 1) {
-      offset = (req.query.page - 1) * limit
-    }
-
-    if (req.query.startDate && req.query.endDate) {
-      where.createdAt = {
-        $gte: new Date(req.query.startDate + '.00:00:00'),
-        $lte: new Date(req.query.endDate + '.23:59:59')
-      }
-    }
-
-    model.transaction.findAll({
-        where,
-        order,
-        limit,
-        offset,
-        include: [{
-          all: true
-        }]
       })
-      .then(result => {
-        return res.send(result)
-      })
-      .catch(err => {
-        console.log('ERROR FIND TRANSACTION:', err)
-        return res.send(err)
-      })
+      .then(results => {
+        const itemCount = results.count;
+        const pageCount = Math.ceil(results.count / req.query.limit);
+        return res.send({
+          free: results.rows,
+          pageCount,
+          itemCount,
+          pages: paginate.getArrayPages(req)(5, pageCount, req.query.page)
+        });
+    }).catch(err => console.log(err))
   },
 
   allTopup: (req, res) => {
-    model.topup.findAll({
-        include: {
-          all: true
-        }
-      })
-      .then(result => {
-        return res.send(result)
-      })
-      .catch(err => {
-        console.log('ERROR FIND TOPUPS:', err)
-        return res.send(err)
-      })
+    model.topup.findAndCountAll({
+      limit: req.query.limit, 
+      offset: req.skip,
+      order: [
+        ['id', 'DESC']
+      ],
+      where: {
+        xenditId: {'$ne': 'null' }
+      },
+      include: [
+        {model: model.user},
+        {model: model.key},
+        {model: model.payment}
+      ]
+    })
+    .then(results => {
+      const itemCount = results.count;
+      const pageCount = Math.ceil(results.count / req.query.limit);
+      return res.send({
+        topup: results.rows,
+        pageCount,
+        itemCount,
+        pages: paginate.getArrayPages(req)(5, pageCount, req.query.page)
+      });
+    })
+    .catch(err => console.log(err))
+  },
+
+  allWalletlog: (req, res) => {
+    model.walletLog.findAndCountAll({
+      limit: req.query.limit, 
+      offset: req.skip,
+      order: [
+        ['id', 'DESC']
+      ],
+      include: [
+        {model: model.user},
+        {model: model.payment}
+      ]
+    })
+    .then(results => {
+      const itemCount = results.count;
+      const pageCount = Math.ceil(results.count / req.query.limit);
+      return res.send({
+        wallet: results.rows,
+        pageCount,
+        itemCount,
+        pages: paginate.getArrayPages(req)(5, pageCount, req.query.page)
+      });
+    })
+    .catch(err => console.log(err))
   },
 
   updateUserWallet: (req, res) => {
@@ -183,10 +151,10 @@ module.exports = {
                         id: req.params.id
                       }
                     })
-                    res.send('amount update')
+                    return res.send('amount update')
                   })
               } else {
-                res.send('nothing updated')
+                return res.send('nothing updated')
               }
             })
         })
@@ -228,9 +196,9 @@ module.exports = {
                   }
                 })
                 if (req.body.aladinkeys > 0 ) {
-                  res.send('aladin keys update')
+                  return res.send('aladin keys update')
                 } else {
-                  res.send('nothing update')
+                  return res.send('nothing update')
                 }
               })
               .catch(err => {

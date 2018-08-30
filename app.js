@@ -5,6 +5,7 @@ var logger = require('morgan');
 var cors = require('cors')
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+const paginate = require('express-paginate');
 var nodeEnv = process.env.NODE_ENV;
 if (nodeEnv === 'development') {
   var envPath = path.resolve('.env.dev');
@@ -20,7 +21,7 @@ var firebase = require('firebase')
 var admin = require("firebase-admin")
 var xmlparser = require('express-xml-bodyparser')
 const cron = require("node-cron");
-const bca = require("./controller/bcaCron")
+const bcaCron = require("./controller/bcaCron")
 
 var auth = require("./helpers/auth")
 
@@ -37,7 +38,7 @@ var config = {
 };
 firebase.initializeApp(config);
 
-// cron.schedule("* * * * *", bca.bcaData);
+// cron.schedule("* * * * * *", bcaCron.updatePaymentBca);
 
 var index = require('./routes/index');
 var users = require('./routes/users');
@@ -45,8 +46,8 @@ var win = require('./routes/win');
 var reward = require('./routes/reward');
 var claim = require('./routes/claim');
 var admin = require('./routes/admin');
-// var lose = require('./routes/gamecount');
-var cms = require('./routes/cms');
+// var bca = require('./routes/bcaRoute')
+// var exportPhoneNumber = require('./routes/exportPhoneNumber')
 
 var app = express();
 app.use(cors())
@@ -64,7 +65,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(xmlparser());
 app.use(bodyParser.text());
-
+app.use(paginate.middleware(50, 50));
 
 app.use('/', index);
 app.use('/users', users);
@@ -72,8 +73,8 @@ app.use('/win', win);
 app.use('/reward', reward);
 app.use('/claim',  claim);
 app.use('/admin',  admin);
-// app.use('/lose',  lose);
-app.use('/cms', cms);
+// app.use('/bca', bca);
+// app.use('/exportPhoneNumber', exportPhoneNumber)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
