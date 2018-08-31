@@ -119,92 +119,90 @@ module.exports = {
   },
 
   updateUserWallet: (req, res) => {
-      model.user.findOne({
-          where: {
-            id: req.params.id
-          },
+  model.user.findOne({
+      where: {
+        id: req.params.id
+      },
+    })
+    .then(dataUser => {
+      if (req.body.amount > 0) {
+      return model.payment.create({
+        invoiceId: dataUser.id,
+        xenditId: 'ADMIN',
+        status: req.body.status || 'NO STATUS',
+        amount: req.body.amount,
+        availableBanks: `Note : ${req.body.note ? req.body.note : 'No Note'}`,
+      })
+      .then(dataPayment => {
+        return model.walletLog.create({
+          userId: dataUser.id,
+          paymentId: dataPayment.id,
+          virtualId: 0,
+          amount: dataPayment.amount,
+          status: 'PAID'
         })
-        .then(dataUser => {
-          model.payment.create({
-              invoiceId: dataUser.id,
-              xenditId: 'ADMIN',
-              status: req.body.status || 'NO STATUS',
-              amount: req.body.amount,
-              availableBanks: `Note : ${req.body.note ? req.body.note : 'No Note'}`
-              // expiredAt: new Date(),
-              // createdAt: new Date(req.body.year, req.body.month - 1, req.body.day , req.body.hours || 7 - 7, req.body.minutes || 0, req.body.seconds || 0, 0) || new Date()
-            })
-            .then(dataPayment => {
-             if (req.body.amount > 0) {
-                model.walletLog.create({
-                    userId: dataUser.id,
-                    paymentId: dataPayment.id,
-                    virtualId: 0,
-                    amount: dataPayment.amount,
-                    status: 'PAID'
-                  })
-                  .then(dataWalletlog => {
-                    model.user.update({
-                      wallet: parseInt(dataUser.wallet) + parseInt(dataWalletlog.amount) || dataUser.wallet
-                    }, {
-                      where: {
-                        id: req.params.id
-                      }
-                    })
-                    return res.send('amount update')
-                  })
-              } else {
-                return res.send('nothing updated')
-              }
-            })
+        .then(dataWalletlog => {
+          model.user.update({
+            wallet: parseInt(dataUser.wallet) + parseInt(dataWalletlog.amount)
+          }, {
+            where: {
+              id: req.params.id
+            }
+          })
+          return res.send('amount update')
         })
-        .catch(err => {
-          console.log(err);
-        })
+      })
+      } else {
+        return res.send('nothing updated')
+      }
+    })
+    .catch(err => {
+      console.log(err);
+    })
   },
 
   updateAladinKeys: (req, res) => {
     model.user.findOne({
-        where: {
-          id: req.params.id
-        },
+      where: {
+        id: req.params.id
+      },
+    })
+    .then(dataUser => {
+      model.payment.create({
+        invoiceId: dataUser.id,
+        xenditId: 'ADMIN',
+        status: 'UPDATE Aladin Keys',
+        amount: 0,
+        availableBanks: `Note : ${req.body.note ? req.body.note : 'No Note'}`,
+        expiredAt: new Date()
       })
-      .then(dataUser => {
-        model.payment.create({
-            invoiceId: dataUser.id,
-            xenditId: 'ADMIN',
-            status: 'UPDATE Aladin Keys',
-            amount: 0,
-            availableBanks: `Note : ${req.body.note ? req.body.note : 'No Note'}`,
-            expiredAt: new Date()
+      .then(dataPayment => {
+        model.topup.create({
+          userId: dataUser.id,
+          keyId: 5,
+          paymentId: dataPayment.id,
+          xenditId: `ADMIN ${req.body.aladinkeys}`,
+          status: `ADMIN`,
+          virtualId: 0
+        })
+        .then(data => {
+          model.user.update({
+            aladinKeys: parseInt(dataUser.aladinKeys) + parseInt(req.body.aladinkeys) || dataUser.aladinKeys,
+          }, {
+            where: {
+              id: req.params.id
+            }
           })
-          .then(dataPayment => {
-            model.topup.create({
-                userId: dataUser.id,
-                keyId: 5,
-                paymentId: dataPayment.id,
-                xenditId: `ADMIN ${req.body.aladinkeys}`,
-                status: `ADMIN`,
-                virtualId: 0
-              })
-              .then(data => {
-                model.user.update({
-                  aladinKeys: parseInt(dataUser.aladinKeys) + parseInt(req.body.aladinkeys) || dataUser.aladinKeys,
-                }, {
-                  where: {
-                    id: req.params.id
-                  }
-                })
-                if (req.body.aladinkeys > 0 ) {
-                  return res.send('aladin keys update')
-                } else {
-                  return res.send('nothing update')
-                }
-              })
-              .catch(err => {
-                console.log(err);
-              })
-          })
+          if (req.body.aladinkeys > 0 ) {
+            return res.send('aladin keys update')
+          } else {
+            return res.send('nothing update')
+          }
+        })
+        .catch(err => {
+          console.log(err);
+        })
       })
+    })
   }
 }

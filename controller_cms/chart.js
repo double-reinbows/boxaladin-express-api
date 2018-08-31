@@ -6,7 +6,7 @@ module.exports = {
     // month = YYYY-MM
     // year = YYYY
   chartAllTransaction: (req, res) => {
-    db.sequelize.query(`select to_char(transactions."updatedAt", '${req.body.time}') "date", count(*) from transactions group by "date" order by date ASC LIMIT 500`, {
+    db.sequelize.query(`select to_char(transactions."updatedAt", '${req.body.time || "YYYY-MM"}') "date", count(*) from transactions group by "date" order by date ASC LIMIT 500`, {
       model: db.transaction,
     })
       .then(data => {
